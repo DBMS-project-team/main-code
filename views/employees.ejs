@@ -1,0 +1,27 @@
+<div class="container-fluid p-0">
+    <div class="card">
+        <div class="card-header">
+            <h5>Employees Details</h5>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Date of Birth</th>
+                    <th>Martial Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% employees.forEach(function(emp){ %>
+                    <tr>
+                        <td>
+                            <img src="img/avatars/avatar-5.jpg" width="48" height="48" class="rounded-circle mr-2" alt="Avatar"> <%= emp.firstname + " " + emp.lastname  %>
+                        </td>
+                        <td><%= emp.birthdate %></td>
+                        <td><%= emp.martial_status %></td>
+                    </tr>
+                <% }) %> 
+            </tbody>
+        </table>
+    </div>
+</div>

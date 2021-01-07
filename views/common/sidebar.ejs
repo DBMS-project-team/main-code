@@ -1,0 +1,108 @@
+<% var menus = [
+    {
+        title: "Dashboard",
+        href: "#/",
+        icon: "sliders",
+        child: false
+    },
+    {
+        title: "Profile",
+        href: "#/profile",
+        icon: "user",
+        child: false
+    },
+    {
+        title: "Employees",
+        href: "#/employees",
+        icon: "users",
+        child: false
+    },
+    {
+        title: "Settings",
+        href: "#/settings",
+        icon: "settings",
+        child: false
+    },
+    {
+        title: "Invoice",
+        href: "/",
+        icon: "credit-card",
+        child: false
+    },
+    {
+        title: "Leave",
+        href: "#/leave",
+        icon: "calendar",
+        child: false
+    },
+    {
+        title: "Auth",
+        href: "auth",
+        icon: "users",
+        child: [
+            {
+                title: "Sign In",
+                href: "signin"
+            },
+            {
+                title: "Sign Up",
+                href: "/signup"
+            }
+        ]
+    }
+];
+%>
+<nav id="sidebar" class="sidebar">
+    <div class="sidebar-content js-simplebar">
+        <a class="sidebar-brand" href="index.html">
+            <span class="align-middle">Jupiter Apparels</span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li class="sidebar-header">
+                Pages
+            </li>
+
+            <% menus.forEach(function(menu){ %>
+                <li class="sidebar-item">
+                    <a href="<%= menu.child ? "#"+menu.href : menu.href %>" data-toggle="<%= menu.child ? "collapse" : '' %>" class="sidebar-link <%= menu.child ? "collapsed" : "" %>">
+                        <i class="align-middle" data-feather="<%= menu.icon %>"></i> <span class="align-middle"><%= menu.title %></span>
+                    </a>
+                    <% if ( menu.child ) { %>
+                        <ul id="<%= menu.href %>" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
+                            <% menu.child.forEach(function(item){ %>
+                                <li class="sidebar-item"><a class="sidebar-link" href="<%= item.href %>"><%= item.title %></a></li>
+                            <% }) %>
+                        </ul>
+                    <% } %>
+                </li>
+            <% }) %> 
+
+            <li class="sidebar-header">
+                Plugins & Addons
+            </li>
+
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="charts-chartjs.html">
+      <i class="align-middle" data-feather="bar-chart-2"></i> <span class="align-middle">Charts</span>
+    </a>
+            </li>
+
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="maps-google.html">
+      <i class="align-middle" data-feather="map"></i> <span class="align-middle">Maps</span>
+    </a>
+            </li>
+        </ul>
+
+        <!--div class="sidebar-cta">
+            <div class="sidebar-cta-content">
+                <strong class="d-inline-block mb-2">Upgrade to Pro</strong>
+                <div class="mb-3 text-sm">
+                    Are you looking for more components? Check out our premium version.
+                </div>
+                <a href="https://adminkit.io/pricing" target="_blank" class="btn btn-primary btn-block">Upgrade to Pro</a>
+            </div>
+        </div-->
+    </div>
+</nav>
