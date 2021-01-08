@@ -47,6 +47,9 @@
         <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
         <script src='https://unpkg.com/react-router-dom@5.0.0/umd/react-router-dom.min.js'></script>
         <script src='https://unpkg.com/babel-standalone@6.26.0/babel.js'></script>
+        
+        <!-- jquery-->
+        <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 
         <script type='text/babel'>
             const Link = ReactRouterDOM.Link;
@@ -76,6 +79,7 @@
                         }
                         
                     }
+                    after_pageload();
                 });
 
                 const [items, setItems] = useState([]);
@@ -88,16 +92,43 @@
                     });
                     setItems(items);
                 };
+
+                const refresh = () => {
+                    // it re-renders the component
+                    console.log('failed');
+                    setItems({});
+                }
                 
                 return (
-                    <div dangerouslySetInnerHTML={{__html: items}}>
-                    </div>
+                    <React.Fragment>
+                        <div dangerouslySetInnerHTML={{__html: items}}/>
+                        <input type="hidden" id="root_refresher" onClick={refresh} value="0"/>
+                    </React.Fragment>
                 );
             }
             const Login = () => <h1>Login</h1>
             const Register = () => <h1>Register</h1>
     
-            ReactDOM.render(<App />, document.querySelector('#root'));
+            const rendered = ReactDOM.render(<App />, document.querySelector('#root'));
+
+        </script>
+        <script>
+            const after_pageload = _ => {
+                const forms = $('#root form');
+                forms.each( function() {
+                    $(this).unbind('submit').submit(e=>{
+                        form = $(this);
+                        e.preventDefault();
+                        var callback = (data)=>{
+                            $('#root_refresher').val('1');
+                        };
+                        if(typeof form.attr('after_submit') !== 'undefined')callback = window[form.attr('after_submit')];
+                        $.post( form.attr('action'), form.serializeArray()).done( callback ).fail(_ => {
+                            $('#root_refresher').click();
+                        });
+                    })
+                })
+            }
         </script>
 
     </body>
