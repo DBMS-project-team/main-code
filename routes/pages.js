@@ -38,7 +38,18 @@ router.get('/employees/categories', (req, res)=>{
                 res.render('categories', {empStatusRes: res_1, jobTitleRes: res_2, payGradesRes: res_3});
         }
     })
-})
+});
+
+router.get('/departments', (req, res)=>{
+    db.query("select * from departments", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            if( result.length > 0 ){
+                res.render('departments', {departments: result});
+            }
+        }
+    })
+});
 
 router.get('/settings', (req, res)=>{
     res.render('settings');
