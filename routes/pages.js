@@ -27,6 +27,19 @@ router.get('/employees', (req, res)=>{
         }
     })
 });
+
+router.get('/employees/categories', (req, res)=>{
+    db.query("select * from employment_statuses; select * from job_titles; select * from pay_grades" , (error, data)=>{
+        if(error) console.log('mysql error', error);
+        if(!error) {
+                var res_1=data[0]
+                var res_2=data[1]
+                var res_3=data[2]
+                res.render('categories', {empStatusRes: res_1, jobTitleRes: res_2, payGradesRes: res_3});
+        }
+    })
+})
+
 router.get('/settings', (req, res)=>{
     res.render('settings');
 });
