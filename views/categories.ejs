@@ -1,4 +1,5 @@
 <div class="container-fluid p-0">
+<<<<<<< HEAD
     <div class="card container">
         <div class="card-header">
             <h3 style="font-family:verdana;">Employment Status</h3>
@@ -21,10 +22,29 @@
                             <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
                             <a href="#"><i class="align-middle del_ele" data-feather="trash"></i></a>
                         </td>
+=======
+    <div class="card">
+        <div class="card-header">
+            <h3 style="font-family:verdana;">Employment Status</h3>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Employement Status ID</th>
+                    <th>Employment Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% empStatusRes.forEach(function(res_1){ %>
+                    <tr>
+                        <td><%= res_1.emp_status_id %></td>
+                        <td><%= res_1.emp_status %></td>
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
                     </tr>
                 <% }) %> 
             </tbody>
         </table>
+<<<<<<< HEAD
         <div class="row g-3 align-items-center">
             <form action="/auth/form_submit/add_new_emp_status">
                 <div class="row p-2">
@@ -40,20 +60,33 @@
                 </div>
             </form>
         </div>
+=======
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
     </div>
 </div>
 
 <div class="container-fluid p-0">
+<<<<<<< HEAD
     <div class="card container">
         <div class="card-header">
             <h3 style="font-family:verdana;">Job Titles</h3>
         </div>
         <table class="table table-striped table-hover" datatable="true">
+=======
+    <div class="card">
+        <div class="card-header">
+            <h3 style="font-family:verdana;">Job Titles</h3>
+        </div>
+        <table class="table table-striped table-hover">
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
             <thead>
                 <tr>
                     <th>Job Title ID</th>
                     <th>Job Title Name</th>
+<<<<<<< HEAD
                     <th>Actions</th>
+=======
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
                 </tr>
             </thead>
             <tbody>
@@ -61,14 +94,18 @@
                     <tr>
                         <td><%= res_2.job_id %></td>
                         <td><%= res_2.job_title_name %></td>
+<<<<<<< HEAD
                         <td class="table-action">
                             <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
                             <a href="#"><i class="align-middle" data-feather="trash"></i></a>
                         </td>
+=======
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
                     </tr>
                 <% }) %> 
             </tbody>
         </table>
+<<<<<<< HEAD
         <div class="row g-3 align-items-center">
             <form action="/auth/form_submit/add_new_emp_jobtitle">
                 <div class="row p-2">
@@ -84,20 +121,33 @@
                 </div>
             </form>
         </div>
+=======
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
     </div>
 </div>
 
 <div class="container-fluid p-0">
+<<<<<<< HEAD
     <div class="card container">
         <div class="card-header">
             <h3 style="font-family:verdana;">Pay Grades</h3>
         </div>
         <table class="table table-striped table-hover" datatable="true">
+=======
+    <div class="card">
+        <div class="card-header">
+            <h3 style="font-family:verdana;">Pay Grades</h3>
+        </div>
+        <table class="table table-striped table-hover">
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
             <thead>
                 <tr>
                     <th>Pay Grade Level</th>
                     <th>Pay Grade Level Title</th>
+<<<<<<< HEAD
                     <th>Actions</th>
+=======
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
                 </tr>
             </thead>
             <tbody>
@@ -105,14 +155,18 @@
                     <tr>
                         <td><%= res_3.pay_grade_level %></td>
                         <td><%= res_3.pay_grade_level_title %></td>
+<<<<<<< HEAD
                         <td class="table-action">
                             <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
                             <a href="#"><i class="align-middle" data-feather="trash"></i></a>
                         </td>
+=======
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
                     </tr>
                 <% }) %> 
             </tbody>
         </table>
+<<<<<<< HEAD
         <div class="row g-3 align-items-center">
             <form action="/auth/form_submit/add_new_paygrade">
                 <div class="row p-2">
@@ -130,3 +184,7 @@
         </div>
     </div>
 </div> 
+=======
+    </div>
+</div> 
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189

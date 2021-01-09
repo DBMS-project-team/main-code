@@ -29,7 +29,11 @@ router.get('/employees', (req, res)=>{
 });
 
 router.get('/employees/categories', (req, res)=>{
+<<<<<<< HEAD
     db.query("select * from employment_statuses; select * from job_titles; select * from pay_grades;" , (error, data)=>{
+=======
+    db.query("select * from employment_statuses; select * from job_titles; select * from pay_grades" , (error, data)=>{
+>>>>>>> 4cbcffced8006c19d0d5e094c0be8e3029f3d189
         if(error) console.log('mysql error', error);
         if(!error) {
                 var res_1=data[0]
