@@ -15,7 +15,7 @@ router.get('/profile', (req, res)=>{
     res.render('profile');
 });
 router.get('/employees', (req, res)=>{
-    db.query("select * from employees", (error, result)=>{
+    db.query("select e.firstname, e.lastname, e.birthdate, e.martial_status, d.name, p.pay_grade_level_title, u.emp_id from employees as e inner join departments as d ON e.dept_id=d.dept_id inner join pay_grades as p ON e.pay_grade_level=p.pay_grade_level left join users as u ON e.emp_id=u.emp_id", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             if( result.length > 0 ){
