@@ -9,6 +9,9 @@
                     <th>Name</th>
                     <th>Date of Birth</th>
                     <th>Martial Status</th>
+                    <th>Department</th>
+                    <th>Pay Grade</th>
+                    <th>User Account</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,6 +22,14 @@
                         </td>
                         <td><%= emp.birthdate %></td>
                         <td><%= emp.martial_status %></td>
+                        <td><%= emp.name %></td>
+                        <td><%= emp.pay_grade_level_title %></td>
+                        <td><% if (!emp.emp_id) { %>
+                                <%= 'No' %>
+                            <% }else{ %>
+                                <%= 'Yes' %>
+                            <% } %>
+                        </td>
                     </tr>
                 <% }) %> 
             </tbody>

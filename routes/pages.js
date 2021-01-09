@@ -15,7 +15,7 @@ router.get('/profile', (req, res)=>{
     res.render('profile');
 });
 router.get('/employees', (req, res)=>{
-    db.query("select * from employees", (error, result)=>{
+    db.query("select e.firstname, e.lastname, e.birthdate, e.martial_status, d.name, p.pay_grade_level_title, u.emp_id from employees as e inner join departments as d ON e.dept_id=d.dept_id inner join pay_grades as p ON e.pay_grade_level=p.pay_grade_level left join users as u ON e.emp_id=u.emp_id", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             if( result.length > 0 ){
@@ -27,6 +27,30 @@ router.get('/employees', (req, res)=>{
         }
     })
 });
+
+router.get('/employees/categories', (req, res)=>{
+    db.query("select * from employment_statuses; select * from job_titles; select * from pay_grades;" , (error, data)=>{
+        if(error) console.log('mysql error', error);
+        if(!error) {
+                var res_1=data[0]
+                var res_2=data[1]
+                var res_3=data[2]
+                res.render('categories', {empStatusRes: res_1, jobTitleRes: res_2, payGradesRes: res_3});
+        }
+    })
+});
+
+router.get('/departments', (req, res)=>{
+    db.query("select * from departments", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            if( result.length > 0 ){
+                res.render('departments', {departments: result});
+            }
+        }
+    })
+});
+
 router.get('/settings', (req, res)=>{
     res.render('settings');
 });

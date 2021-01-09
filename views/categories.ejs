@@ -1,0 +1,71 @@
+<div class="container-fluid p-0">
+    <div class="card">
+        <div class="card-header">
+            <h3 style="font-family:verdana;">Employment Status</h3>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Employement Status ID</th>
+                    <th>Employment Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% empStatusRes.forEach(function(res_1){ %>
+                    <tr>
+                        <td><%= res_1.emp_status_id %></td>
+                        <td><%= res_1.emp_status %></td>
+                    </tr>
+                <% }) %> 
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="container-fluid p-0">
+    <div class="card">
+        <div class="card-header">
+            <h3 style="font-family:verdana;">Job Titles</h3>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Job Title ID</th>
+                    <th>Job Title Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% jobTitleRes.forEach(function(res_2){ %>
+                    <tr>
+                        <td><%= res_2.job_id %></td>
+                        <td><%= res_2.job_title_name %></td>
+                    </tr>
+                <% }) %> 
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="container-fluid p-0">
+    <div class="card">
+        <div class="card-header">
+            <h3 style="font-family:verdana;">Pay Grades</h3>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Pay Grade Level</th>
+                    <th>Pay Grade Level Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% payGradesRes.forEach(function(res_3){ %>
+                    <tr>
+                        <td><%= res_3.pay_grade_level %></td>
+                        <td><%= res_3.pay_grade_level_title %></td>
+                    </tr>
+                <% }) %> 
+            </tbody>
+        </table>
+    </div>
+</div> 
