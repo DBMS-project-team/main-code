@@ -12,4 +12,13 @@ router.post('/add_new_emp_status', (req, res) => {
     })
 });
 
+router.post('/add_new_department', (req, res) => {
+    db.query('INSERT INTO `departments` SET ?', {name: req.body.value}, (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
+
 module.exports = router;
