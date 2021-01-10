@@ -1,9 +1,10 @@
 <div class="container-fluid p-0">
-    <div class="card">
+    <div class="card container">
         <div class="card-header">
             <h5>Employees Details</h5>
+            <a href="#/employees/newEmployee" class="btn btn-primary gap-2 md">Add New Employee</a>
         </div>
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" datatable="true" db_table="employment_statuses" db_primary_column="emp_status_id" edit-page="/employees/edit"> <%# edit-page format will be /employees/edit/emp_id/emp_name  %>
             <thead>
                 <tr>
                     <th>Name</th>
@@ -12,11 +13,12 @@
                     <th>Department</th>
                     <th>Pay Grade</th>
                     <th>User Account</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <% employees.forEach(function(emp){ %>
-                    <tr>
+                    <tr data-id="<%= emp.emp_id %>" show-name="<%= emp.firstname + " " + emp.lastname  %>">
                         <td>
                             <img src="img/avatars/avatar-5.jpg" width="48" height="48" class="rounded-circle mr-2" alt="Avatar"> <%= emp.firstname + " " + emp.lastname  %>
                         </td>
@@ -24,11 +26,15 @@
                         <td><%= emp.martial_status %></td>
                         <td><%= emp.name %></td>
                         <td><%= emp.pay_grade_level_title %></td>
-                        <td><% if (!emp.emp_id) { %>
+                        <td><% if (!emp.user_id) { %>
                                 <%= 'No' %>
                             <% }else{ %>
                                 <%= 'Yes' %>
                             <% } %>
+                        </td>
+                        <td class="table-action">
+                            <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
+                            <a href="#"><i class="align-middle del_ele" data-feather="trash"></i></a>
                         </td>
                     </tr>
                 <% }) %> 

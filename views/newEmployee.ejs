@@ -1,0 +1,97 @@
+<div class="content container-fluid p-0">
+    <%# JSON.stringify(result) %>
+    <div class="card">
+
+        <div class="card-header">
+            <h5 class="card-title mb-0">Employee Info</h5>
+        </div>
+
+        <div class="card-body">
+            <form after_submit="change_page" action="auth/addNewEmployee">
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputFirstName">First name</label>
+                        <input type="text"  name="firstname" class="form-control" id="inputFirstName" placeholder="First name">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputLastName">Last name</label>
+                        <input type="text"  name="lastname" class="form-control" id="inputLastName" placeholder="Last name">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputDob">Date of birth</label>
+                        <input type="date" required  name="dob" class="form-control" id="inputDob" placeholder="Date of birth">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputMstatus">Martial Status</label>
+                        <select required name="martialStatus" id="inputMstatus" class="form-control">
+                            <option value="single">Single</option>
+                            <option value="married">Married</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputDepartment">Department</label>
+                        <select required name="department" id="inputDepartment" class="form-control">
+                            <% result[0].forEach(function(dpt){ %>
+                            <option value="<%= dpt.dept_id %>"><%= dpt.name %></option>
+                            <% }) %> 
+                        </select>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputJtitle">Job Title</label>
+                        <select required name="jobTitle" id="inputJtitle" class="form-control">
+                            <% result[1].forEach(function(jt){ %>
+                                <option value="<%= jt.job_id %>"><%= jt.job_title_name %></option>
+                                <% }) %> 
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputEstatus">Employee Status</label>
+                        <select required name="empStatus" id="inputEstatus" class="form-control">
+                            <% result[2].forEach(function(emps){ %>
+                                <option value="<%= emps.emp_status_id %>"><%= emps.emp_status %></option>
+                                <% }) %> 
+                        </select>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputPglevel">Pay Grade Level</label>
+                        <select required name="payGlevel" id="inputPgl" class="form-control">
+                            <% result[3].forEach(function(pgl){ %>
+                                <option value="<%= pgl.pay_grade_level %>"><%= pgl.pay_grade_level_title %></option>
+                                <% }) %> 
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputSupervisor">Supervisor</label>
+                        <select required name="supervisor" id="inputSupervisor" class="form-control">
+                            <% result[4].forEach(function(emp){ %>
+                                <option value="<%= emp.emp_id %>"><%= emp.fullname %></option>
+                                <% }) %> 
+                        </select>
+                    </div>
+                </div>
+                    
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<script >
+    var change_page = () => {
+        location.hash = "/employees";
+    }
+</script>

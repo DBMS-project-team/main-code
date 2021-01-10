@@ -92,12 +92,13 @@
                     fetchPage();
                     if( document.querySelector('#root div').getElementsByTagName('script').length > 0 ){
                         for ( let sEle of document.querySelector('#root div').getElementsByTagName('script') ){
+                            let s = document.createElement("script");
                             if( sEle.src !== '' ){
-                                let s = document.createElement("script");
                                 s.src = sEle.src;
-                                document.querySelector('#root').appendChild(s);
+                                
                             }
-                            sEle.innerHTML !== '' ? eval( sEle.innerHTML ) : '';
+                            s.innerHTML = sEle.innerHTML;
+                            document.querySelector('#root').appendChild(s);
                         }
                         
                     }
@@ -241,8 +242,13 @@
                         });
                     })
                 });
-
-                $('table[datatable]').DataTable({buttons: ['copy', 'excel', 'pdf', 'colvis']});
+                
+                if ( $.fn.dataTable.isDataTable( 'table[datatable=true]' ) ) {
+                    table = $('table[datatable]').DataTable();
+                }
+                else {
+                    table = $('table[datatable=true]').DataTable({buttons: ['copy', 'excel', 'pdf', 'colvis']});
+                }
                 //table.buttons().container().appendTo('#datatable-buttons_wrapper .col-md-6:eq(0)');
                 feather.replace();
                 $('.del_ele').unbind('click').click(function(e){
@@ -258,15 +264,20 @@
                 });
                 $('.edit_ele').unbind('click').click( function(e){
                     e.preventDefault();
-                    var table = $(this).parents('table').attr('db_table');
-                    var column = $(this).parents('table').attr('db_primary_column');
-                    var dataid = $(this).parents('tr').attr('data-id');
-                    var value = $(this).parents('tr').children('td').eq( $(this).parents('table').attr('popup-edit') ).html();
-                    var title = $(this).parents('.card').find('.card-header h3').html();
-                    var field = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).html();
-                    var db_column = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).attr('db_column');
-                    $('#modal-btn').attr({table, column, dataid, value, title, field, db_column});
-                    $('#modal-btn').click();
+                    if( $(this).parents('table').attr('popup-edit') !== 'false' && typeof $(this).parents('table').attr('popup-edit') !== 'undefined' ){
+                        var table = $(this).parents('table').attr('db_table');
+                        var column = $(this).parents('table').attr('db_primary_column');
+                        var dataid = $(this).parents('tr').attr('data-id');
+                        var value = $(this).parents('tr').children('td').eq( $(this).parents('table').attr('popup-edit') ).html();
+                        var title = $(this).parents('.card').find('.card-header h3').html();
+                        var field = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).html();
+                        var db_column = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).attr('db_column');
+                        $('#modal-btn').attr({table, column, dataid, value, title, field, db_column});
+                        $('#modal-btn').click();
+                    }else{
+                        var edit_page = $(this).parents('table').attr('edit-page');
+                        location.hash = edit_page + ( /\/$/.test(edit_page)? '' : '/' ) + $(this).parents('tr').attr('data-id') + '/' + $(this).parents('tr').attr('show-name');
+                    }
                 })
             }
         </script>
