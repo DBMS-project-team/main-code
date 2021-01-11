@@ -7,15 +7,15 @@
         </div>
 
         <div class="card-body">
-            <form after_submit="change_page" action="auth/addNewEmployee">
+            <form after_submit="change_page" action="auth/form_submit/addNewEmployee">
                 <div class="row">
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputFirstName">First name</label>
-                        <input type="text"  name="firstname" class="form-control" id="inputFirstName" placeholder="First name">
+                        <input type="text" required name="firstname" class="form-control" id="inputFirstName" placeholder="First name">
                     </div>
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputLastName">Last name</label>
-                        <input type="text"  name="lastname" class="form-control" id="inputLastName" placeholder="Last name">
+                        <input type="text" required name="lastname" class="form-control" id="inputLastName" placeholder="Last name">
                     </div>
                 </div>
 
@@ -81,6 +81,34 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="form-check form-switch ml-2 mb-1 mt-2" style="height: 3rem" >
+                    <input class="form-check-input" style="height: 1.5rem;width: 3rem;" onchange="userToggle()" name="userAccount" type="checkbox" id="inputUserAcc">
+                    <label class="form-check-label" style="padding-left: 1.5rem;line-height: 2rem;" for="inputUserAcc">Add a User Account</label>
+                </div>
+
+                <div class="col-md-12 d-none" id="newEmpUser" >
+                    <div class="card p-4 pt-1">
+                        <div class="card-header">
+                            <h5 class="card-title">User account</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label" for="inputUsername">User Name</label>
+                                <input type="text" name="userName" class="form-control mb-2 mr-sm-2" id="inputUsername" placeholder="User Name">
+                            </div>
+
+                            <div class="col-6">
+                                    <label class="form-label" for="inputUserLevel">User Level</label>
+                                    <select required name="userLevel" id="inputUserLevel" class="form-control">
+                                        <% result[5].forEach(function(usLevel){ %>
+                                            <option value="<%= usLevel.user_level %>"><%= usLevel.user_level_title %></option>
+                                            <% }) %> 
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                     
                 <button type="submit" class="btn btn-primary">Save changes</button>
             </form>
@@ -93,5 +121,9 @@
 <script >
     var change_page = () => {
         location.hash = "/employees";
+    }
+    var userToggle = () => {
+        document.querySelector("#newEmpUser").classList.toggle("d-none");
+        document.querySelector("#inputUsername").toggleAttribute("required");
     }
 </script>
