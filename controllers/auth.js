@@ -102,19 +102,3 @@ exports.logout = ( req, res ) => {
     res.redirect('/');
 }
 
-exports.addNewEnployee = ( req, res ) => {
-    try {
-        const {firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor} = req.body;
-        db.query("INSERT INTO `employees`(`firstname`, `lastname`, `birthdate`, `martial_status`, `dept_id`, `job_id`, `emp_status_id`, `pay_grade_level`, `supervisor`) VALUES (?,?,?,?,?,?,?,?,?)",
-            [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor], 
-            async (err,result) =>{
-                if(err) console.log('error', error);
-                else {
-                    console.log(result);
-                    res.end();
-                }
-            });
-    } catch (error) {
-        console.log(error);
-    }
-}
