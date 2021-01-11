@@ -6,7 +6,7 @@
         <table class="table table-striped table-hover" datatable="true" db_table="employment_statuses" db_primary_column="emp_status_id" popup-edit="1">
             <thead>
                 <tr>
-                    <th style="width: 30px;">#</th>
+                    <th style="width: 30px;"></th>
                     <th db_column="emp_status">Employment Status</th>
                     <th>Actions</th>
                 </tr>
@@ -48,35 +48,36 @@
         <div class="card-header">
             <h3 style="font-family:verdana;">Job Titles</h3>
         </div>
-        <table class="table table-striped table-hover" datatable="true">
+        <table class="table table-striped table-hover" datatable="true" db_table="job_titles" db_primary_column="job_id" popup-edit="1">
             <thead>
                 <tr>
-                    <th>Job Title ID</th>
-                    <th>Job Title Name</th>
+                    <th style="width: 30px;"></th>
+                    <th db_column="job_title_name">Job Title Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
+                <% var count = 1 %>
                 <% jobTitleRes.forEach(function(res_2){ %>
-                    <tr>
-                        <td><%= res_2.job_id %></td>
+                    <tr data-id="<%= res_2.job_id %>">
+                        <td><%= count++ %></td>
                         <td><%= res_2.job_title_name %></td>
                         <td class="table-action">
-                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                            <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
+                            <a href="#"><i class="align-middle del_ele" data-feather="trash"></i></a>
                         </td>
                     </tr>
                 <% }) %> 
             </tbody>
         </table>
         <div class="row g-3 align-items-center">
-            <form action="/auth/form_submit/add_new_emp_jobtitle">
+            <form action="/auth/form_submit/add_new_job_title">
                 <div class="row p-2">
                     <div class="col-auto">
-                        <label for="add_new_emp_jobtitle" class="col-form-label">Add new Job Title</label>
+                        <label for="add_new_job_title" class="col-form-label">Add new Job Title</label>
                     </div>
                     <div class="col-auto">
-                        <input type="text" name="value" id="add_new_emp_jobtitle" class="form-control" aria-describedby="passwordHelpInline" required>
+                        <input type="text" name="value" id="add_new_emp_job_title" class="form-control" aria-describedby="passwordHelpInline" required>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-primary" type="submit">Add</button>
@@ -85,42 +86,43 @@
             </form>
         </div>
     </div>
-</div>
+</div>            
 
 <div class="container-fluid p-0">
     <div class="card container">
         <div class="card-header">
             <h3 style="font-family:verdana;">Pay Grades</h3>
         </div>
-        <table class="table table-striped table-hover" datatable="true">
+        <table class="table table-striped table-hover" datatable="true" db_table="pay_grades" db_primary_column="pay_grade_level" popup-edit="1">
             <thead>
                 <tr>
-                    <th>Pay Grade Level</th>
-                    <th>Pay Grade Level Title</th>
+                    <th style="width: 30px;"></th>
+                    <th db_column="pay_grade_level_title">Pay Grade Level Title</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
+                <% var count = 1 %>
                 <% payGradesRes.forEach(function(res_3){ %>
-                    <tr>
-                        <td><%= res_3.pay_grade_level %></td>
+                    <tr data-id="<%= res_3.pay_grade_level %>">
+                        <td><%= count++ %></td>
                         <td><%= res_3.pay_grade_level_title %></td>
                         <td class="table-action">
-                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                            <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
+                            <a href="#"><i class="align-middle del_ele" data-feather="trash"></i></a>
                         </td>
                     </tr>
                 <% }) %> 
             </tbody>
         </table>
         <div class="row g-3 align-items-center">
-            <form action="/auth/form_submit/add_new_paygrade">
+            <form action="/auth/form_submit/add_new_pay_grade_level">
                 <div class="row p-2">
                     <div class="col-auto">
-                        <label for="add_new_paygrade" class="col-form-label">Add new Pay Grade</label>
+                        <label for="add_new_pay_grade_level" class="col-form-label">Add new Pay Grade Level</label>
                     </div>
                     <div class="col-auto">
-                        <input type="text" name="value" id="add_new_paygrade" class="form-control" aria-describedby="passwordHelpInline" required>
+                        <input type="text" name="value" id="add_new_pay_grade_level" class="form-control" aria-describedby="passwordHelpInline" required>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-primary" type="submit">Add</button>
@@ -129,4 +131,4 @@
             </form>
         </div>
     </div>
-</div> 
+</div>           
