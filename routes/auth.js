@@ -10,6 +10,5 @@ router.post('/logout', authController.logout);
 router.get('/login', (req, res)=>{
     res.send('auth login')
 })
-router.post('/addNewEmployee',authController.addNewEnployee);
 
 module.exports = router;
