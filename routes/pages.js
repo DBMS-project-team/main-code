@@ -34,7 +34,7 @@ router.get('/employees/edit/:emp_id/*', (req, res)=>{
         db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where emp_id != ? ;SELECT * FROM `user_levels`;SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.martial_status,e.dept_id,e.job_id,e.emp_status_id,e.pay_grade_level,e.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) WHERE e.emp_id=?", [emp_id,emp_id],(error, result)=>{
             if(error) console.log('mysql error', error);
             else {
-                res.render('editEmployee',{result});
+                res.render('newEmployee',{result,newEmp:false});
             } 
         })
     } catch (error) {
@@ -83,7 +83,7 @@ router.get('/employees/newEmployee', (req, res)=>{
     db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` ;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('newEmployee',{result});
+            res.render('newEmployee',{result, newEmp:true});
         } 
     })
 });
