@@ -12,6 +12,24 @@ router.post('/add_new_emp_status', (req, res) => {
     })
 });
 
+router.post('/add_new_job_title', (req, res) => {
+    db.query('INSERT INTO `job_titles` SET ?', {job_title_name: req.body.value}, (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
+
+router.post('/add_new_pay_grade_level', (req, res) => {
+    db.query('INSERT INTO `pay_grades` SET ?', {pay_grade_level_title: req.body.value}, (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
+
 router.post('/add_new_department', (req, res) => {
     db.query('INSERT INTO `departments` SET ?', {name: req.body.value}, (error, result) => {
         if(error) console.log('mysql error', error);
