@@ -1,5 +1,12 @@
 <div class="content container-fluid p-0">
-    <%# JSON.stringify(result) %>
+    <%# JSON.stringify(result[6]) %>
+    <% if(newEmp){
+            var employee={"emp_id":null,"firstname":"","lastname":"","bd":"","martial_status":"","dept_id":null,"job_id":null,"emp_status_id":null,"pay_grade_level":null,"supervisor":null,"username":null,"user_level":null,"userAcc":null}
+            var action="auth/form_submit/addNewEmployee";
+        }else{
+            var employee =result[6][0]
+            var action="auth/form_submit/editEmployee";
+        } %>
     <div class="card">
 
         <div class="card-header">
@@ -7,28 +14,30 @@
         </div>
 
         <div class="card-body">
-            <form after_submit="change_page" action="auth/form_submit/addNewEmployee">
+            <form after_submit="change_page" action="<%= action %>">
+                <input type="hidden" name="empId" value="<%= employee.emp_id %>">
+                <input type="hidden" name="userAcc" value="<%= employee.userAcc %>">
                 <div class="row">
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputFirstName">First name</label>
-                        <input type="text" required name="firstname" class="form-control" id="inputFirstName" placeholder="First name">
+                        <input type="text" required name="firstname" class="form-control" id="inputFirstName" value="<%= employee.firstname %>" placeholder="First name" >
                     </div>
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputLastName">Last name</label>
-                        <input type="text" required name="lastname" class="form-control" id="inputLastName" placeholder="Last name">
+                        <input type="text" required name="lastname" class="form-control" id="inputLastName" value="<%= employee.lastname %>" placeholder="Last name">
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputDob">Date of birth</label>
-                        <input type="date" required  name="dob" class="form-control" id="inputDob" placeholder="Date of birth">
+                        <input type="date" required  name="dob" class="form-control" id="inputDob" value="<%= employee.bd %>">
                     </div>
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputMstatus">Martial Status</label>
                         <select required name="martialStatus" id="inputMstatus" class="form-control">
-                            <option value="single">Single</option>
-                            <option value="married">Married</option>
+                            <option value="single" <%= employee.martial_status=="single" ? 'selected':'' %> >Single</option>
+                            <option value="married" <%= employee.martial_status=="married" ? 'selected':'' %>>Married</option>
                         </select>
                     </div>
                 </div>
@@ -38,7 +47,7 @@
                         <label class="form-label" for="inputDepartment">Department</label>
                         <select required name="department" id="inputDepartment" class="form-control">
                             <% result[0].forEach(function(dpt){ %>
-                            <option value="<%= dpt.dept_id %>"><%= dpt.name %></option>
+                            <option value="<%= dpt.dept_id %>" <%= employee.dept_id==dpt.dept_id ? 'selected':'' %>><%= dpt.name %></option>
                             <% }) %> 
                         </select>
                     </div>
@@ -46,7 +55,7 @@
                         <label class="form-label" for="inputJtitle">Job Title</label>
                         <select required name="jobTitle" id="inputJtitle" class="form-control">
                             <% result[1].forEach(function(jt){ %>
-                                <option value="<%= jt.job_id %>"><%= jt.job_title_name %></option>
+                                <option value="<%= jt.job_id %>" <%= employee.job_id==jt.job_id ? 'selected':'' %>><%= jt.job_title_name %></option>
                                 <% }) %> 
                         </select>
                     </div>
@@ -57,7 +66,7 @@
                         <label class="form-label" for="inputEstatus">Employee Status</label>
                         <select required name="empStatus" id="inputEstatus" class="form-control">
                             <% result[2].forEach(function(emps){ %>
-                                <option value="<%= emps.emp_status_id %>"><%= emps.emp_status %></option>
+                                <option value="<%= emps.emp_status_id %>" <%= employee.emp_status_id==emps.emp_status_id ? 'selected':'' %>><%= emps.emp_status %></option>
                                 <% }) %> 
                         </select>
                     </div>
@@ -65,7 +74,7 @@
                         <label class="form-label" for="inputPglevel">Pay Grade Level</label>
                         <select required name="payGlevel" id="inputPgl" class="form-control">
                             <% result[3].forEach(function(pgl){ %>
-                                <option value="<%= pgl.pay_grade_level %>"><%= pgl.pay_grade_level_title %></option>
+                                <option value="<%= pgl.pay_grade_level %>" <%= employee.pay_grade_level==pgl.pay_grade_level ? 'selected':'' %>><%= pgl.pay_grade_level_title %></option>
                                 <% }) %> 
                         </select>
                     </div>
@@ -76,18 +85,18 @@
                         <label class="form-label" for="inputSupervisor">Supervisor</label>
                         <select required name="supervisor" id="inputSupervisor" class="form-control">
                             <% result[4].forEach(function(emp){ %>
-                                <option value="<%= emp.emp_id %>"><%= emp.fullname %></option>
+                                <option value="<%= emp.emp_id %>" <%= employee.supervisor==emp.emp_id ? 'selected':'' %>><%= emp.fullname %></option>
                                 <% }) %> 
                         </select>
                     </div>
                 </div>
 
                 <div class="form-check form-switch ml-2 mb-1 mt-2" style="height: 3rem" >
-                    <input class="form-check-input" style="height: 1.5rem;width: 3rem;" onchange="userToggle()" name="userAccount" type="checkbox" id="inputUserAcc">
+                    <input class="form-check-input" style="height: 1.5rem;width: 3rem;" onchange="editUserToggle()" name="userAccount" type="checkbox" id="inputUserAcc" <%= employee.userAcc==null ? '':'checked' %>>
                     <label class="form-check-label" style="padding-left: 1.5rem;line-height: 2rem;" for="inputUserAcc">Add a User Account</label>
                 </div>
 
-                <div class="col-md-12 d-none" id="newEmpUser" >
+                <div class="col-md-12 <%= employee.userAcc==null ? 'd-none':'' %>" id="editEmpUser" >
                     <div class="card p-4 pt-1">
                         <div class="card-header">
                             <h5 class="card-title">User account</h5>
@@ -95,14 +104,14 @@
                         <div class="row">
                             <div class="col-6">
                                 <label class="form-label" for="inputUsername">User Name</label>
-                                <input type="text" name="userName" class="form-control mb-2 mr-sm-2" id="inputUsername" placeholder="User Name">
+                                <input type="text" <%= employee.userAcc==null ? '':'required' %> name="userName" class="form-control mb-2 mr-sm-2" id="inputUsername" value="<%= employee.username %>" placeholder="User Name">
                             </div>
 
                             <div class="col-6">
                                     <label class="form-label" for="inputUserLevel">User Level</label>
                                     <select required name="userLevel" id="inputUserLevel" class="form-control">
                                         <% result[5].forEach(function(usLevel){ %>
-                                            <option value="<%= usLevel.user_level %>"><%= usLevel.user_level_title %></option>
+                                            <option value="<%= usLevel.user_level %>" <%= employee.user_level==usLevel.user_level ? 'selected':'' %>><%= usLevel.user_level_title %></option>
                                             <% }) %> 
                                     </select>
                             </div>
@@ -119,11 +128,12 @@
 </div>
 
 <script >
+
     var change_page = () => {
         location.hash = "/employees";
     }
-    var userToggle = () => {
-        document.querySelector("#newEmpUser").classList.toggle("d-none");
+    var editUserToggle = () => {
+        document.querySelector("#editEmpUser").classList.toggle("d-none");
         document.querySelector("#inputUsername").toggleAttribute("required");
     }
 </script>
