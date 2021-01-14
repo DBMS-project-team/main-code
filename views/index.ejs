@@ -14,6 +14,9 @@
         <% var title = "Jupiter Apparels" %>
         <title><%= title %></title>
 
+        <!-- jquery Ui CSS -->
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
         <!--Bootstrap 4.5 for modal-->
         <link
             rel="stylesheet"
@@ -53,6 +56,9 @@
 
         <!-- jquery-->
         <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+
+        <!-- Jquery ui -->
+        <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js" integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk=" crossorigin="anonymous"></script>
 
         <!-- data table-->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
@@ -235,8 +241,10 @@
                         var callback = (data)=>{
                             $('#root_refresher').click();
                         };
-                        console.log(form.attr('after_submit'));
-                        if(typeof form.attr('after_submit') !== 'undefined')callback = window[form.attr('after_submit')];
+                        if(typeof form.attr('page_after_submit') !== 'undefined')callback = _=> {
+                            location.hash = form.attr('page_after_submit');
+                        };
+                        else if(typeof form.attr('after_submit') !== 'undefined')callback = window[form.attr('after_submit')];
                         $.post( form.attr('action'), form.serializeArray()).done( callback ).fail(_ => {
                             $('#root_refresher').click();
                         });
@@ -253,17 +261,20 @@
                 feather.replace();
                 $('.del_ele').unbind('click').click(function(e){
                     e.preventDefault();
-                    var table = $(this).parents('table').attr('db_table');
-                    var column = $(this).parents('table').attr('db_primary_column');
-                    var id = $(this).parents('tr').attr('data-id');
-                    $.post( '/auth/alter/delete', {table, column, id}).done( _ => {
-                        $('#root_refresher').click(); 
-                    }).fail(_ => {
-                        $('#root_refresher').click();
-                    });
+                    if( typeof $(this).parents('table').attr('del_fun') !== 'undefined' && $(this).parents('table').attr('del_fun') !== 'false' ){
+                        window[$(this).parents('table').attr('del_fun')]();
+                    }else{
+                        var table = $(this).parents('table').attr('db_table');
+                        var column = $(this).parents('table').attr('db_primary_column');
+                        var id = $(this).parents('tr').attr('data-id');
+                        $.post( '/auth/alter/delete', {table, column, id}).done( _ => {
+                            $('#root_refresher').click(); 
+                        }).fail(_ => {
+                            $('#root_refresher').click();
+                        });
+                    }
                 });
                 $('.edit_ele').unbind('click').click( function(e){
-                    e.preventDefault();
                     if( $(this).parents('table').attr('popup-edit') !== 'false' && typeof $(this).parents('table').attr('popup-edit') !== 'undefined' ){
                         var table = $(this).parents('table').attr('db_table');
                         var column = $(this).parents('table').attr('db_primary_column');
@@ -274,9 +285,11 @@
                         var db_column = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).attr('db_column');
                         $('#modal-btn').attr({table, column, dataid, value, title, field, db_column});
                         $('#modal-btn').click();
-                    }else{
+                        e.preventDefault();
+                    }else if ( $(this).parents('table').attr('edit-page') !== 'false' && typeof $(this).parents('table').attr('edit-page') !== 'undefined' ) {
                         var edit_page = $(this).parents('table').attr('edit-page');
                         location.hash = edit_page + ( /\/$/.test(edit_page)? '' : '/' ) + $(this).parents('tr').attr('data-id') + '/' + $(this).parents('tr').attr('show-name');
+                        e.preventDefault();
                     }
                 })
             }
