@@ -39,17 +39,44 @@ router.post('/add_new_department', (req, res) => {
     })
 });
 
+router.post('/add_new_cus_attribute', (req, res) => {
+    const {attr_title, attr_value} =req.body;
+    db.query('INSERT INTO `custom_fields` SET ? ;', {custom_field_name:attr_title}, (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            db.query('INSERT INTO `employee_additional_detail` SELECT emp_id,?,? FROM `employees`;', [result.insertId,attr_value], (error, result2) => {
+                if(error) console.log('mysql error', error);
+                else {
+                    res.json(result);
+                }
+            })
+        }
+    })
+});
+
 router.post('/addNewEmployee', ( req, res ) => {
     try {
-        const {firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor} = req.body;
+        let {firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val} = req.body;
         db.query("INSERT INTO `employees`(`firstname`, `lastname`, `birthdate`, `martial_status`, `dept_id`, `job_id`, `emp_status_id`, `pay_grade_level`, `supervisor`) VALUES (?,?,?,?,?,?,?,?,?)",
             [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor], 
             async (err,result) =>{
                 if(err) console.log('error', error);
                 else {
-                    console.log(result);
+                    const emp_id = result.insertId;
+                    if(attr_id){
+                        var valueArray=[];
+                        if (attr_id.length==1){
+                            attr_id=[attr_id];
+                            attr_val=[attr_val];
+                        }
+                        for (var i = 0; i < attr_id.length; i++) {
+                            valueArray.push([emp_id,attr_id[i],attr_val[i]]);
+                          }
+                        db.query("INSERT INTO `employee_additional_detail`(`emp_id`, `custom_field_id`, `custom_field_value`) VALUES ?",[valueArray], async (err,result2) =>{
+                            if(err) console.log('error', error);
+                        })
+                    }
                     if (req.body.userAccount){
-                        const emp_id = result.insertId;
                         const username = req.body.userName;
                         const user_level = req.body.userLevel;
                         const password = "password";
@@ -72,12 +99,29 @@ router.post('/addNewEmployee', ( req, res ) => {
 
 router.post('/editEmployee', ( req, res ) => {
     try {
-        const {empId,userAcc,firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor} = req.body;
+        let {empId,userAcc,firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val} = req.body;
 
         db.query('UPDATE `employees` SET `firstname`=?,`lastname`=?,`birthdate`=?,`martial_status`=?,`dept_id`=?,`job_id`=?,`emp_status_id`=?,`pay_grade_level`=?,`supervisor`=? WHERE emp_id=? ;', 
         [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,empId], (error, result) => {
             if(error) console.log('mysql error', error);
         })
+
+        if(attr_id){
+            var valueArray=[];
+            var query='';
+            if (attr_id.length==1){
+                attr_id=[attr_id];
+                attr_val=[attr_val];
+            }
+            for (var i = 0; i < attr_id.length; i++) {
+                query +="UPDATE `employee_additional_detail` SET `custom_field_value`=? WHERE `emp_id`=? AND`custom_field_id`=?;";
+                valueArray.push(attr_val[i],empId,attr_id[i]);
+              }
+            db.query(query,valueArray, async (err,result2) =>{
+                if(err) console.log('error', error);
+            })
+        }
+
         if(req.body.userAccount){
             const username = req.body.userName;
             const user_level = req.body.userLevel;
