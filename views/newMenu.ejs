@@ -1,0 +1,110 @@
+<style>
+    .ui-selectmenu-menu.ui-front.ui-selectmenu-open{
+        max-height: 200px;
+        overflow: auto;
+    }
+</style>
+<div class="content container-fluid p-0">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <% if( data ) { %>
+                    Edit <%= data.title %> Menu 
+                <% } else if (parent) { %>
+                    Create new sub menu under <%= parent_title %> 
+                <% } else { %>
+                    Create new main menu
+                <% } %>
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <form page_after_submit="/menus" action="<%= data? '/auth/form_submit/edit_menu' : '/auth/form_submit/new_menu' %>">
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label" for="title">Menu Title</label>
+                    <div class="col-sm-10">
+                        <input type="text"  name="title" class="form-control" id="title" value="<%= data? data.title : '' %>" placeholder="title" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label" for="href">Href</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <div class="input-group-text">#/</div>
+                            <input type="text"  name="href" class="form-control" id="href" value="<%= data ? data.href : '' %>" placeholder="href">
+                        </div>
+                    </div>
+                </div>
+                <% if( data.parent === null || !parent) { %> 
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="icon">Icon</label>
+                        <div class="col-sm-10">
+                            <select required name="icon" id="icon" class="form-control selectpicker">
+                                <% Object.keys(icons).forEach(function(key){ %>
+                                    <% let icon = icons[key] %>
+                                <option value="<%= icon.name %>" data-class="<%= icon.name %>" <%= (data && data.icon == icon.name ) ? 'selected' : '' %>>
+                                    <%= icon.name %>
+                                </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                <% } %>
+                <% if( data) { %>
+                    <input type="hidden" name="menu_id" value="<%= data.menu_id %>" />
+                <% } else { %>
+                    <input type="hidden" name="parent" value="<%= parent? parent : 'null' %>" />
+                <% } %>
+                <button type="submit" class="btn btn-primary"><%= ( data )? 'Save changes' : 'Create' %></button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<script >
+    $.widget( "custom.iconselectmenu", $.ui.selectmenu, {
+        _renderButtonItem: function( item ) {
+            var buttonItem = $( "<span>", {
+                "class": "ui-selectmenu-text"
+            })
+            this._setText( buttonItem, item.label );
+            var icon = $( "<i>", {
+                style: item.element.attr( "data-style" ),
+                "class": "ui-icon align-middle " + item.element.attr( "data-class" ),
+                "data-feather": item.element.attr( "data-class" )
+            }).css({"margin-right": "5px"});
+            var cont = $( '<div>' ).append(icon).append(buttonItem);
+            buttonItem.css( {"background-color": item.value, "display": "inline-block"} )
+            return cont;
+        },
+      _renderItem: function( ul, item ) {
+        var li = $( "<li>" ),
+          wrapper = $( "<div>", { text: item.label } );
+ 
+        if ( item.disabled ) {
+          li.addClass( "ui-state-disabled" );
+        }
+ 
+        $( "<i>", {
+          style: item.element.attr( "data-style" ),
+          "class": "ui-icon align-middle " + item.element.attr( "data-class" ),
+          "data-feather": item.element.attr( "data-class" )
+        })
+          .appendTo( wrapper );
+        feather.replace();
+        return li.append( wrapper ).appendTo( ul );
+      }
+    });
+ 
+    $( ".selectpicker" )
+        .iconselectmenu({
+            change: _=>{
+                    feather.replace();
+            }
+        })
+        .iconselectmenu( "menuWidget" )
+            .addClass( "ui-menu-icons" );
+    feather.replace();
+</script>

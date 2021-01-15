@@ -11,6 +11,11 @@ const db = mysql.createConnection({
 db.connect( error=> {
     if(error)console.log(error);
     else console.log("mysql connected");
+    setInterval( _ => {
+        db.query('SELECT 1', error => {
+            if( error ) console.log(error);
+        })
+    }, 60*60);
 });
 
 module.exports = db;

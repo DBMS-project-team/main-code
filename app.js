@@ -30,19 +30,20 @@ app.use((req, res, next)=>{
 
 let auth = (req, res, next)=>{
     if(!req.session.username && !req.originalUrl.startsWith('/logs')){
-        console.log(req.session);
-        res.render('logs/login', {error: "login first", url: req.originalUrl})
+        console.log(req.url);
+        if( req.originalUrl.startsWith('/pages') ){
+            res.send('<meta http-equiv="refresh" content="0">');
+        }else{
+            res.render('logs/login', {error: "login first"})
+        }
     }else{
         next();
     }
 }
 
-var user = {
-    name: "Pranavan",
-    img:"/img/avatars/avatar.jpg"
-}
-
 app.get('/', auth, (req, res)=>{
+    var user = req.session;
+    user.img="/img/avatars/avatar.jpg";
     res.render('index', {user});
 });
 app.use('/auth', require('./routes/auth'));

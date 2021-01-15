@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 var dateFormat = require('dateformat');
 const db = require('../db_config');
+const feather = require('feather-icons')
 
 var user = {
     name: "Pranavan",
@@ -29,9 +30,17 @@ router.get('/employees', (req, res)=>{
 });
 
 router.get('/employees/edit/:emp_id/*', (req, res)=>{
-    const emp_id = req.params.emp_id;
-    // code here
-    res.send(emp_id);
+    try{
+        const emp_id = req.params.emp_id;
+        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where emp_id != ? ;SELECT * FROM `user_levels`; SELECT c1.custom_field_name,c1.custom_field_id,c2.custom_field_value FROM `custom_fields` as c1 INNER JOIN `employee_additional_detail` c2 ON c1.custom_field_id=c2.custom_field_id WHERE c2.emp_id=?; SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.martial_status,e.dept_id,e.job_id,e.emp_status_id,e.pay_grade_level,e.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) WHERE e.emp_id=?", [emp_id,emp_id,emp_id],(error, result)=>{
+            if(error) console.log('mysql error', error);
+            else {
+                res.render('newEmployee',{result,newEmp:false});
+            } 
+        })
+    } catch (error) {
+        console.log(error);
+    }
 });
 
 router.get('/employees/categories', (req, res)=>{
@@ -57,11 +66,45 @@ router.get('/departments', (req, res)=>{
     })
 });
 
+router.get('/menus', (req, res)=>{
+    db.query("select * from menus where parent is null;select * from menus where parent is not null;", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            if( result[0].length > 0 ){
+                result[0].forEach((menu)=>{
+                    var children = result[1].filter( m =>  m.parent === menu.menu_id);
+                    if(children.length > 0 ) menu.children = children;
+                    else menu.children = false;
+                })
+                console.log(result[0])
+                res.render('menus', {menus: result[0]});
+            }
+        }
+    })
+});
+
+router.get('/menus/new/:parent?/:parent_title?', (req, res)=>{
+    if(req.params.parent){
+        res.render('newMenu', {parent: req.params.parent, parent_title: req.params.parent_title, data: false});
+    }else{
+        res.render('newMenu', {parent: false, icons: feather.icons, data: false});
+    }
+});
+
+router.get('/menus/edit/:menu_id/*', (req, res)=>{
+    db.query("select * from menus where parent is null;select * from menus where menu_id=?", req.params.menu_id, (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            res.render('newMenu', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
+        }
+    })
+});
+
 router.get('/settings', (req, res)=>{
     res.render('settings');
 });
-router.get('/leave', (req, res)=>{
-    res.render('leave');
+router.get('/leaves', (req, res)=>{
+    res.render('leaves');
 });
 router.get('/login/new', (req, res)=>{
     res.render('login/new');
@@ -72,12 +115,22 @@ router.get('/login/new', (req, res)=>{
 })*/
 
 router.get('/employees/newEmployee', (req, res)=>{
-    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` ;", (error, result)=>{
+    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` ;SELECT * FROM `user_levels`;SELECT * FROM `custom_fields`;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('newEmployee',{result});
+            res.render('newEmployee',{result, newEmp:true});
         } 
     })
+});
+
+router.get('/employees/custom-attributes', (req, res)=>{
+    db.query("SELECT * FROM `custom_fields`", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            res.render('customAttributes',{cusAttr:result});
+        } 
+    })
+
 });
 
 router.get('/*', (req, res)=>{

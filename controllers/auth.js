@@ -61,7 +61,7 @@ exports.login = async (req, res)=>{
                     req.session.username = username;
                     req.session.admin = true;
                     req.session.user_id = result[0].org_id;
-                    res.status(200).redirect(url);
+                    res.status(200).redirect('/'+url);
                 }
             })
         }else{
@@ -89,7 +89,7 @@ exports.login = async (req, res)=>{
                     req.session.username = username;
                     req.session.admin = false;
                     req.session.user_id = result[0].emp_id;
-                    res.status(200).redirect(url);
+                    res.status(200).redirect('/'+url);
                 }
             })
         }
@@ -100,21 +100,4 @@ exports.login = async (req, res)=>{
 exports.logout = ( req, res ) => {
     req.session.destroy();
     res.redirect('/');
-}
-
-exports.addNewEnployee = ( req, res ) => {
-    try {
-        const {firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor} = req.body;
-        db.query("INSERT INTO `employees`(`firstname`, `lastname`, `birthdate`, `martial_status`, `dept_id`, `job_id`, `emp_status_id`, `pay_grade_level`, `supervisor`) VALUES (?,?,?,?,?,?,?,?,?)",
-            [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor], 
-            async (err,result) =>{
-                if(err) console.log('error', error);
-                else {
-                    console.log(result);
-                    res.end();
-                }
-            });
-    } catch (error) {
-        console.log(error);
-    }
 }

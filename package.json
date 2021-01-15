@@ -16,6 +16,7 @@
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "feather-icons": "^4.28.0",
     "hbs": "^4.1.1",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",

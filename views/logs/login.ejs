@@ -66,7 +66,7 @@
 										</div>
 										<div class="text-center mt-3">
 											<!--a href="index.html" class="btn btn-lg btn-primary">Sign in</a-->
-											<input type="hidden" name="url" value="<% if (typeof url !='undefined' && url) { %><%= url %><% }else{ %><%='/'%><% } %>">
+											<input type="hidden" id="url" name="url" value="/">
 											<button type="submit" class="btn btn-lg btn-primary">Sign in</button>
 										</div>
 									</form>
@@ -81,7 +81,9 @@
 	</main>
 
 	<script src="/js/app.js"></script>
-
+	<script>
+		document.getElementById('url').value = location.hash;
+	</script>
 </body>
 
 </html>

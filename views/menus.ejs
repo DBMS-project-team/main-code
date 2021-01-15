@@ -1,0 +1,94 @@
+<div class="container-fluid p-0">
+    <div class="card container">
+        <div class="card-header">
+            <h5>Menus</h5>
+            <a href="#/menus/new" class="btn btn-primary gap-2 md">Add New Menu</a>
+        </div>
+        <table class="table table-striped table-hover" datatable="false" db_table="menus" db_primary_column="menu_id"> <%# edit-page format will be /employees/edit/emp_id/emp_name  %>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th></th>
+                    <th>Title</th>
+                    <th>href</th>
+                    <th>Icon</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <%  var count = 1; %>
+                <% menus.forEach(function(menu){ %>
+                    <tr data-id="<%= menu.menu_id %>" children="<%= JSON.stringify( menu.children ) %>">
+                        <td><%= count++ %></td>
+                        <td>
+                            <i class="align-middle" data-feather="<%= menu.icon %>"></i>
+                        </td>
+                        <td><%= menu.title %></td>
+                        <td>#/<%= menu.href %></td>
+                        <td><%= menu.icon %></td>
+                        <td class="table-action">
+                            <a href="#/menus/edit/<%= menu.menu_id %>/<%= menu.title %>"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
+                            <a href="#"><i class="align-middle del_ele" data-feather="trash"></i></a>
+                        </td>
+                    </tr>
+                    
+                <% }) %> 
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    var groupColumn =1;
+    if ( $.fn.dataTable.isDataTable( 'table[db_table=menus]' ) ) {
+        table = $('table[db_table=menus]').DataTable();
+    }
+    else {
+        table = $('table[db_table=menus]').DataTable({
+            "buttons": ['copy', 'excel', 'pdf', 'colvis'],
+            "drawCallback": function ( settings ) {
+                var api = this.api();
+                var rows = api.rows( {page:'current'} ).nodes();
+
+                api.column( {page:'current'} ).data().each( function ( group, i ) {
+                    var inserted = $('<tr><td></td><td colspan="5"></td></tr>').insertAfter( $(rows).eq( i ) );
+                    inserted = $(inserted).find('td').eq(1);
+                    if( $(rows).eq( i ).attr('children') !== 'false' ){
+                        var children = JSON.parse( $(rows).eq( i ).attr('children') );
+                        $(inserted).append( `
+                            <table class="table table-striped table-hover"  db_table="menus" db_primary_column="menu_id">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Title</th>
+                                        <th>href</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        ` );
+                        var table = $(inserted).find('table tbody');
+                        var count = 1;
+                        children.forEach( child => {
+                            $(table).append(`
+                                <tr data-id="${ child.menu_id }">
+                                    <td>${ count++ }</td>
+                                    <td>${ child.title }</td>
+                                    <td>#/${ child.href }</td>
+                                    <td class="table-action">
+                                        <a href="#/menus/edit/${ child.menu_id }/${ child.title }"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
+                                        <a href="#"><i class="align-middle del_ele" data-feather="trash"></i></a>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }else{
+                        $(inserted).append('<span>No sub menus</span><br/>');
+                    }
+                    inserted.append(`<a class="btn btn-primary" href="#/menus/new/${$(rows).eq( i ).attr('data-id')}/${$(rows).eq( i ).find('td').eq(2).html()}">Add Submenu</a>`)
+                } );
+            }
+        });
+    }
+</script>
