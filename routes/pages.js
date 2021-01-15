@@ -80,7 +80,7 @@ router.get('/login/new', (req, res)=>{
 })*/
 
 router.get('/employees/newEmployee', (req, res)=>{
-    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` ;", (error, result)=>{
+    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` ;SELECT * FROM `user_levels`;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             res.render('newEmployee',{result, newEmp:true});
