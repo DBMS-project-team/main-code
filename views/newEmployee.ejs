@@ -4,7 +4,7 @@
             var employee={"emp_id":null,"firstname":"","lastname":"","bd":"","martial_status":"","dept_id":null,"job_id":null,"emp_status_id":null,"pay_grade_level":null,"supervisor":null,"username":null,"user_level":null,"userAcc":null}
             var action="auth/form_submit/addNewEmployee";
         }else{
-            var employee =result[6][0]
+            var employee =result[7][0]
             var action="auth/form_submit/editEmployee";
         } %>
     <div class="card">
@@ -91,6 +91,25 @@
                     </div>
                 </div>
 
+                <div class="col-md-12 <%= result[6][0] ? '':'d-none' %>">
+                    <div class="card p-4 pt-1">
+                        <div class="card-header pl-0">
+                            <h4 class="card-title">Custom Attributes</h4>
+                        
+                            <% result[6].forEach(function(cusAttr,val){ %>
+                            <% if ( val%2 == 0) { %>
+                                </div><div class='row'> 
+                            <% } %>
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label" for="input<%= cusAttr.custom_field_name %>"><%= cusAttr.custom_field_name.charAt(0).toUpperCase() + cusAttr.custom_field_name.slice(1) %></label>
+                                    <input type="hidden"  name=attr_id value="<%= cusAttr.custom_field_id %>" >
+                                    <input type="text" required name=attr_val class="form-control" id="input<%= cusAttr.custom_field_name %>" value="<%= cusAttr.custom_field_value? cusAttr.custom_field_value:"" %>" placeholder="<%= cusAttr.custom_field_name %>" >
+                                </div>
+                            <% }) %> 
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-check form-switch ml-2 mb-1 mt-2" style="height: 3rem" >
                     <input class="form-check-input" style="height: 1.5rem;width: 3rem;" onchange="editUserToggle()" name="userAccount" type="checkbox" id="inputUserAcc" <%= employee.userAcc==null ? '':'checked' %>>
                     <label class="form-check-label" style="padding-left: 1.5rem;line-height: 2rem;" for="inputUserAcc">Add a User Account</label>
@@ -98,7 +117,7 @@
 
                 <div class="col-md-12 <%= employee.userAcc==null ? 'd-none':'' %>" id="editEmpUser" >
                     <div class="card p-4 pt-1">
-                        <div class="card-header">
+                        <div class="card-header pl-0">
                             <h5 class="card-title">User account</h5>
                         </div>
                         <div class="row">
