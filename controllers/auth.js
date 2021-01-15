@@ -60,6 +60,7 @@ exports.login = async (req, res)=>{
                 } else{
                     req.session.username = username;
                     req.session.admin = true;
+                    req.session.emp_id = 0;
                     req.session.user_id = result[0].org_id;
                     res.status(200).redirect('/'+url);
                 }
@@ -88,6 +89,7 @@ exports.login = async (req, res)=>{
                     res.status(200).redirect('/');*/
                     req.session.username = username;
                     req.session.admin = false;
+                    req.session.emp_id = result[0].emp_id;
                     req.session.user_id = result[0].emp_id;
                     res.status(200).redirect('/'+url);
                 }

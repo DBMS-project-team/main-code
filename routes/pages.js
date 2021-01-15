@@ -106,6 +106,10 @@ router.get('/settings', (req, res)=>{
 router.get('/leaves', (req, res)=>{
     res.render('leaves');
 });
+router.get('/leaves/my-applications', (req, res)=>{
+    const emp_id = req.session.emp_id;
+    res.render('myLeaveApplications', {emp_id});
+});
 router.get('/login/new', (req, res)=>{
     res.render('login/new');
 });
