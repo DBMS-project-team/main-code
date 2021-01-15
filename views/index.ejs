@@ -110,9 +110,7 @@
                     }
                     after_pageload();
                 });
-
                 const [items, setItems] = useState([]);
-
                 const fetchPage = async () => {
                     const items = await fetch('/pages'+location.pathname).then( data => data.text() ).then(text => {
                         //var html = new DOMParser().parseFromString(text, 'text/html');
@@ -121,7 +119,6 @@
                     });
                     setItems(items);
                 };
-
                 const refresh = () => {
                     // it re-renders the component
                     setItems({});
@@ -171,7 +168,6 @@
                                 <Form.Control type="text" placeholder="Enter" defaultValue={props.value} onChange={handleChange} />
                             </Form.Group>
                         </Form>
-
                     </Modal.Body>
                     <Modal.Footer>
                         <Button onClick={props.onHide}>Close</Button>
@@ -180,11 +176,9 @@
                     </Modal>
                 );
                 }
-
                 function App2() {
                 const [modalShow, setModalShow] = React.useState(false);
                 const [datas, setDatas] = React.useState({table:'', column: '', dataid: '', value: '', title: '', field: '', db_column: ''});
-
                 const handleClick = (e) => {
                     var ele = e.target;
                     setDatas({
@@ -198,7 +192,6 @@
                     });
                     setModalShow(true);
                 }
-
                 return (
                     <React.Fragment>
                         <Button variant="primary" onClick={handleClick} id="modal-btn"
@@ -212,7 +205,6 @@
                             db_column={datas.db_column}>
                             modal
                         </Button>
-
                         <MyVerticallyCenteredModal
                             show={modalShow}
                             onHide={() => setModalShow(false)}
@@ -262,7 +254,7 @@
                 $('.del_ele').unbind('click').click(function(e){
                     e.preventDefault();
                     if( typeof $(this).parents('table').attr('del_fun') !== 'undefined' && $(this).parents('table').attr('del_fun') !== 'false' ){
-                        window[$(this).parents('table').attr('del_fun')]();
+                        window[$(this).parents('table').attr('del_fun')](this);
                     }else{
                         var table = $(this).parents('table').attr('db_table');
                         var column = $(this).parents('table').attr('db_primary_column');
