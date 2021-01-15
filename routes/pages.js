@@ -31,7 +31,7 @@ router.get('/employees', (req, res)=>{
 router.get('/employees/edit/:emp_id/*', (req, res)=>{
     try{
         const emp_id = req.params.emp_id;
-        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where emp_id != ? ;SELECT * FROM `user_levels`;SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.martial_status,e.dept_id,e.job_id,e.emp_status_id,e.pay_grade_level,e.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) WHERE e.emp_id=?", [emp_id,emp_id],(error, result)=>{
+        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where emp_id != ? ;SELECT * FROM `user_levels`; SELECT c1.custom_field_name,c1.custom_field_id,c2.custom_field_value FROM `custom_fields` as c1 INNER JOIN `employee_additional_detail` c2 ON c1.custom_field_id=c2.custom_field_id WHERE c2.emp_id=?; SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.martial_status,e.dept_id,e.job_id,e.emp_status_id,e.pay_grade_level,e.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) WHERE e.emp_id=?", [emp_id,emp_id,emp_id],(error, result)=>{
             if(error) console.log('mysql error', error);
             else {
                 res.render('newEmployee',{result,newEmp:false});
@@ -80,12 +80,22 @@ router.get('/login/new', (req, res)=>{
 })*/
 
 router.get('/employees/newEmployee', (req, res)=>{
-    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` ;SELECT * FROM `user_levels`;", (error, result)=>{
+    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` ;SELECT * FROM `user_levels`;SELECT * FROM `custom_fields`;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             res.render('newEmployee',{result, newEmp:true});
         } 
     })
+});
+
+router.get('/employees/custom-attributes', (req, res)=>{
+    db.query("SELECT * FROM `custom_fields`", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            res.render('customAttributes',{cusAttr:result});
+        } 
+    })
+
 });
 
 router.get('/*', (req, res)=>{
