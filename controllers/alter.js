@@ -5,7 +5,14 @@ const db = require('../db_config');
 
 router.post('/delete', (req, res) => {
     const {table, column, id} = req.body;
-    db.query('DELETE FROM ?? where ?? = ?', [table, column, id], (error, result) => {
+    //db.query('DELETE FROM ?? where ?? = ?', [table, column, id], (error, result) => {
+        if( typeof column !== 'object' ) var argument = {[column]:id};
+        else {
+            column.forEach( (value, i) => {
+                argument[value] = column[i]
+            } );
+        }
+    db.query('DELETE FROM ?? WHERE ?', [table, argument], (error, result) => {
         if(error) console.log('mysql error', error);
         else {
             res.json(result);

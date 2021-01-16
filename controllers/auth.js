@@ -87,11 +87,17 @@ exports.login = async (req, res)=>{
                     }
                     res.cookie('jwt', token, cookieOptions);
                     res.status(200).redirect('/');*/
-                    req.session.username = username;
-                    req.session.admin = false;
-                    req.session.emp_id = result[0].emp_id;
-                    req.session.user_id = result[0].emp_id;
-                    res.status(200).redirect('/'+url);
+                    if(result.length > 0 ){
+                        req.session.username = username;
+                        req.session.admin = false;
+                        req.session.emp_id = result[0].emp_id;
+                        req.session.user_id = result[0].emp_id;
+                        res.status(200).redirect('/'+url);
+                    }   else {
+                        res.status(400).render('./logs/login', {
+                            error: 'Cannot find the account'
+                        })
+                    }
                 }
             })
         }
