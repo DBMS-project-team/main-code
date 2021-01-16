@@ -161,6 +161,31 @@ router.get('/leaves/new_max_leave/:parent?/:parent_title?', (req, res)=>{
     
 });
 
+router.get('/leaves/my-applications', (req, res)=>{
+    const emp_id = req.session.emp_id;
+    db.query("select t.leave_type,a.apply_date_time,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id="+emp_id, (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            if( result.length > 0 ){
+                result.forEach( row => {
+                    row.apply_date_time = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'dddd, mmmm dS, yyyy' ) : ''
+                })
+                res.render('myLeaveApplications', {emp_id,applications: result});
+            }
+        }
+    })
+});
+
+router.get('/leaves/newApplication', (req, res)=>{
+    const emp_id = req.session.emp_id;
+    db.query("SELECT * FROM `leave_types`", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            res.render('newLeaveApplication',{emp_id,result, newApp:true});
+        } 
+    })
+});
+
 router.get('/*', (req, res)=>{
     res.render('.'+req.originalUrl)
 })
