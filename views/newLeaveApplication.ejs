@@ -1,0 +1,37 @@
+<div class="content container-fluid p-0">
+    
+    <% var application={"emp_id":null,"applydatetime":"","leave_type_id":null,"period":null,"status_id":null} %>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0"><b>Leave Application</b></h5>
+        </div>
+        <div class="card-body">
+            <form page_after_submit="/leaves/my-applications" action="/auth/form_submit/addNewLeaveApplication">
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputType">Leave Type</label>
+                        <select required name="leavetype" id="inputType" class="form-control">
+                            <% result.forEach(function(type){ %>
+                            <option value="<%= type.leave_type_id %>" <%= application.leave_type_id==type.leave_type_id ? 'selected':'' %>><%= type.leave_type %></option>
+                            <% }) %> 
+                        </select>
+                    </div>
+                </div>     
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputDT">Start Date</label>
+                        <input type="date" required  name="applydatetime" class="form-control" id="inputDT">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputPeriod">Period</label>
+                        <input type="int" required  name="period" class="form-control" id="inputPeriod" value="<%= application.period %>" placeholder="# of days">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Apply</button>
+            </form>
+        </div>
+    </div>
+</div>
