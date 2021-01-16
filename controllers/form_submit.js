@@ -198,4 +198,16 @@ router.post('/new_max_leave', (req, res) => {
     
 });
 
+router.post('/addNewLeaveApplication', (req, res) => {
+    const emp_id = req.session.emp_id;
+    const applydatetime = dateFormat( req.body.applydatetime, 'yyyy-mm-dd HH:mm:ss' );
+    db.query("INSERT INTO `leave_applications`(`emp_id`, `apply_date_time`, `leave_type_id`, `period`, `status_id`) VALUES (?,?,?,?,?)", [emp_id, applydatetime,req.body.leavetype,req.body.period,1], (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
+
+
 module.exports = router;
