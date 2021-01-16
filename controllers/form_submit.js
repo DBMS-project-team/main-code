@@ -172,4 +172,30 @@ router.post('/edit_menu', (req, res) => {
     })
 });
 
+router.post('/add_new_leave_type', (req, res) => {
+    db.query('INSERT INTO `leave_types` SET ?', {name: req.body.value}, (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
+
+router.post('/new_max_leave', (req, res) => {
+    var values = {};
+    var {leave_type, pay_grade_level_title, max_leaves} = req.body;
+    
+    values.leave_type_id = req.body.leave_type;
+    values.pay_grade_level = req.body.pay_grade_level_title;
+    values.no_of_leaves = req.body.max_leaves;
+    db.query('INSERT INTO `max_leave_days` SET ?', values, (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    });
+        
+    
+});
+
 module.exports = router;
