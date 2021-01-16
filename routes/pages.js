@@ -137,6 +137,30 @@ router.get('/employees/custom-attributes', (req, res)=>{
 
 });
 
+router.get('/leaves/settings',(req, res)=>{
+    db.query("SELECT * FROM `leave_types`;SELECT lt.*, pg.*, mld.* FROM `max_leave_days` as mld inner join `leave_types` as lt ON mld.leave_type_id=lt.leave_type_id inner join `pay_grades` as pg ON mld.pay_grade_level=pg.pay_grade_level", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else{
+            var res_1=result[0];
+            var res_2=result[1];
+            res.render('leave_settings',{leave_type_res:res_1, max_leave_res:res_2});
+        }
+    })
+});
+
+router.get('/leaves/new_max_leave/:parent?/:parent_title?', (req, res)=>{
+    db.query("SELECT * FROM `leave_types`;SELECT * FROM `pay_grades`;", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            var res_1=result[0];
+            var res_2=result[1];     
+            res.render('new_max_leave', {data: false, leave_type_res:res_1, pay_gr_res:res_2});
+            
+        } 
+    })
+    
+});
+
 router.get('/*', (req, res)=>{
     res.render('.'+req.originalUrl)
 })
