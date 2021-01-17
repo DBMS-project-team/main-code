@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 var dateFormat = require('dateformat');
+const mysql = require('mysql');
 const db = require('../db_config');
 
 router.post('/delete', (req, res) => {
@@ -30,12 +31,24 @@ router.post('/del_custom_attribute', (req, res) => {
 });
 router.post('/edit', (req, res) => {
     const {table, column, id,  value, changed_column} = req.body;
-    db.query('UPDATE ?? SET ?? = ? WHERE ??=?', [table, changed_column, value, column, id], (error, result) => {
+    if( typeof column !== 'undefined' ) var argument = {[column]:id};
+    else {
+        const column = req.body['column[]'];
+        const id = req.body['id[]'];
+        var string = '1';
+        column.forEach( (value, i) => {
+            string += ` and ${mysql.escapeId( value )} = ${mysql.escape( id[i] )}`;
+        } );
+        var argument = { toSqlString: function() { return string; } };
+    }
+    console.log(typeof column);
+    var query = db.query('UPDATE ?? SET ?? = ? WHERE ?', [table, changed_column, value, argument], (error, result) => {
         if(error) console.log('mysql error', error);
         else {
             res.json(result);
         }
-    })
+    });
+    console.log(query.sql)
 });
 
 module.exports = router;

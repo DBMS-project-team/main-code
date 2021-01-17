@@ -143,7 +143,15 @@
                 const handleClose = () => setShow(false);
                 const handleShow = () => setShow(true);
                 const handleSave = () => {
-                    $.post( '/auth/alter/edit', {table: props.table, column: props.column, id: props.dataid,  value, changed_column: props.db_column}).always( _ => {
+                    try {
+                        var column = JSON.parse(props.column);
+                        var id = JSON.parse(props.dataid);
+                        console.log('in try')
+                    } catch (e) {
+                        var column = props.column;
+                        var id = props.dataid;
+                    }
+                    $.post( '/auth/alter/edit', {table: props.table, column, id,  value, changed_column: props.db_column}).always( _ => {
                         $('#root_refresher').click();
                     });
                     props.onHide();

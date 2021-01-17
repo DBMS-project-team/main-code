@@ -92,7 +92,7 @@ router.get('/menus/new/:parent?/:parent_title?', (req, res)=>{
 });
 
 router.get('/menus/edit/:menu_id/*', (req, res)=>{
-    db.query("select * from menus where parent is null;select * from menus where menu_id=?", req.params.menu_id, (error, result)=>{
+    db.query("select * from menus where parent is null;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             res.render('newMenu', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
@@ -100,16 +100,19 @@ router.get('/menus/edit/:menu_id/*', (req, res)=>{
     })
 });
 
+router.get('/menus/permissions', (req, res)=>{
+    db.query("select * from menus where parent is null;select * from menus where menu_id=?", req.params.menu_id, (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            res.render('menuPermissions', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
+        }
+    })
+});
+
 router.get('/settings', (req, res)=>{
     res.render('settings');
 });
-router.get('/leaves', (req, res)=>{
-    res.render('leaves');
-});
-router.get('/leaves/my-applications', (req, res)=>{
-    const emp_id = req.session.emp_id;
-    res.render('myLeaveApplications', {emp_id});
-});
+
 router.get('/login/new', (req, res)=>{
     res.render('login/new');
 });
@@ -135,6 +138,10 @@ router.get('/employees/custom-attributes', (req, res)=>{
         } 
     })
 
+});
+
+router.get('/leaves', (req, res)=>{
+    res.render('leaves');
 });
 
 router.get('/leaves/settings',(req, res)=>{
@@ -168,7 +175,8 @@ router.get('/leaves/my-applications', (req, res)=>{
         else {
             if( result.length > 0 ){
                 result.forEach( row => {
-                    row.apply_date_time = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'dddd, mmmm dS, yyyy' ) : ''
+                    row.formatted_date_time = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'dddd, mmmm dS, yyyy' ) : '';
+                    row.apply_date_time     = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'yy-mm-dd HH:MM:ss' ) : '';
                 })
                 res.render('myLeaveApplications', {emp_id,applications: result});
             }
@@ -187,7 +195,10 @@ router.get('/leaves/newApplication', (req, res)=>{
 });
 
 router.get('/*', (req, res)=>{
-    res.render('.'+req.originalUrl)
+    res.render('404',{url: req.originalUrl})
 })
+/*router.get('/*', (req, res)=>{
+    res.render('.'+req.originalUrl)
+})*/
 
 module.exports = router;
