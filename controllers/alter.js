@@ -51,4 +51,14 @@ router.post('/edit', (req, res) => {
     console.log(query.sql)
 });
 
+router.post('/leave_approval', (req, res) => {
+    const {empId,dateTime,status} = req.body;
+    db.query('UPDATE `leave_applications` SET  status_id=? WHERE `emp_id`=? and `apply_date_time`=?;', [status,empId,dateTime], (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            res.json(result);
+        }
+    })
+});
+
 module.exports = router;
