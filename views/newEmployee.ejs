@@ -103,6 +103,7 @@
                                 <div class="mb-3 col-md-6">
                                     <label class="form-label" for="input<%= cusAttr.custom_field_name %>"><%= cusAttr.custom_field_name.charAt(0).toUpperCase() + cusAttr.custom_field_name.slice(1) %></label>
                                     <input type="hidden"  name=attr_id value="<%= cusAttr.custom_field_id %>" >
+                                    <input type="hidden"  name=exist_attr_id value="<%= cusAttr.old_custom_field_id %>" >
                                     <input type="text" required name=attr_val class="form-control" id="input<%= cusAttr.custom_field_name %>" value="<%= cusAttr.custom_field_value? cusAttr.custom_field_value:"" %>" placeholder="<%= cusAttr.custom_field_name %>" >
                                 </div>
                             <% }) %> 
