@@ -189,8 +189,8 @@ router.get('/leaves/my-applications', (req, res)=>{
                     row.formatted_date_time = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'dddd, mmmm dS, yyyy' ) : '';
                     row.apply_date_time     = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'yy-mm-dd HH:MM:ss' ) : '';
                 })
-                res.render('myLeaveApplications', {emp_id,applications: result});
             }
+            res.render('myLeaveApplications', {emp_id,applications: result});
         }
     })
 });
