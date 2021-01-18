@@ -99,7 +99,7 @@ router.post('/addNewEmployee', ( req, res ) => {
 
 router.post('/editEmployee', ( req, res ) => {
     try {
-        let {empId,userAcc,firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val} = req.body;
+        let {empId,userAcc,firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,exist_attr_id,attr_val} = req.body;
 
         db.query('UPDATE `employees` SET `firstname`=?,`lastname`=?,`birthdate`=?,`martial_status`=?,`dept_id`=?,`job_id`=?,`emp_status_id`=?,`pay_grade_level`=?,`supervisor`=? WHERE emp_id=? ;', 
         [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,empId], (error, result) => {
@@ -114,8 +114,14 @@ router.post('/editEmployee', ( req, res ) => {
                 attr_val=[attr_val];
             }
             for (var i = 0; i < attr_id.length; i++) {
-                query +="UPDATE `employee_additional_detail` SET `custom_field_value`=? WHERE `emp_id`=? AND`custom_field_id`=?;";
-                valueArray.push(attr_val[i],empId,attr_id[i]);
+                if(exist_attr_id[i]==''){
+                    query += "INSERT INTO `employee_additional_detail`(`custom_field_value`,`emp_id`, `custom_field_id`) VALUES (?,?,?);";
+                    valueArray.push(attr_val[i],empId,attr_id[i]);
+                }else{
+                    query +="UPDATE `employee_additional_detail` SET `custom_field_value`=? WHERE `emp_id`=? AND`custom_field_id`=?;";
+                    valueArray.push(attr_val[i],empId,attr_id[i]);
+                }
+                
               }
             db.query(query,valueArray, async (err,result2) =>{
                 if(err) console.log('error', error);
