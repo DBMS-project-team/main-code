@@ -32,7 +32,7 @@ router.get('/employees', (req, res)=>{
 router.get('/employees/edit/:emp_id/*', (req, res)=>{
     try{
         const emp_id = req.params.emp_id;
-        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where emp_id != ? ;SELECT * FROM `user_levels`; SELECT c1.custom_field_name,c1.custom_field_id,c2.custom_field_value FROM `custom_fields` as c1 INNER JOIN `employee_additional_detail` c2 ON c1.custom_field_id=c2.custom_field_id WHERE c2.emp_id=?; SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.martial_status,e.dept_id,e.job_id,e.emp_status_id,e.pay_grade_level,e.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) WHERE e.emp_id=?", [emp_id,emp_id,emp_id],(error, result)=>{
+        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where status=1 and emp_id != ? ;SELECT * FROM `user_levels`; SELECT c.custom_field_id,c.custom_field_name,d.custom_field_value,d.custom_field_id AS old_custom_field_id FROM `custom_fields` c LEFT JOIN (SELECT * FROM employee_additional_detail e WHERE emp_id=?) d ON c.custom_field_id=d.custom_field_id ; SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.martial_status,e.dept_id,e.job_id,e.emp_status_id,e.pay_grade_level,e.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) WHERE e.emp_id=?", [emp_id,emp_id,emp_id],(error, result)=>{
             if(error) console.log('mysql error', error);
             else {
                 res.render('newEmployee',{result,newEmp:false});
@@ -122,12 +122,23 @@ router.get('/login/new', (req, res)=>{
 })*/
 
 router.get('/employees/newEmployee', (req, res)=>{
-    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` ;SELECT * FROM `user_levels`;SELECT * FROM `custom_fields`;", (error, result)=>{
+    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where  status=1;SELECT * FROM `user_levels`;SELECT * FROM `custom_fields`;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             res.render('newEmployee',{result, newEmp:true});
         } 
     })
+});
+
+router.get('/leaves/requests', (req, res)=>{
+    const emp_id = req.session.emp_id;
+    db.query("SELECT l.emp_id,CONCAT(l.apply_date_time,'') datetime,l.period,CONCAT(e.firstname,' ',e.lastname) fullname,s.title status,lt.leave_type,d.name department,j.job_title_name jobtitle FROM leave_applications l INNER JOIN employees e ON l.emp_id=e.emp_id INNER JOIN leave_application_statuses s ON l.status_id=s.status_id INNER JOIN leave_types lt ON l.leave_type_id=lt.leave_type_id INNER JOIN departments d ON e.dept_id=d.dept_id INNER JOIN job_titles j ON e.job_id=j.job_id  WHERE e.status=1 and e.supervisor=? ORDER BY l.status_id,fullname;",
+        emp_id,(err,result) =>{
+            if(err) console.log('mysql error', err );
+            else {
+                res.render('leave_requests',{result});
+            }
+        })
 });
 
 router.get('/employees/custom-attributes', (req, res)=>{
