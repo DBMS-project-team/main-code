@@ -101,7 +101,7 @@ router.get('/menus/edit/:menu_id/*', (req, res)=>{
 });
 
 router.get('/menus/permissions', (req, res)=>{
-    db.query("select * from menus where parent is null;select * from menus where menu_id=?", req.params.menu_id, (error, result)=>{
+    db.query("select * from menus where parent is null;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             res.render('menuPermissions', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
