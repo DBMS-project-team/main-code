@@ -5,7 +5,7 @@ const db = require('../../db_config');
 const feather = require('feather-icons');
 
 router.get('/', (req, res)=>{
-    res.render('settings');
+    res.render('settings/');
 });
 
 module.exports = router;

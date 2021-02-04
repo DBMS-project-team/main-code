@@ -5,7 +5,7 @@ const db = require('../../db_config');
 const feather = require('feather-icons');
 
 router.get('/', (req, res)=>{
-    res.render('leaves');
+    res.render('leaves/');
 });
 
 router.get('/requests', (req, res)=>{
@@ -14,7 +14,7 @@ router.get('/requests', (req, res)=>{
         emp_id,(err,result) =>{
             if(err) console.log('mysql error', err );
             else {
-                res.render('leave_requests',{result});
+                res.render('leaves/leave_requests',{result});
             }
         })
 });
@@ -25,7 +25,7 @@ router.get('/settings',(req, res)=>{
         else{
             var res_1=result[0];
             var res_2=result[1];
-            res.render('leave_settings',{leave_type_res:res_1, max_leave_res:res_2});
+            res.render('leaves/leave_settings',{leave_type_res:res_1, max_leave_res:res_2});
         }
     })
 });
@@ -36,7 +36,7 @@ router.get('/new_max_leave/:parent?/:parent_title?', (req, res)=>{
         else {
             var res_1=result[0];
             var res_2=result[1];     
-            res.render('new_max_leave', {data: false, leave_type_res:res_1, pay_gr_res:res_2});
+            res.render('leaves/new_max_leave', {data: false, leave_type_res:res_1, pay_gr_res:res_2});
             
         } 
     })
@@ -54,7 +54,7 @@ router.get('/my-applications', (req, res)=>{
                     row.apply_date_time     = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'yy-mm-dd HH:MM:ss' ) : '';
                 })
             }
-            res.render('myLeaveApplications', {emp_id,applications: result});
+            res.render('leaves/myLeaveApplications', {emp_id,applications: result});
         }
     })
 });
@@ -64,7 +64,7 @@ router.get('/newApplication', (req, res)=>{
     db.query("SELECT * FROM `leave_types`", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('newLeaveApplication',{emp_id,types: result});
+            res.render('leaves/newLeaveApplication',{emp_id,types: result});
         } 
     })
 });

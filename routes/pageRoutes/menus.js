@@ -15,7 +15,7 @@ router.get('/', (req, res)=>{
                     else menu.children = false;
                 })
                 console.log(result[0])
-                res.render('menus', {menus: result[0]});
+                res.render('menus/', {menus: result[0]});
             }
         }
     })
@@ -25,7 +25,7 @@ router.get('/new/:parent?/:parent_title?', (req, res)=>{
     if(req.params.parent){
         res.render('newMenu', {parent: req.params.parent, parent_title: req.params.parent_title, data: false});
     }else{
-        res.render('newMenu', {parent: false, icons: feather.icons, data: false});
+        res.render('menus/newMenu', {parent: false, icons: feather.icons, data: false});
     }
 });
 
@@ -33,7 +33,7 @@ router.get('/edit/:menu_id/*', (req, res)=>{
     db.query("select * from menus where parent is null;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('newMenu', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
+            res.render('menus/newMenu', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
         }
     })
 });
@@ -42,7 +42,7 @@ router.get('/permissions', (req, res)=>{
     db.query("select * from menus where parent is null;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('menuPermissions', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
+            res.render('menus/menuPermissions', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
         }
     })
 });

@@ -1,0 +1,39 @@
+<div class="container-fluid p-0">
+    <div class="card container">
+        <div class="card-header">
+            <h3 style="font-family:verdana;">My applications</h3>
+            <a href="#/leaves/newApplication" class="btn btn-primary gap-2 md">Add New Application</a>
+        </div>
+        <table class="table table-striped table-hover" datatable="true" db_table="leave_applications" db_primary_column='["emp_id", "apply_date_time"]' popup-edit="3">
+            <thead>
+                <tr>
+                    <th style="width: 30px;"></th>
+                    <th>Leave Type</th>
+                    <th>Start Date</th>
+                    <th db_column="period">Period (# of days)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>  
+            </thead>
+            <tbody> 
+                <% var id=0 %>
+                <% applications.forEach(function(res){ %>
+                    <tr data-id='["<%= emp_id %>", "<%= res.apply_date_time %>"]'>
+                        <td><%= ++id %></td>
+                        <td><%= res.leave_type %></td>
+                        <td><%= res.formatted_date_time %></td>
+                        <td><%= res.period %></td> 
+                        <td><%= res.title %></td>
+                        <% if (res.title == "Sent") { %>
+                            <td class="table-action">
+                                <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
+                            </td>
+                        <% }else{ %>
+                            <td></td>
+                        <% } %>
+                    </tr>
+                <% }) %> 
+            </tbody> 
+        </table>
+    </div> 
+</div> 
