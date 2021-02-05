@@ -12,17 +12,14 @@ var user = {
 router.get('/', (req, res)=>{
     res.render('home', {user});
 });
-router.get('/profile', (req, res)=>{
-    res.render('profile');
-});
 
 router.use('/employees/', require('./pageRoutes/employees'));
-router.use('/departments', require('./pageRoutes/departments'))
+router.use('/departments', require('./pageRoutes/departments'));
 router.use('/menus', require('./pageRoutes/menus'));
 router.use('/leaves', require('./pageRoutes/leaves'));
 router.use('/settings', require('./pageRoutes/settings'));
 router.use('/login', require('./pageRoutes/login'));
-
+router.use('/profile', require('./pageRoutes/profile'));
 
 /*router.get('/auth/login', (req, res)=>{
     res.send('normal')
