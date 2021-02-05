@@ -58,6 +58,10 @@
             {
                 title: "My Applications",
                 href: "#/leaves/my-applications"
+            },
+            {
+                title: "Requests",
+                href: "#/leaves/requests"
             }
         ]
     },
@@ -99,6 +103,9 @@
     }
 ];
 %>
+<script>
+    var menus=JSON.parse('<%-JSON.stringify(menus) %>');
+</script>
 <nav id="sidebar" class="sidebar">
     <div class="sidebar-content js-simplebar">
         <a class="sidebar-brand" href="index.html">
@@ -109,6 +116,9 @@
             <li class="sidebar-header">
                 Pages
             </li>
+            <div id="sideBarCont" >
+
+            </div>
 
             <% menus.forEach(function(menu){ %>
                 <li class="sidebar-item">

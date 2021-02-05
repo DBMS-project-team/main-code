@@ -65,7 +65,7 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.23/af-2.3.5/b-1.6.5/b-colvis-1.6.5/b-flash-1.6.5/b-html5-1.6.5/b-print-1.6.5/cr-1.5.3/fc-3.3.2/fh-3.1.7/kt-2.5.3/r-2.2.7/rg-1.1.2/rr-1.2.7/sc-2.0.3/sb-1.0.1/sp-1.2.2/sl-1.3.1/datatables.min.js"></script>
 
-        <script src="/js/app.js"></script>
+        <script defer src="/js/app.js"></script>
         <script src="js/fullcalendar.js"></script>
         <!-- <%# if (typeof jsfile !='undefined' && jsfile) { %>
             <script src="<%#= jsfile %>"></script>
@@ -101,7 +101,6 @@
                             let s = document.createElement("script");
                             if( sEle.src !== '' ){
                                 s.src = sEle.src;
-                                
                             }
                             s.innerHTML = sEle.innerHTML;
                             document.querySelector('#root').appendChild(s);
@@ -234,13 +233,46 @@
                         />
                     </React.Fragment>
                 );
-                }
-    
-            const rendered = ReactDOM.render(<App />, document.querySelector('#root'));
+            }
+            const SidebarItem = ({menu}) => {
+                return (
+                    <li className="sidebar-item">
+                    <a href={menu.child ? "#"+menu.href : menu.href} data-toggle={ menu.child ? "collapse" : '' } className={"sidebar-link" +  menu.child ? "collapsed" : "" }>
+                        <i className="align-middle" data-feather={ menu.icon }></i> <span className="align-middle">{ menu.title }</span>
+                    </a>
+                    {  menu.child &&
+                        <ul id={ menu.href } className="sidebar-dropdown list-unstyled collapse" data-parent="#sidebar">
+                            {
+                                menu.child.map((item, id)=> (
+                                    <li key={id} className="sidebar-item"><a className="sidebar-link" href={ item.href }>{ item.title }</a></li>
+                                ))
+                            }
+                        </ul>
+                    }
+                </li>
+                );
+            }
+            const SideBar = ({menus}) => {
+                return (
+                    <React.Fragment>
+                    {menus.map((menu, id)=>(
+                        <SidebarItem key={id} menu={menu} />
+                    ))}
+                    </React.Fragment>
+                )
+            }
+            ReactDOM.render(<App />, document.querySelector('#root'));
             ReactDOM.render(<App2 />, document.querySelector('#modal-cont'));
+            //ReactDOM.render(<SideBar menus={menus} />, document.querySelector('.sidebar-nav'));
         </script>
         <script>
             const after_pageload = _ => {
+                $('.sidebar-item').removeClass('active');
+                $(`a[aria-expanded='true']`).attr('aria-expanded', false)
+                $(`a[href='${location.hash}]'`).addClass('active');
+                $(`a[href='${location.hash}']`).parents('.sidebar-item').addClass('active');
+                $(`a[href='${location.hash}']`).parents('.sidebar-item').children('a').attr('aria-expanded', true)
+                $(`a[href='${location.hash}']`).parents('.sidebar-item').children('ul').addClass('show');
                 const forms = $('#root form');
                 forms.each( function() {
                     $(this).unbind('submit').submit(e=>{
@@ -300,6 +332,10 @@
                         e.preventDefault();
                     }
                 })
+                // $('.sidebar-item').unbind('click').click(function(){
+                //     $('.sidebar-item').removeClass('active');
+                //     $(this).toggleClass('active');
+                // })
             }
         </script>
 

@@ -3,9 +3,22 @@ const router = express.Router();
 var dateFormat = require('dateformat');
 const db = require('../../db_config');
 const feather = require('feather-icons');
+const errorHandler = require('../errorHandler');
 
 router.get('/', (req, res)=>{
-    res.render('leaves/');
+    db.query("SELECT concat(e.firstname, ' ', e.lastname, ' - ', s.title) title, l.apply_date_time, l.period FROM leave_applications l NATURAL JOIN employees e NATURAL JOIN leave_application_statuses s;", (error, result) => {
+        if( error ) errorHandler(error);
+        else {
+            result.forEach( ele => {
+                ele.start = dateFormat( ele.apply_date_time, 'isoDateTime' );
+                const end = ele.apply_date_time;
+                end.setDate(end.getDate() + ele.period)
+                ele.end = dateFormat( end, 'isoDateTime' );
+                ele.allDay = true;
+            });
+            res.render('leaves/', {leaves: result});
+        }
+    })
 });
 
 router.get('/requests', (req, res)=>{
