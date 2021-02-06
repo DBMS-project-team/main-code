@@ -7,6 +7,10 @@ const path = require('path');
 dotenv.config({path: './.env'})
 
 const app = express();
+
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
 app.set('view engine', 'ejs');
 app.use(express.static('public')); //No need of public folder for html
 //parse url-encoded bodies (as sent by HTML forms)
@@ -19,8 +23,7 @@ app.use(session({
 	resave: true,
 	saveUninitialized: true
 }));
-app.use(bodyParser.urlencoded({extended : true}));
-app.use(bodyParser.json());
+
 
 app.use((req, res, next)=>{
     console.log(req.originalUrl);
