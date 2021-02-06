@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/css/croppie.css" />
 <div class="content container-fluid p-0">
     <%#  JSON.stringify(result[6]) %>
     <% if(newEmp){
@@ -17,6 +18,21 @@
             <form after_submit="change_page" action="<%= action %>">
                 <input type="hidden" name="empId" value="<%= employee.emp_id %>">
                 <input type="hidden" name="userAcc" value="<%= employee.userAcc %>">
+                <input type="hidden" name="profileImage" id="profileImage" value="<%= newEmp ? 'default' :'unchanged' %>">
+
+                <div class="card" >
+                    <div class="row">
+                        <div  class="mb-3 col-md-2">
+                            <img src="<%= (newEmp || imageData=='default')  ? 'img/profile/default.jpg':imageData %>" id="croppedImage" name="croppedImage" alt="Profile Photo" class="img-fluid rounded-circle mb-2" width="128" height="128" />
+                        </div>
+                        <div  class="mb-3 col-md-10">
+                            <label for="upload_image" style="margin: 35px 0 14px;width: 140px;" class="btn btn-primary" ><i class="fas fa-upload"></i>  Upload Image</label> 
+                            <input type="file" style="display: none;" name="upload_image" id="upload_image" accept="image/*" /><br>
+                            <button type="Button" class="btn btn-primary" id="defaultImage">Set Default Image</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputFirstName">First name</label>
@@ -145,14 +161,34 @@
         </div>
     </div>
 
-</div>
+    <div id="uploadimageModal" class="modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title">Crop Image</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row">
+                          <div class="col-md-8 text-center">
+                              <div id="image_demo" style="width:350px; margin-top:30px"></div>
+                          </div>
+                          <div class="col-md-4" style="padding-top:30px;">
+                              <br />
+                              <br />
+                              <br/>
+                              <button class="btn btn-success crop_image">Crop Image</button>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+            </div>
+        </div>
+    </div>
 
-<script >
-    var change_page = () => {
-        location.hash = "/employees";
-    }
-    var editUserToggle = () => {
-        document.querySelector("#editEmpUser").classList.toggle("d-none");
-        document.querySelector("#inputUsername").toggleAttribute("required");
-    }
-</script>
+</div>
+<script src="/js/newEmployee.js"> </script>
+<script src="/js/croppie.js"></script>
+
