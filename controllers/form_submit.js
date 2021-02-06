@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 var dateFormat = require('dateformat');
 const db = require('../db_config');
+var fs = require("fs");
 
 router.post('/add_new_emp_status', (req, res) => {
     db.query('INSERT INTO `employment_statuses` SET ?', {emp_status: req.body.value}, (error, result) => {
@@ -56,13 +57,17 @@ router.post('/add_new_cus_attribute', (req, res) => {
 
 router.post('/addNewEmployee', ( req, res ) => {
     try {
-        let {firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val} = req.body;
+        let {firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val,profileImage} = req.body;
         db.query("INSERT INTO `employees`(`firstname`, `lastname`, `birthdate`, `martial_status`, `dept_id`, `job_id`, `emp_status_id`, `pay_grade_level`, `supervisor`) VALUES (?,?,?,?,?,?,?,?,?)",
             [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor], 
             async (err,result) =>{
                 if(err) console.log('error', error);
                 else {
                     const emp_id = result.insertId;
+                    if (profileImage !=="default"){
+                        fs.writeFile("public\\img\\profile\\"+emp_id+".jpg", new Buffer.from(profileImage.split(",")[1], "base64"), 
+                        function(imageWriteErr) {if(imageWriteErr) console.log(imageWriteErr);});
+                    }
                     if(attr_id){
                         var valueArray=[];
                         if (attr_id.length==1){
@@ -99,8 +104,17 @@ router.post('/addNewEmployee', ( req, res ) => {
 
 router.post('/editEmployee', ( req, res ) => {
     try {
-        let {empId,userAcc,firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,exist_attr_id,attr_val} = req.body;
-
+        let {empId,userAcc,firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,exist_attr_id,attr_val,profileImage} = req.body;
+        if(profileImage !== "unchanged"){
+            if (profileImage=="default"){
+                fs.unlink("public\\img\\profile\\"+empId+".jpg", (delErr) => {
+                    if (delErr) console.log("image delete error",delErr);
+                });
+            }else{
+                fs.writeFile("public\\img\\profile\\"+empId+".jpg", new Buffer.from(profileImage.split(",")[1], "base64"), 
+                function(writeErr) {if(writeErr) console.log("write error",writeErr);});
+            }
+        }
         db.query('UPDATE `employees` SET `firstname`=?,`lastname`=?,`birthdate`=?,`martial_status`=?,`dept_id`=?,`job_id`=?,`emp_status_id`=?,`pay_grade_level`=?,`supervisor`=? WHERE emp_id=? ;', 
         [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,empId], (error, result) => {
             if(error) console.log('mysql error', error);
