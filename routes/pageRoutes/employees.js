@@ -6,14 +6,14 @@ const feather = require('feather-icons');
 const fs = require("fs")
 
 router.get('/', (req, res)=>{
-    db.query("select e.firstname, e.lastname, e.birthdate, e.martial_status, d.name, p.pay_grade_level_title, e.emp_id, u.emp_id user_id from employees as e inner join departments as d ON e.dept_id=d.dept_id inner join pay_grades as p ON e.pay_grade_level=p.pay_grade_level left join users as u ON e.emp_id=u.emp_id", (error, result)=>{
+    db.query("select * FROM employees_details;select * from custom_fields", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            if( result.length > 0 ){
-                result.forEach( row => {
+            if( result[0].length > 0 ){
+                result[0].forEach( row => {
                     row.birthdate = row.birthdate !== null ? dateFormat( row.birthdate, 'dddd, mmmm dS, yyyy' ) : ''
                 })
-                res.render('employees/', {employees: result});
+                res.render('employees/', {employees: result[0], custom_fields: result[1]});
             }
         }
     })
@@ -70,6 +70,21 @@ router.get('/custom-attributes', (req, res)=>{
         } 
     })
 
+});
+
+router.get('/reports/:table?', (req, res)=>{
+    console.log(req.params.table);
+    db.query("select * FROM employees_details;select * from custom_fields;select dept_id id, name title from departments;select pay_grade_level id, pay_grade_level_title title from pay_grades;select job_id id, job_title_name title from job_titles;", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            if( result[0].length > 0 ){
+                result[0].forEach( row => {
+                    row.birthdate = row.birthdate !== null ? dateFormat( row.birthdate, 'dddd, mmmm dS, yyyy' ) : ''
+                })
+                res.render('employees/reports', {employees: result[0], custom_fields: result[1], rest_fields: result.slice(2)});
+            }
+        }
+    })
 });
 
 module.exports = router;
