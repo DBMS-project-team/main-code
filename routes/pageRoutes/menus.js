@@ -39,10 +39,10 @@ router.get('/edit/:menu_id/*', (req, res)=>{
 });
 
 router.get('/permissions', (req, res)=>{
-    db.query("select * from menus where parent is null;", (error, result)=>{
+    db.query("select * from pivoted_menu_permissions where parent is null;select * from user_levels", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('menus/menuPermissions', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});
+            res.render('menus/menuPermissions', {icons: feather.icons, data: result[0], userLevels: result[1]});
         }
     })
 });

@@ -108,12 +108,20 @@ CREATE TABLE employee_additional_details (
     PRIMARY KEY (emp_id, custom_field_value_id)
 );
 
+CREATE TABLE emergency_contact_items (
+    eme_item_id int AUTO_INCREMENT,
+    eme_item_name varchar(64),
+    personal TINYINT DEFAULT 0,
+    PRIMARY KEY (eme_item_id)
+);
+
 CREATE TABLE emergency_contact_details (
     emp_id int(11),
-    field_name varchar(50),
-    field_value varchar(50),
-    PRIMARY KEY (emp_id, field_name),
-    FOREIGN KEY (emp_id) REFERENCES employees(emp_id)
+    eme_item_id int(11),
+    eme_item_value varchar(50),
+    PRIMARY KEY (emp_id, eme_item_id, eme_item_value),
+    FOREIGN KEY (emp_id) REFERENCES employees(emp_id),
+    FOREIGN KEY (eme_item_id) REFERENCES emergency_contact_items(eme_item_id)
 );
 
 CREATE TABLE leave_types (
@@ -148,106 +156,6 @@ CREATE TABLE leave_application_statuses (
     title varchar(50),
     PRIMARY KEY (status_id)
 );
-
---///////////////////////////////////////////////////////////////
-
-SET @sql = NULL;
-SELECT
-  GROUP_CONCAT(DISTINCT
-    CONCAT(
-      'GROUP_CONCAT((CASE user_level when ',
-      user_level,
-      ' then permission else NULL END)) AS permission',
-      user_level
-    )
-  ) INTO @sql
-FROM menu_permissions;
-
-
-SET @sql = CONCAT('SELECT menu_id, ', @sql, ' 
-                  FROM menu_permissions 
-                  GROUP BY menu_id');
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-SELECT menu_id,
-	COUNT(user_level = 1 OR NULL) AS "Print 1 pages",
-    COUNT(user_level = 2 OR NULL) AS "Print 2 pages",
-    COUNT(user_level = 3 OR NULL) AS "Print 3 pages"
-FROM   menu_permissions
-GROUP  BY menu_id;
-
-
-DROP PROCEDURE IF EXISTS menuPermission;
-DELIMITER $$
-CREATE PROCEDURE menuPermission ()
-BEGIN
-	DECLARE finished INTEGER DEFAULT 0;
-	DECLARE user_level varchar(100) DEFAULT "";
-    DECLARE statement TEXT DEFAULT "";
-	-- declare cursor for employee email
-	DEClARE curEmail 
-		CURSOR FOR 
-			SELECT user_level FROM user_levels;
-
-	-- declare NOT FOUND handler
-	DECLARE CONTINUE HANDLER 
-        FOR NOT FOUND SET finished = 1;
-
-	OPEN curEmail;
-
-	getEmail: LOOP
-		FETCH curEmail INTO user_level;
-		IF finished = 1 THEN 
-			LEAVE getEmail;
-		END IF;
-		-- build email list
-		SET statement = CONCAT(statement,", ", "COUNT(user_level = ", user_level, " OR NULL) AS 'col", user_level, "'");
-	END LOOP getEmail;
-	CLOSE curEmail;
-    
-	SET @sql = CONCAT('SELECT menu_id, ', statement, ' 
-                  FROM menu_permissions 
-                  GROUP BY menu_id');
-
-    PREPARE stmt FROM @sql;
-    EXECUTE stmt;
-    DEALLOCATE PREPARE stmt;
-    
-END$$
-DELIMITER ;
-call menuPermission ();
-
-DROP PROCEDURE IF EXISTS menuPermission;
-DELIMITER $$
-CREATE PROCEDURE menuPermission ()
-BEGIN
-	SET @sql = NULL;
-    SELECT
-      GROUP_CONCAT(DISTINCT
-        CONCAT(
-          'GROUP_CONCAT((CASE user_level when ',
-          user_level,
-          ' then permission else NULL END)) AS user_level_',
-          user_level
-        )
-      ) INTO @sql
-    FROM menu_permissions;
-
-
-    SET @sql = CONCAT('SELECT menu_id, ', @sql, ' 
-                      FROM menu_permissions 
-                      GROUP BY menu_id');
-
-    PREPARE stmt FROM @sql;
-    EXECUTE stmt;
-    DEALLOCATE PREPARE stmt;
-    
-END$$
-DELIMITER ;
-call menuPermission ();
 
 --/////////////////////////////////////////////////////////////////////////////////////
 
@@ -342,3 +250,40 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- ///////////////////////////////////////////////////
+-- menupermission procedure
+
+DROP PROCEDURE IF EXISTS menuPermission;
+DELIMITER $$
+CREATE PROCEDURE menuPermission ()
+BEGIN
+	SET @sql = NULL;
+    SELECT
+      GROUP_CONCAT(DISTINCT
+        CONCAT(
+            'GROUP_CONCAT((CASE user_level when ',
+            user_level,
+            ' then permission else NULL END)) AS ',
+            'user_level_', user_level
+        )
+      ) INTO @sql
+    FROM menu_permissions natural join user_levels;
+
+
+    SET @sql = CONCAT('CREATE OR REPLACE VIEW pivoted_menu_permissions AS SELECT
+                        *
+                        FROM menus m NATURAL LEFT OUTER JOIN (
+                        SELECT menu_id, ', @sql, ' 
+                        FROM menu_permissions
+                        GROUP BY menu_id
+                        ) menus
+                        ');
+
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+    
+END$$
+DELIMITER ;
+call menuPermission ();

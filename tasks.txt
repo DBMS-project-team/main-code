@@ -1,0 +1,3 @@
+employee detail
+    emergency detail (personal and emergency)
+    custom attributes
