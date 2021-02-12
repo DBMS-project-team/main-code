@@ -63,10 +63,12 @@ router.get('/newEmployee', (req, res)=>{
 });
 
 router.get('/custom-attributes', (req, res)=>{
-    db.query("SELECT * FROM `custom_fields`", (error, result)=>{
+    db.query("SELECT * FROM custom_fields; SELECT * FROM custom_field_values;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('employees/customAttributes',{cusAttr:result});
+            var res_1 = result[0]
+            var res_2 = result[1]
+            res.render('employees/customAttributes',{cusAttr: res_1, cusVal: res_2});
         } 
     })
 
