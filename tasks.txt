@@ -1,3 +1,5 @@
 employee detail
     emergency detail (personal and emergency)
     custom attributes
+menu permissions
+max num of leaves

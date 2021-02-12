@@ -4,6 +4,8 @@ var dateFormat = require('dateformat');
 const db = require('../db_config');
 var fs = require("fs");
 
+router.use('/employees', require('./form_submit/employees'));
+
 router.post('/add_new_emp_status', (req, res) => {
     db.query('INSERT INTO `employment_statuses` SET ?', {emp_status: req.body.value}, (error, result) => {
         if(error) console.log('mysql error', error);
@@ -36,21 +38,6 @@ router.post('/add_new_department', (req, res) => {
         if(error) console.log('mysql error', error);
         else {
             res.json(result.insertId);
-        }
-    })
-});
-
-router.post('/add_new_cus_attribute', (req, res) => {
-    const {attr_title, attr_value} =req.body;
-    db.query('INSERT INTO `custom_fields` SET ? ;', {custom_field_name:attr_title}, (error, result) => {
-        if(error) console.log('mysql error', error);
-        else {
-            db.query('INSERT INTO `employee_additional_detail` SELECT emp_id,?,? FROM `employees`;', [result.insertId,attr_value], (error, result2) => {
-                if(error) console.log('mysql error', error);
-                else {
-                    res.json(result);
-                }
-            })
         }
     })
 });

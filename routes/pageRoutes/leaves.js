@@ -33,12 +33,10 @@ router.get('/requests', (req, res)=>{
 });
 
 router.get('/settings',(req, res)=>{
-    db.query("SELECT * FROM `leave_types`;SELECT lt.*, pg.*, mld.* FROM `max_leave_days` as mld inner join `leave_types` as lt ON mld.leave_type_id=lt.leave_type_id inner join `pay_grades` as pg ON mld.pay_grade_level=pg.pay_grade_level", (error, result)=>{
+    db.query("SELECT * FROM `leave_types`;select * from pivoted_max_leave_days;select * from pay_grades;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else{
-            var res_1=result[0];
-            var res_2=result[1];
-            res.render('leaves/leave_settings',{leave_type_res:res_1, max_leave_res:res_2});
+            res.render('leaves/leave_settings',{leave_type_res: result[0], max_leave_res:result[1], pay_grades: result[2]});
         }
     })
 });

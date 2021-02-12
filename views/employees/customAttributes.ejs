@@ -26,7 +26,7 @@
             </tbody>
         </table>
         <div class="row g-3 align-items-center">
-            <form action="/auth/form_submit/add_new_cus_attribute">
+            <form action="/auth/form_submit/employees/add_new_cus_attribute">
                 <div class="row p-2">
                     <div class="col-auto">
                         <label for="add_new_cus_attribute" class="col-form-label">Add A New Custom Attribute</label>
@@ -35,13 +35,18 @@
                         <input type="text" name="attr_title" id="add_new_cus_attribute" class="form-control" aria-describedby="passwordHelpInline" placeholder="Custom Attribute Title" required>
                     </div>
                     <div class="col-auto">
-                        <input type="text" name="attr_value" id="add_new_cus_default" class="form-control" aria-describedby="passwordHelpInline" placeholder="Default Value" required>
-                    </div>
-                    <div class="col-auto">
                         <button class="btn btn-primary" type="submit">Add</button>
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid p-0">
+    <div class="card container">
+        <div class="card-header">
+            <h3>Custom Attribute Values</h3>
         </div>
     </div>
 </div>
@@ -75,16 +80,14 @@
                 </tbody>
             </table>
             <div class="row g-3 align-items-center">
-                <form action="/auth/form_submit/add_new_cus_attribute">
+                <form action="/auth/form_submit/employees/attr_value">
+                    <input type="hidden" name="custom_field_id" value="<%= attr.custom_field_id %>">
                     <div class="row p-2">
                         <div class="col-auto">
                             <label for="add_new_cus_attribute" class="col-form-label">Add A New <%= attr.custom_field_name %> Type</label>
                         </div>
                         <div class="col-auto">
-                            <input type="text" name="attr_title" id="add_new_cus_attribute" class="form-control" aria-describedby="passwordHelpInline" placeholder="Custom Attribute Title" required>
-                        </div>
-                        <div class="col-auto">
-                            <input type="text" name="attr_value" id="add_new_cus_default" class="form-control" aria-describedby="passwordHelpInline" placeholder="Default Value" required>
+                            <input type="text" name="attr_value" id="attr_value" class="form-control" placeholder="Add new <%= attr.custom_field_name %>" required>
                         </div>
                         <div class="col-auto">
                             <button class="btn btn-primary" type="submit">Add</button>

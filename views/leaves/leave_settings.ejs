@@ -53,23 +53,20 @@
                 <tr>
                     <th style="width: 30px;"></th>
                     <th db_column="leave_type_id">Leave Type</th>
-                    <th db_column="pay_grade_level">Pay Grade Level</th>
-                    <th db_column="no_of_leaves">No of Leaves</th>
-                    <th>Actions</th>
+                    <% pay_grades.forEach(pay_grade=>{ %>
+                        <th><%= pay_grade.pay_grade_level_title %></th>
+                    <% }) %>
                 </tr>
             </thead>
             <tbody>
                 <% var count = 1 %>
-                <% max_leave_res.forEach(function(res_2){ %>
-                    <tr data-id="<%= res_2.leave_type_id %>" children="<%= JSON.stringify( res_2.children ) %>">
+                <% max_leave_res.forEach(function(res){ %>
+                    <tr %>">
                         <td><%= count++ %></td>
-                        <td><%= res_2.leave_type %></td>
-                        <td><%= res_2.pay_grade_level_title %></td>
-                        <td><%= res_2.no_of_leaves %></td>
-                        <td class="table-action">
-                            <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
-                            <a href="#"><i class="align-middle del_ele" data-feather="trash"></i></a>
-                        </td>
+                        <td><%= res.leave_type %></td>
+                        <% pay_grades.forEach(pay_grade=>{ %>
+                            <td><%= res[`pay_grade_level_${pay_grade.pay_grade_level}`] %></td>
+                        <% }) %>
                     </tr>
                 <% }) %> 
             </tbody>

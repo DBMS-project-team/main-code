@@ -74,6 +74,17 @@ router.get('/custom-attributes', (req, res)=>{
 
 });
 
+router.get('/emergency-contact', (req, res)=>{
+    db.query("SELECT * FROM custom_fields; SELECT * FROM custom_field_values;", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            var res_1 = result[0]
+            var res_2 = result[1]
+            res.render('employees/emergency',{cusAttr: res_1, cusVal: res_2});
+        } 
+    });
+});
+
 router.get('/reports/:table?', (req, res)=>{
     console.log(req.params.table);
     db.query("select * FROM employees_details;select * from custom_fields;select dept_id id, name title from departments;select pay_grade_level id, pay_grade_level_title title from pay_grades;select job_id id, job_title_name title from job_titles;", (error, result)=>{

@@ -287,3 +287,40 @@ BEGIN
 END$$
 DELIMITER ;
 call menuPermission ();
+
+-- ///////////////////////////////////////////////////
+-- max leave
+
+DROP PROCEDURE IF EXISTS maxLeaves;
+DELIMITER $$
+CREATE PROCEDURE maxLeaves ()
+BEGIN
+	SET @sql = NULL;
+    SELECT
+      GROUP_CONCAT(DISTINCT
+        CONCAT(
+            'GROUP_CONCAT((CASE pay_grade_level when ',
+            pay_grade_level,
+            ' then max_no_of_leaves else NULL END)) AS ',
+            'pay_grade_level_', pay_grade_level
+        )
+      ) INTO @sql
+    FROM max_leave_days;
+
+
+    SET @sql = CONCAT('CREATE OR REPLACE VIEW pivoted_max_leave_days AS SELECT
+                        *
+                        FROM leave_types NATURAL LEFT OUTER JOIN (
+                        SELECT leave_type_id, ', @sql, ' 
+                        FROM max_leave_days
+                        GROUP BY leave_type_id
+                        ) leaves
+                        ');
+
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+    
+END$$
+DELIMITER ;
+call maxLeaves ();
