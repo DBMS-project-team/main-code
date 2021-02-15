@@ -27,11 +27,14 @@ create table employees (
     emp_id int not null auto_increment,
     firstname varchar(50) not null,
     lastname varchar (50) not null,
+    status TINYINT DEFAULT 1,
     birthdate date,
-    martial_status varchar(10),
+    gender ENUM ( 'male', 'female', 'transgender', 'gender_neutral', 'non_binary', 'agender', 'pangender', 'genderqueer', 'two_spirit', 'third_gender', 'all') DEFAULT 'male',
+    marital_status ENUM ('single', 'married', 'widowed', 'divorced', 'separated','registered_partnership') DEFAULT 'single',
     dept_id int(11),
     job_id int(11),
     emp_status_id int(11),
+    emp_status_type ENUM ('not_applicable', 'full_time', 'part_time') DEFAULT 'not_applicable',
     pay_grade_level int(11),
     supervisor int(11),
     primary key(emp_id),
@@ -39,6 +42,14 @@ create table employees (
 	foreign key (job_id) references job_titles(job_id),
     FOREIGN KEY (emp_status_id) REFERENCES employement_statuses(emp_status_id),
 	foreign key (pay_grade_level) references pay_grades(pay_grade_level),
+    FOREIGN KEY (supervisor) REFERENCES employees(emp_id)
+);
+
+CREATE TABLE supervisors (
+    emp_id int(11) not null,
+    supervisor int(11),
+    PRIMARY KEY (emp_id),
+    FOREIGN KEY (emp_id) REFERENCES employees(emp_id),
     FOREIGN KEY (supervisor) REFERENCES employees(emp_id)
 );
 
@@ -112,6 +123,8 @@ CREATE TABLE emergency_contact_items (
     eme_item_id int AUTO_INCREMENT,
     eme_item_name varchar(64),
     personal TINYINT DEFAULT 0,
+    is_required TINYINT DEFAULT 0,
+    multivalued TINYINT DEFAULT 0,
     PRIMARY KEY (eme_item_id)
 );
 
@@ -164,22 +177,29 @@ DELIMITER $$
 CREATE PROCEDURE employeesProcedure ()
 BEGIN
 	SET @sql = NULL;
-    SELECT
-      GROUP_CONCAT(DISTINCT
-        CONCAT(
-            'GROUP_CONCAT((CASE custom_field_id when ',
-            custom_field_id,
-            ' then custom_field_value else NULL END)) AS ',
-            custom_field_name,
-            ', ',
-            'GROUP_CONCAT((CASE custom_field_id when ',
-            custom_field_id,
-            ' then custom_field_id else NULL END)) AS ',
-            custom_field_name, '_id'
-        )
-      ) INTO @sql
-    FROM employee_additional_details natural join custom_field_values natural join custom_fields;
+    SET @custom_fields = 0;
+    SELECT COUNT(!) INTO @custom_fields FROM custom_fields;
+    IF @custom_fields <> 0 THEN
+        SELECT
+        GROUP_CONCAT(DISTINCT
+            CONCAT(
+                'GROUP_CONCAT((CASE custom_field_id when ',
+                custom_field_id,
+                ' then custom_field_value else NULL END)) AS ',
+                custom_field_name,
+                ', ',
+                'GROUP_CONCAT((CASE custom_field_id when ',
+                custom_field_id,
+                ' then custom_field_id else NULL END)) AS ',
+                custom_field_name, '_id'
+            )
+        ) INTO @sql
+        FROM employee_additional_details natural join custom_field_values natural join custom_fields;
+    ELSE
+        @sql = 'none';
+    END IF;
 
+    
 
     SET @sql = CONCAT('CREATE OR REPLACE VIEW employees_details AS SELECT
                         e.firstname, e.lastname, e.birthdate, e.martial_status, e.dept_id, e.job_id, e.emp_status_id, e.pay_grade_level pay_grade_level_id,
