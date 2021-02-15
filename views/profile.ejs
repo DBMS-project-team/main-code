@@ -14,16 +14,16 @@
 				my_birthdate = 'Birth date';
 				my_martial_status = 'Martial status(Single/married)';
 				my_dept_name = 'Department name';
-				my_emp_status = 'Employment status';
+				my_emp_status = 'Employee status - Employee status type';
 				my_pay_grade_level_title = 'Pay Grade Level Title';
 			}else{ 
 					my_detail.forEach(function(Det){ 
 						my_fullname = Det.fullname;
 						my_job_title_name = Det.job_title_name;
 						my_birthdate = Det.birthdate;
-						my_martial_status = Det.martial_status;
+						my_martial_status = Det.marital_status;
 						my_dept_name = Det.name;
-						my_emp_status = Det.emp_status;
+						my_emp_status = Det.emp_status + ' - ' + Det.emp_status_type;
 						my_pay_grade_level_title = Det.pay_grade_level_title;
 					})
 			}%>
@@ -66,9 +66,14 @@
 				<% if(emp_id == 0){ %>
 					Custom field name : Custom field value
 				<% }else{ 
+					if(eme_res.length > 0){
 						cus_res.forEach(function(Det){ %>
 							<h3 class="card-title mb-0"><%= Det.custom_field %></h3>
-				<% })} %>
+						<% })
+					}else{ %>
+						<h3 class="card-title mb-0">Not Given</h3>
+					<% }
+				 } %>
 			</div>
 			<hr class="my-0" />
 			<div class="card-body">
