@@ -29,4 +29,17 @@ router.post('/attr_value', (req, res) => {
     })
 });
 
+router.post('/add_new_emergency_attribute', (req, res) => {
+    var {isRequired, isMultivalued }=req.body;
+    const { name, isPersonal} = req.body; 
+    isRequired = (isRequired == null)? 0 : 1;
+    isMultivalued = (isMultivalued == null)? 0 : 1;
+    db.query('INSERT INTO `emergency_contact_items` SET ? ;', { eme_item_name: name, personal: isPersonal, is_required: isRequired, multivalued: isMultivalued }, (error, result) => {
+        if (error) console.log('mysql error', error);
+        else {
+            res.json(result);
+        }
+    })
+});
+
 module.exports = router;
