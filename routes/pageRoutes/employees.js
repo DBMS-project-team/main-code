@@ -75,14 +75,19 @@ router.get('/custom-attributes', (req, res)=>{
 });
 
 router.get('/emergency-contact', (req, res)=>{
-    db.query("SELECT * FROM custom_fields; SELECT * FROM custom_field_values;", (error, result)=>{
+    db.query("SELECT * FROM emergency_contact_items;", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            var res_1 = result[0]
-            var res_2 = result[1]
-            res.render('employees/emergency',{cusAttr: res_1, cusVal: res_2});
+            var emerDetails = result;
+            res.render('employees/emergency',{emerDetails});
         } 
     });
+}); 
+
+router.get('/newEmergency/:isPersonal?', (req, res)=>{
+    const isPersonal = req.params.isPersonal;
+    res.render('employees/newEmergency',{isPersonal});
+ 
 });
 
 router.get('/reports/:table?', (req, res)=>{
