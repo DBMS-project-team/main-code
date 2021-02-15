@@ -2,44 +2,36 @@
     <div class="card container">
         <div class="card-header">
             <h3 style="font-family:verdana;">Emergency Detail menus</h3>
+            <a href="#/employees/newEmergency/0" class="btn btn-primary gap-2 md">Add New Attribute</a>
         </div>
-        <table class="table table-striped table-hover" del_fun="deleteCusAtter" datatable="true" db_table="custom_fields" db_primary_column="custom_field_id" popup-edit="1">
+        <table class="table table-striped table-hover" del_fun="deleteCusAtter" datatable="true" db_table="emergency_contact_items" db_primary_column="eme_item_id" popup-edit="1">
             <thead>
                 <tr>
                     <th style="width: 30px;">#</th>
-                    <th db_column="custom_field_name">Custom Attribute Title</th>
+                    <th db_column="eme_item_name">Emergency Attribute Title</th>
+                    <th>Required</th>
+                    <th>Multivalued</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <% var count = 1 %>
-                <% cusAttr.forEach(function(attr){ %>
-                    <tr data-id="<%= attr.custom_field_id %>">
+                <% emerDetails.forEach(function(attr){ %>
+                    <% if (attr.personal == 0) { %>
+                    <tr data-id="<%= attr.eme_item_id %>">
                         <td><%= count++ %></td>
-                        <td><%= attr.custom_field_name %></td>
+                        <td><%= attr.eme_item_name %></td>
+                        <td><% if (attr.is_required == 0) { %><%= 'No' %><% }else{ %><%= 'Yes' %><% } %></td>
+                        <td><% if (attr.multivalued == 0) { %><%= 'No' %><% }else{ %><%= 'Yes' %><% } %></td>
                         <td class="table-action">
                             <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
                             <a href="#"><i class="align-middle del_ele"  data-feather="trash"></i></a>
                         </td>
                     </tr>
+                    <% } %>
                 <% }) %> 
             </tbody>
         </table>
-        <div class="row g-3 align-items-center">
-            <form action="/auth/form_submit/employees/add_new_cus_attribute">
-                <div class="row p-2">
-                    <div class="col-auto">
-                        <label for="add_new_cus_attribute" class="col-form-label">Add A New Custom Attribute</label>
-                    </div>
-                    <div class="col-auto">
-                        <input type="text" name="attr_title" id="add_new_cus_attribute" class="form-control" aria-describedby="passwordHelpInline" placeholder="Custom Attribute Title" required>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-primary" type="submit">Add</button>
-                    </div>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
 
@@ -47,43 +39,36 @@
     <div class="card container">
         <div class="card-header">
             <h3 style="font-family:verdana;">Contact Detail menus</h3>
+            <a href="#/employees/newEmergency/1" class="btn btn-primary gap-2 md">Add New Attribute</a>
         </div>
-        <table class="table table-striped table-hover" del_fun="deleteCusAtter" datatable="true" db_table="custom_fields" db_primary_column="custom_field_id" popup-edit="1">
+        <table class="table table-striped table-hover" del_fun="deleteCusAtter" datatable="true" db_table="emergency_contact_items" db_primary_column="eme_item_id" popup-edit="1">
             <thead>
                 <tr>
                     <th style="width: 30px;">#</th>
-                    <th db_column="custom_field_name">Custom Attribute Title</th>
+                    <th db_column="eme_item_name">Contact Attribute Title</th>
+                    <th>Required</th>
+                    <th>Multivalued</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <% var count = 1 %>
-                <% cusAttr.forEach(function(attr){ %>
-                    <tr data-id="<%= attr.custom_field_id %>">
+                <% emerDetails.forEach(function(attr){ %>
+                    <% if (attr.personal == 1) { %>
+                    <tr data-id="<%= attr.eme_item_id %>">
                         <td><%= count++ %></td>
-                        <td><%= attr.custom_field_name %></td>
+                        <td><%= attr.eme_item_name %></td>
+                        <td><% if (attr.is_required == 0) { %><%= 'No' %><% }else{ %><%= 'Yes' %><% } %></td>
+                        <td><% if (attr.multivalued == 0) { %><%= 'No' %><% }else{ %><%= 'Yes' %><% } %></td>
                         <td class="table-action">
                             <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
                             <a href="#"><i class="align-middle del_ele"  data-feather="trash"></i></a>
                         </td>
                     </tr>
+                    <% } %>
                 <% }) %> 
             </tbody>
         </table>
-        <div class="row g-3 align-items-center">
-            <form action="/auth/form_submit/employees/add_new_cus_attribute">
-                <div class="row p-2">
-                    <div class="col-auto">
-                        <label for="add_new_cus_attribute" class="col-form-label">Add A New Custom Attribute</label>
-                    </div>
-                    <div class="col-auto">
-                        <input type="text" name="attr_title" id="add_new_cus_attribute" class="form-control" aria-describedby="passwordHelpInline" placeholder="Custom Attribute Title" required>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-primary" type="submit">Add</button>
-                    </div>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
+
