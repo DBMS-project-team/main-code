@@ -178,7 +178,7 @@ CREATE PROCEDURE employeesProcedure ()
 BEGIN
 	SET @sql = NULL;
     SET @custom_fields = 0;
-    SELECT COUNT(!) INTO @custom_fields FROM custom_fields;
+    SELECT COUNT(1) INTO @custom_fields FROM custom_fields;
     IF @custom_fields <> 0 THEN
         SELECT
         GROUP_CONCAT(DISTINCT
@@ -186,28 +186,29 @@ BEGIN
                 'GROUP_CONCAT((CASE custom_field_id when ',
                 custom_field_id,
                 ' then custom_field_value else NULL END)) AS ',
-                custom_field_name,
+                'custom_field_', custom_field_id,
                 ', ',
                 'GROUP_CONCAT((CASE custom_field_id when ',
                 custom_field_id,
-                ' then custom_field_id else NULL END)) AS ',
-                custom_field_name, '_id'
+                ' then custom_field_value_id else NULL END)) AS ',
+                'custom_field_',custom_field_id, '_id'
             )
         ) INTO @sql
         FROM employee_additional_details natural join custom_field_values natural join custom_fields;
+        SET @sql = concat(', ',@sql);
     ELSE
-        @sql = 'none';
+        SET @sql = '';
     END IF;
 
     
 
     SET @sql = CONCAT('CREATE OR REPLACE VIEW employees_details AS SELECT
-                        e.firstname, e.lastname, e.birthdate, e.martial_status, e.dept_id, e.job_id, e.emp_status_id, e.pay_grade_level pay_grade_level_id,
+                        e.firstname, e.lastname, e.birthdate, e.marital_status, e.dept_id, e.job_id, e.emp_status_id, e.pay_grade_level pay_grade_level_id,
                         additional.*,
                         d.name department, p.pay_grade_level_title pay_grade_level, j.job_title_name job_title,
                         u.username
-                        FROM employees e natural join (
-                        SELECT emp_id, ', @sql, ' 
+                        FROM employees e NATURAL LEFT OUTER JOIN (
+                        SELECT emp_id', @sql, ' 
                         FROM employee_additional_details natural join custom_field_values
                         GROUP BY emp_id
                         ) additional

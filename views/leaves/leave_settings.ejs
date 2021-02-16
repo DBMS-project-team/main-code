@@ -48,7 +48,7 @@
         <div class="card-header">
             <h3 style="font-family:verdana;">Maximum No of Leaves</h3>
         </div>
-        <table class="table table-striped table-hover" datatable="true" db_table="max_leave_days" db_primary_column="leave_type_id, pay_grade_level" >
+        <table class="table table-striped table-hover" datatable="true" db_table="max_leave_days" db_primary_column="leave_type_id, pay_grade_level" popup-edit="1">
             <thead>
                 <tr>
                     <th style="width: 30px;"></th>
@@ -65,7 +65,10 @@
                         <td><%= count++ %></td>
                         <td><%= res.leave_type %></td>
                         <% pay_grades.forEach(pay_grade=>{ %>
-                            <td><%= res[`pay_grade_level_${pay_grade.pay_grade_level}`] %></td>
+                            <td>
+                                <%= res[`pay_grade_level_${pay_grade.pay_grade_level}`] %>
+                                <a href="#"><i celledit class="align-middle edit_ele" data-feather="edit-2"></i></a>
+                            </td>
                         <% }) %>
                     </tr>
                 <% }) %> 

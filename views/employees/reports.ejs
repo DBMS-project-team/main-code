@@ -1,73 +1,92 @@
-<% var cols = ['department', 'pay_grade', 'job_title']; %>
+<% var cols = ['dept_id', 'pay_grade_level_id', 'job_id']; %>
 <div class="container-fluid p-0">
     <div class="card container">
         <div class="card-header">
-            <h5>Filter Employees Details</h5>
+            <h3>Filter Employees Details</h3>
+            <h5><%= page_para.heading %></h5>
+            <% if(page_para.filter_type!='none'){ %>
+                <a href="#/employees/reports" class="btn btn-primary gap-2 md" id="show_all">Show All</a>
+            <% } %>
         </div>
-        <table class="table table-striped table-hover" datatable="true" db_table="employment_statuses" db_primary_column="emp_status_id" edit-page="/employees/edit"> <%# edit-page format will be /employees/edit/emp_id/emp_name  %>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Date of Birth</th>
-                    <th>Martial Status</th>
-                    <th>Department</th>
-                    <th>Pay Grade</th>
-                    <th>Job Title</th>
-                    <% custom_fields.forEach(function(field){ %>
-                        <th><%= field.custom_field_name %></th>
-                    <% }) %>
-                    <th>User Account</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <% rest_fields.forEach(function(field, id){ %>
-                        <th>
-                            <select name="<%= cols[id] %>" class="filter_select">
-                                <option value="0">All</option>
-                                <% field.forEach(function(col){ %>
-                                    <option value="<%= col.id %>"><%= col.title %></option>
-                                <% }) %>
-                            </select>
-                        </th>
-                    <% }) %>
-                    <% custom_fields.forEach(function(field, id){ %>
-                        <th><%= field.custom_field_name %></th>
-                    <% }) %>
-                    <th></th>
-                </tr>
-            </tbody>
-            <tbody>
-                <% employees.forEach(function(emp){ %>
-                    <tr data-id="<%= emp.emp_id %>" show-name="<%= emp.firstname + " " + emp.lastname  %>">
-                        <td>
-                            <img src="img/avatars/avatar-5.jpg" width="48" height="48" class="rounded-circle mr-2" alt="Avatar"> <%= emp.firstname + " " + emp.lastname  %>
-                        </td>
-                        <td><%= emp.birthdate %></td>
-                        <td><%= emp.martial_status %></td>
-                        <td><%= emp.department %></td>
-                        <td><%= emp.pay_grade_level %></td>
-                        <td><%= emp.job_title %></td>
+        <div style="overflow: auto;">
+            <table class="table table-striped table-hover" datatable="true" db_table="employment_statuses" db_primary_column="emp_status_id" edit-page="/employees/edit"> <%# edit-page format will be /employees/edit/emp_id/emp_name  %>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date of Birth</th>
+                        <th>Martial Status</th>
+                        <th>Department</th>
+                        <th>Pay Grade</th>
+                        <th>Job Title</th>
                         <% custom_fields.forEach(function(field){ %>
-                            <td><%= emp[field.custom_field_name] %></td>
+                            <th><%= field.custom_field_name %></th>
                         <% }) %>
-                        <td><% if (!emp.username) { %>
-                                <%= 'No' %>
-                            <% }else{ %>
-                                <%= 'Yes' %>
-                            <% } %>
-                        </td>
+                        <th>User Account</th>
                     </tr>
-                <% }) %> 
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <% rest_fields.forEach(function(field, id){ %>
+                            <th>
+                                <select name="<%= cols[id] %>" filter_type="default" class="filter_select form-control mb-3">
+                                    <option value="0">All</option>
+                                    <% field.forEach(function(col){ %>
+                                        <option value="<%= col.id %>" <%= (page_para.filter_type==='default'&&page_para.table==cols[id]&&page_para.value==col.id)?'selected':'' %>><%= col.title %></option>
+                                    <% }) %>
+                                </select>
+                            </th>
+                        <% }) %>
+                        <% custom_fields.forEach(function(field, id){ %>
+                            <th>
+                                <select name="<%= field.custom_field_name %>" filter_type="custom" custom_field_id="<%= field.custom_field_id %>" class="filter_select form-control mb-3">
+                                    <option value="0">All</option>
+                                    <% custom_field_values.forEach(function(value){ %>
+                                        <% if(value.custom_field_id===field.custom_field_id){ %>
+                                            <option value="<%= value.custom_field_value_id %>" <%= (page_para.filter_type==='custom'&&page_para.custom_field_value_id==value.custom_field_value_id)?'selected':'' %>><%= value.custom_field_value %></option>
+                                        <% } %>
+                                    <% }) %>
+                                </select>
+                            </th>
+                        <% }) %>
+                        <th></th>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <% employees.forEach(function(emp){ %>
+                        <tr data-id="<%= emp.emp_id %>" show-name="<%= emp.firstname + " " + emp.lastname  %>">
+                            <td>
+                                <img src="img/avatars/avatar-5.jpg" width="48" height="48" class="rounded-circle mr-2" alt="Avatar"> <%= emp.firstname + " " + emp.lastname  %>
+                            </td>
+                            <td><%= emp.birthdate %></td>
+                            <td><%= emp.marital_status %></td>
+                            <td><%= emp.department %></td>
+                            <td><%= emp.pay_grade_level %></td>
+                            <td><%= emp.job_title %></td>
+                            <% custom_fields.forEach(function(field){ %>
+                                <td><%= emp[`custom_field_${field.custom_field_id}`] %></td>
+                            <% }) %>
+                            <td><% if (!emp.username) { %>
+                                    <%= 'No' %>
+                                <% }else{ %>
+                                    <%= 'Yes' %>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }) %> 
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <script>
     $('.filter_select').unbind('change').change(function(){
-        location.hash = `/employees/reports/${$(this).attr('name')}-${$(this).find(':selected').text()}-${$(this).find(':selected').val()}`;
+        if($(this).find(':selected').val()=='0'){
+            location.hash = '/employees/reports';
+        }else{
+            location.hash = `/employees/reports/${$(this).attr('filter_type')}/${$(this).attr('name')}/${$(this).find(':selected').text()}/${$(this).find(':selected').val()}${ $(this).attr('filter_type')==='custom' ? ('/'+$(this).attr('custom_field_id')) : '' }`;
+        }
     })
 </script>

@@ -26,11 +26,11 @@
                             <img src="img/avatars/avatar-5.jpg" width="48" height="48" class="rounded-circle mr-2" alt="Avatar"> <%= emp.firstname + " " + emp.lastname  %>
                         </td>
                         <td><%= emp.birthdate %></td>
-                        <td><%= emp.martial_status %></td>
+                        <td><%= emp.marital_status %></td>
                         <td><%= emp.department %></td>
                         <td><%= emp.pay_grade_level %></td>
                         <% custom_fields.forEach(function(field){ %>
-                            <td><%= emp[field.custom_field_name] %></td>
+                            <td><%= emp[`custom_field_${field.custom_field_id}`] %></td>
                         <% }) %>
                         <td><% if (!emp.username) { %>
                             <%= 'No' %>

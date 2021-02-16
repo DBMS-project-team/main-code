@@ -316,13 +316,20 @@
                 });
                 $('.edit_ele').unbind('click').click( function(e){
                     if( $(this).parents('table').attr('popup-edit') !== 'false' && typeof $(this).parents('table').attr('popup-edit') !== 'undefined' ){
+
                         var table = $(this).parents('table').attr('db_table');
-                        var column = $(this).parents('table').attr('db_primary_column');
-                        var dataid = $(this).parents('tr').attr('data-id');
-                        var value = $(this).parents('tr').children('td').eq( $(this).parents('table').attr('popup-edit') ).html();
                         var title = $(this).parents('.card').find('.card-header h3').html();
-                        var field = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).html();
-                        var db_column = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).attr('db_column');
+                            var column = $(this).parents('table').attr('db_primary_column');
+
+                        if($(this).attr('celledit')=='undefined'){
+                            var dataid = $(this).parents('tr').attr('data-id');
+                            var value = $(this).parents('tr').children('td').eq( $(this).parents('table').attr('popup-edit') ).html();
+                            var field = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).html();
+                            var db_column = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).attr('db_column');
+                        }else{
+
+                        }
+                        
                         $('#modal-btn').attr({table, column, dataid, value, title, field, db_column});
                         $('#modal-btn').click();
                         e.preventDefault();
