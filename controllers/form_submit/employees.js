@@ -9,12 +9,7 @@ router.post('/add_new_cus_attribute', (req, res) => {
     db.query('INSERT INTO `custom_fields` SET ? ;', { custom_field_name: attr_title }, (error, result) => {
         if (error) console.log('mysql error', error);
         else {
-            // db.query('INSERT INTO `employee_additional_detail` SELECT emp_id,?,? FROM `employees`;', [result.insertId,attr_value], (error, result2) => {
-            //     if(error) console.log('mysql error', error);
-            //     else {
             res.json(result);
-            //     }
-            // })
         }
     })
 });
