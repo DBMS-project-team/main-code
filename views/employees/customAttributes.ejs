@@ -43,7 +43,7 @@
     </div>
 </div>
 <script>
-    var deleteCusAtter = (icon) => {
+    var deleteCusAttr = (icon) => {
         var id = $(icon).parents('tr').attr('data-id');
         $.post( '/auth/alter/del_custom_attribute', {id}).done( _ => {
             $('#root_refresher').click(); 
