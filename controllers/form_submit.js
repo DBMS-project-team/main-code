@@ -216,5 +216,19 @@ router.post('/addNewLeaveApplication', (req, res) => {
     })
 });
 
+router.post('/menuCheckUpdate', (req, res) => {
+    console.log('yes');
+    var arr = req.body;
+    var perm = arr[0];
+    var user_level = arr[1];
+    var menu_id= arr[2];
+    console.log(perm,user_level, menu_id);
+    db.query("UPDATE `menu_permissions` SET `permission` = ? WHERE `menu_permissions`.`user_level` = ? AND `menu_permissions`.`menu_id` = ?;", { perm, user_level, menu_id }, (error, result) => {
+        if (error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
 
 module.exports = router;
