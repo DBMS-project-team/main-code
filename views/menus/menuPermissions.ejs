@@ -24,8 +24,14 @@
                             <%= menu.title %>
                         </td>
                         <% userLevels.forEach(userLevel => { %>
-                            <td><input class="form-check-input" type="checkbox" <%= menu['user_level_'+userLevel.user_level]==1&&'checked' %>></td>
+                            <td>
+                                <% var action = "auth/form_submit/menuCheckUpdate"; %>
+                                <form after_submit="change_page" action="<%= action %>">
+                                    <input name="menu_check" id="menu_check" class="form-check-input" type="checkbox" onclick='update_check(this, "<%= menu[`user_level_`+userLevel.user_level] %>","<%= userLevel.user_level %>","<%= menu.menu_id %>")' <%= menu['user_level_'+userLevel.user_level]==1&&'checked' %>>
+                                </form>
+                                </td>
                         <% }) %>
+                        
                     </tr>
                     
                 <% }) %> 
@@ -85,5 +91,14 @@
                 } );
             }
         });
-    }
+    };
+    function update_check(menu, perm, user_level, menu_id){
+        
+        if(perm==1){
+            menu.value= ['0', user_level, menu_id];
+        }else{
+            menu.value= ['1', user_level, menu_id];
+        }
+        console.log(menu.value);
+    };
 </script>
