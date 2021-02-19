@@ -36,13 +36,11 @@ create table employees (
     emp_status_id int(11),
     emp_status_type ENUM ('not_applicable', 'full_time', 'part_time') DEFAULT 'not_applicable',
     pay_grade_level int(11),
-    supervisor int(11),
     primary key(emp_id),
 	foreign key (dept_id) references departments(dept_id),
 	foreign key (job_id) references job_titles(job_id),
     FOREIGN KEY (emp_status_id) REFERENCES employement_statuses(emp_status_id),
-	foreign key (pay_grade_level) references pay_grades(pay_grade_level),
-    FOREIGN KEY (supervisor) REFERENCES employees(emp_id)
+	foreign key (pay_grade_level) references pay_grades(pay_grade_level)
 );
 
 CREATE TABLE supervisors (
@@ -71,7 +69,9 @@ CREATE TABLE user_levels (
 
 create table users(
     emp_id int(11) NOT null,
+    username varchar(64) NOT NULL,
     user_level int(11),
+    status TINYINT DEFAULT 1,
     PASSWORD varchar(50),
     PRIMARY KEY (emp_id),
     FOREIGN key (emp_id) REFERENCES employees(emp_id),
@@ -178,7 +178,7 @@ CREATE PROCEDURE employeesProcedure ()
 BEGIN
 	SET @sql = NULL;
     SET @custom_fields = 0;
-    SELECT COUNT(1) INTO @custom_fields FROM custom_fields;
+    SELECT COUNT(1) INTO @custom_fields FROM employee_additional_details;
     IF @custom_fields <> 0 THEN
         SELECT
         GROUP_CONCAT(DISTINCT
