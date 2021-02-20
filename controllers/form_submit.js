@@ -42,15 +42,24 @@ router.post('/add_new_department', (req, res) => {
     })
 });
 
+
 router.post('/addNewEmployee', ( req, res ) => {
     try {
-        let {firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val,profileImage} = req.body;
-        db.query("INSERT INTO `employees`(`firstname`, `lastname`, `birthdate`, `martial_status`, `dept_id`, `job_id`, `emp_status_id`, `pay_grade_level`, `supervisor`) VALUES (?,?,?,?,?,?,?,?,?)",
-            [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor], 
+        let {firstname, lastname, dob, martialStatus,gender, department,empStaType, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val,profileImage} = req.body;
+        console.log(attr_id,attr_val);
+        db.query("INSERT INTO `employees`(`firstname`, `lastname`, `birthdate`,`gender`, `marital_status`, `dept_id`, `job_id`, `emp_status_id`,`emp_status_type`, `pay_grade_level`) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            [firstname, lastname, dob,gender, martialStatus, department, jobTitle, empStatus,empStaType, payGlevel], 
             async (err,result) =>{
-                if(err) console.log('error', error);
+                if(err) console.log('error', err);
                 else {
                     const emp_id = result.insertId;
+                    if (supervisor !=="0"){
+                        db.query("INSERT INTO `supervisors`(`emp_id`, `supervisor`) VALUES (?,?);",[emp_id,supervisor],
+                        (err2) =>{
+                            if(err2) console.log('error', err2);
+                        });
+
+                    }
                     if (profileImage !=="default"){
                         fs.writeFile("public\\img\\profile\\"+emp_id+".jpg", new Buffer.from(profileImage.split(",")[1], "base64"), 
                         function(imageWriteErr) {if(imageWriteErr) console.log(imageWriteErr);});
@@ -62,10 +71,10 @@ router.post('/addNewEmployee', ( req, res ) => {
                             attr_val=[attr_val];
                         }
                         for (var i = 0; i < attr_id.length; i++) {
-                            valueArray.push([emp_id,attr_id[i],attr_val[i]]);
+                            valueArray.push([emp_id,attr_val[i]]);
                           }
-                        db.query("INSERT INTO `employee_additional_detail`(`emp_id`, `custom_field_id`, `custom_field_value`) VALUES ?",[valueArray], async (err,result2) =>{
-                            if(err) console.log('error', error);
+                        db.query("INSERT INTO `employee_additional_details`(`emp_id`, `custom_field_value_id` ) VALUES ?",[valueArray], async (error,result2) =>{
+                            if(error) console.log('error', error);
                         })
                     }
                     if (req.body.userAccount){
@@ -75,13 +84,9 @@ router.post('/addNewEmployee', ( req, res ) => {
 
                         db.query('INSERT INTO `users`(`emp_id`, `username`, `user_level`, `password`) VALUES (?,?,?,?);', [emp_id,username,user_level,password], (error, result) => {
                             if(error) console.log('mysql error', error);
-                            else {
-                                res.end();
-                            }
                         });
-                    }else{
-                        res.end();
                     }
+                    res.json({new:true,emp_id});
                 }
             });
     } catch (error) {
@@ -91,7 +96,8 @@ router.post('/addNewEmployee', ( req, res ) => {
 
 router.post('/editEmployee', ( req, res ) => {
     try {
-        let {empId,userAcc,firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,attr_id,exist_attr_id,attr_val,profileImage} = req.body;
+        let {empId,userAcc,firstname, lastname, dob, martialStatus,gender, department, jobTitle, empStatus,empStaType, payGlevel,supervisor,attr_id,exist_attr_id,attr_val,profileImage} = req.body;
+        console.log(attr_id,exist_attr_id,attr_val);
         if(profileImage !== "unchanged"){
             if (profileImage=="default"){
                 fs.unlink("public\\img\\profile\\"+empId+".jpg", (delErr) => {
@@ -102,10 +108,22 @@ router.post('/editEmployee', ( req, res ) => {
                 function(writeErr) {if(writeErr) console.log("write error",writeErr);});
             }
         }
-        db.query('UPDATE `employees` SET `firstname`=?,`lastname`=?,`birthdate`=?,`martial_status`=?,`dept_id`=?,`job_id`=?,`emp_status_id`=?,`pay_grade_level`=?,`supervisor`=? WHERE emp_id=? ;', 
-        [firstname, lastname, dob, martialStatus, department, jobTitle, empStatus, payGlevel,supervisor,empId], (error, result) => {
+        db.query('UPDATE `employees` SET `firstname`=?,`lastname`=?,`birthdate`=?,`marital_status`=?,`gender`=?,`dept_id`=?,`job_id`=?,`emp_status_id`=?,`emp_status_type`=?,`pay_grade_level`=? WHERE emp_id=? ;', 
+        [firstname, lastname, dob, martialStatus,gender, department, jobTitle, empStatus,empStaType, payGlevel,empId], (error, result) => {
             if(error) console.log('mysql error', error);
         })
+
+        if (supervisor !=="0"){
+            db.query("INSERT INTO supervisors (`emp_id`, `supervisor`) VALUES(?,?) ON DUPLICATE KEY UPDATE supervisor=?;",[empId,supervisor,supervisor],
+            (err2) =>{
+                if(err2) console.log('error', err2);
+            });
+        }else{
+            db.query("DELETE FROM `supervisors` WHERE emp_id=?;",[empId],
+            (err3) =>{
+                if(err3) console.log('error', err3);
+            });
+        }
 
         if(attr_id){
             var valueArray=[];
@@ -115,17 +133,17 @@ router.post('/editEmployee', ( req, res ) => {
                 attr_val=[attr_val];
             }
             for (var i = 0; i < attr_id.length; i++) {
-                if(exist_attr_id[i]==''){
-                    query += "INSERT INTO `employee_additional_detail`(`custom_field_value`,`emp_id`, `custom_field_id`) VALUES (?,?,?);";
-                    valueArray.push(attr_val[i],empId,attr_id[i]);
+                if(exist_attr_id[i]=='0'){
+                    query += "INSERT INTO `employee_additional_details`(`emp_id`, `custom_field_value_id`) VALUES (?,?);";
+                    valueArray.push(empId,attr_val[i]);
                 }else{
-                    query +="UPDATE `employee_additional_detail` SET `custom_field_value`=? WHERE `emp_id`=? AND`custom_field_id`=?;";
-                    valueArray.push(attr_val[i],empId,attr_id[i]);
+                    query +="UPDATE `employee_additional_details` SET `custom_field_value_id`=? WHERE `emp_id`=? AND`custom_field_value_id`=?;";
+                    valueArray.push(attr_val[i],empId,exist_attr_id[i]);
                 }
                 
               }
             db.query(query,valueArray, async (err,result2) =>{
-                if(err) console.log('error', error);
+                if(err) console.log('error', err);
             })
         }
         
@@ -147,27 +165,11 @@ router.post('/editEmployee', ( req, res ) => {
                 if(error) console.log('mysql error', error);
             });
         }
-        res.end();
+        res.json({new:false,emp_id:empId});
     } catch (error) {
         console.log(error);
     }
 });
-
-router.post('/new_menu', (req, res) => {
-    var values = {};
-    var {title, href, icon, parent} = req.body;
-    values.title = req.body.title;
-    values.href = req.body.href;
-    values.icon = req.body.icon;
-    if( req.body.parent !== 'null' ) values.parent = req.body.parent;
-    db.query('INSERT INTO `menus` SET ?', values, (error, result) => {
-        if(error) console.log('mysql error', error);
-        else {
-            res.json(result.insertId);
-        }
-    })
-});
-
 router.post('/edit_menu', (req, res) => {
     var values = {};
     var {title, href, icon} = req.body;
@@ -229,6 +231,60 @@ router.post('/menuCheckUpdate', (req, res) => {
             res.json(result.insertId);
         }
     })
+});
+
+
+router.post('/addEmergencyDetails', (req,res)=>{
+    let { array,deleted,emp_id }=req.body;
+    deleted=deleted ? deleted:[]; 
+    var insert=[];
+    var update_sql="";
+
+    for (var i=0;i < array.length ; i++){
+        if (array[i][1]==""){
+            if (array[i][2] !==""){
+                insert.push([emp_id,array[i][0],array[i][2]]);
+            }
+        }
+        else{
+            if (array[i][2]==""){
+                deleted.push([array[i][0],array[i][1]])
+            }else if(array[i][1] !== array[i][2]){
+                update_sql +="UPDATE `emergency_contact_details` SET `eme_item_value`="+db.escape(array[i][2])+"  WHERE `emp_id`="+db.escape(emp_id)+" AND`eme_item_id`="+db.escape(array[i][0])+" AND `eme_item_value`="+db.escape(array[i][1])+" ;";
+            }
+        }
+    }
+    if (insert.length > 0){
+        db.query("INSERT INTO `emergency_contact_details`(`emp_id`, `eme_item_id`, `eme_item_value`) VALUES ?",[insert],(error,result)=>{
+            if(error) console.log('mysql error', error);
+            else {
+                console.log(result);
+            }
+        })
+    }
+    if (update_sql !== ""){
+        db.query(update_sql,(error2,result2)=>{
+            if(error2) console.log('mysql error', error2);
+            else {
+                console.log(result2);
+            }
+        })
+    }
+
+    var del_query="";
+    if (deleted.length >0){
+        for (var i=0; i<deleted.length ; i++){
+            del_query +="DELETE FROM `emergency_contact_details` WHERE  `emp_id`="+db.escape(emp_id)+" AND `eme_item_id`="+db.escape(deleted[i][0])+" AND `eme_item_value`="+db.escape(deleted[i][1])+" ;"; 
+        }
+
+        db.query(del_query,(error3,result3)=>{
+            if(error3) console.log('mysql error', error3);
+            else {
+                console.log(result3);
+            }
+        })
+    }
+    res.end();
 });
 
 module.exports = router;
