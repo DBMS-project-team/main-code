@@ -171,6 +171,22 @@ router.post('/editEmployee', ( req, res ) => {
         console.log(error);
     }
 });
+
+router.post('/new_menu', (req, res) => {
+    var values = {};
+    var {title, href, icon, parent} = req.body;
+    values.title = req.body.title;
+    values.href = req.body.href;
+    values.icon = req.body.icon;
+    if( req.body.parent !== 'null' ) values.parent = req.body.parent;
+    db.query('INSERT INTO `menus` SET ?', values, (error, result) => {
+        if(error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
+
 router.post('/edit_menu', (req, res) => {
     var values = {};
     var {title, href, icon} = req.body;
