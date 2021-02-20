@@ -22,11 +22,11 @@ router.get('/', (req, res)=>{
 router.get('/edit/:emp_id/*', (req, res)=>{
     try{
         const emp_id = req.params.emp_id;
-        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where status=1 and emp_id != ? ;SELECT * FROM `user_levels`; SELECT c.custom_field_id,c.custom_field_name,d.custom_field_value,d.custom_field_id AS old_custom_field_id FROM `custom_fields` c LEFT JOIN (SELECT * FROM employee_additional_detail e WHERE emp_id=?) d ON c.custom_field_id=d.custom_field_id ; SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.martial_status,e.dept_id,e.job_id,e.emp_status_id,e.pay_grade_level,e.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) WHERE e.emp_id=?", [emp_id,emp_id,emp_id],
+        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where status=1 and emp_id != ? ;SELECT * FROM `user_levels`; CALL employee_custom_attributes(?) ; SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.gender,e.marital_status,e.dept_id,e.job_id,e.emp_status_id,e.emp_status_type,e.pay_grade_level,s.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) LEFT JOIN supervisors s on (s.emp_id=e.emp_id) WHERE e.emp_id=?", [emp_id,emp_id,emp_id],
         (error, result)=>{
             if(error) console.log('mysql error', error);
             else {
-                fs.readFile("public\\img\\profile\\"+result[7][0].emp_id+".jpg",{encoding: 'base64'}, function(err, image) {
+                fs.readFile("public\\img\\profile\\"+result[8][0].emp_id+".jpg",{encoding: 'base64'}, function(err, image) {
                     if (err) imageData="default"; 
                     else{
                         imageData="data:image/png;base64,"+image
@@ -54,7 +54,7 @@ router.get('/categories', (req, res)=>{
 });
 
 router.get('/newEmployee', (req, res)=>{
-    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where  status=1;SELECT * FROM `user_levels`;SELECT * FROM `custom_fields`;", (error, result)=>{
+    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where  status=1;SELECT * FROM `user_levels`;CALL custom_attributes();", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             res.render('employees/newEmployee',{result, newEmp:true});
@@ -120,6 +120,26 @@ router.get('/reports/:filter_type?/:table?/:attr?/:id?/:custom_field_id?', (req,
             }
         }
     })
+});
+
+
+router.get('/emergency_info/:emp_id/' ,(req,res) =>{
+    const emp_id = req.params.emp_id;
+    // var query='SELECT CONCAT("[",GROUP_CONCAT( JSON_OBJECT( "id", i.eme_item_id, "name", i.eme_item_name, "old_id",d.eme_item_id,"old_value",d.eme_item_value) ),"]") AS details FROM emergency_contact_items AS i LEFT OUTER JOIN emergency_contact_details AS d on (d.eme_item_id=i.eme_item_id AND d.emp_id=emp_id) GROUP BY i.is_required,i.multivalued;';
+    db.query("CALL emergency_details(?)",[emp_id],(err,result)=>{
+        if (err) console.log('mysql error', err);
+        else {
+            if(result[0].length==0){
+                res.render("employees/editEmergencyDetails",{success:false});
+            }else{
+            var required=result[0][2] ? result[0][2].details:"[]";
+            var required_multi=result[0][3] ? result[0][3].details:"[]";
+            var optional=result[0][0] ? result[0][0].details:"[]";
+            var optional_multi=result[0][1] ? result[0][1].details:"[]";
+            res.render("employees/editEmergencyDetails",{required,required_multi,optional,optional_multi,emp_id,success:true});
+            }
+        }
+    });
 });
 
 module.exports = router;
