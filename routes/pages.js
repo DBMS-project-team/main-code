@@ -15,6 +15,7 @@ router.use('/leaves', require('./pageRoutes/leaves'));
 router.use('/settings', require('./pageRoutes/settings'));
 router.use('/login', require('./pageRoutes/login'));
 router.use('/profile', require('./pageRoutes/profile'));
+router.use('/organization', require('./pageRoutes/organization'));
 
 /*router.get('/auth/login', (req, res)=>{
     res.send('normal')

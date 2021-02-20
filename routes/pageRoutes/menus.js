@@ -31,7 +31,7 @@ router.get('/new/:parent?/:parent_title?', (req, res)=>{
 });
 
 router.get('/edit/:menu_id/*', (req, res)=>{
-    db.query("select * from menus where parent is null;", (error, result)=>{
+    db.query("select * from menus where parent is null;select * from menus where menu_id=?;", [req.params.menu_id], (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             res.render('menus/newMenu', {icons: feather.icons, parents: result[0], data: result[1][0], parent : false});

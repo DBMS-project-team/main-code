@@ -66,7 +66,6 @@ CREATE TABLE organization_details (
     org_name varchar(50),
     registration_number int(11),
     address varchar(50),
-    admin_username varchar(50),
     admin_password varchar(50),
     PRIMARY KEY (org_id)
 );

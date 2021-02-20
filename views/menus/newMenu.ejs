@@ -99,12 +99,15 @@
     });
  
     $( ".selectpicker" )
-        .iconselectmenu({
-            change: _=>{
-                    feather.replace();
-            }
-        })
-        .iconselectmenu( "menuWidget" )
-            .addClass( "ui-menu-icons" );
+    .iconselectmenu({
+        change: _=>{
+            feather.replace();
+        },
+        focus: _=>{
+            $('#icon-menu').find('.ui-state-active').focus();
+        }
+    })
+    .iconselectmenu( "menuWidget" )
+    .addClass( "ui-menu-icons" );
     feather.replace();
 </script>
