@@ -14,8 +14,9 @@ router.get('/', (req, res)=>{
                     if(children.length > 0 ) menu.children = children;
                     else menu.children = false;
                 })
-                console.log(result[0])
                 res.render('menus/', {menus: result[0]});
+            }else{
+                res.status(500).send();
             }
         }
     })
@@ -23,7 +24,7 @@ router.get('/', (req, res)=>{
 
 router.get('/new/:parent?/:parent_title?', (req, res)=>{
     if(req.params.parent){
-        res.render('newMenu', {parent: req.params.parent, parent_title: req.params.parent_title, data: false});
+        res.render('menus/newMenu', {parent: req.params.parent, parent_title: req.params.parent_title, data: false});
     }else{
         res.render('menus/newMenu', {parent: false, icons: feather.icons, data: false});
     }
@@ -39,10 +40,10 @@ router.get('/edit/:menu_id/*', (req, res)=>{
 });
 
 router.get('/permissions', (req, res)=>{
-    db.query("select * from pivoted_menu_permissions where parent is null;select * from user_levels", (error, result)=>{
+    db.query("select * from pivoted_menu_permissions where parent is null;select * from pivoted_menu_permissions where parent IS NOT NULL;select * from user_levels", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('menus/menuPermissions', {icons: feather.icons, data: result[0], userLevels: result[1]});
+            res.render('menus/menuPermissions', {icons: feather.icons, data: result[0], sub_menus:result[1], userLevels: result[2]});
         }
     })
 });

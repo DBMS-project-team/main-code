@@ -17,10 +17,18 @@ pay_grade_level_title varchar(50),
 primary key (pay_grade_level)
 );
 
-create table employement_statuses(
+create table employment_statuses(
 emp_status_id int not null auto_increment,
 emp_status varchar(50),
 primary key (emp_status_id)
+);
+
+CREATE TABLE branches (
+    branch_id int(11) NOT NULL AUTO_INCREMENT,
+    title varchar(64) NOT NULL,
+    status TINYINT DEFAULT 1,
+    PRIMARY KEY (branch_id),
+    CHECK (status=0 OR status=1)
 );
 
 create table employees (
@@ -32,14 +40,16 @@ create table employees (
     gender ENUM ( 'male', 'female', 'transgender', 'gender_neutral', 'non_binary', 'agender', 'pangender', 'genderqueer', 'two_spirit', 'third_gender', 'all') DEFAULT 'male',
     marital_status ENUM ('single', 'married', 'widowed', 'divorced', 'separated','registered_partnership') DEFAULT 'single',
     dept_id int(11),
+    branch_id int(11),
     job_id int(11),
     emp_status_id int(11),
     emp_status_type ENUM ('not_applicable', 'full_time', 'part_time') DEFAULT 'not_applicable',
     pay_grade_level int(11),
     primary key(emp_id),
 	foreign key (dept_id) references departments(dept_id),
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id),
 	foreign key (job_id) references job_titles(job_id),
-    FOREIGN KEY (emp_status_id) REFERENCES employement_statuses(emp_status_id),
+    FOREIGN KEY (emp_status_id) REFERENCES employment_statuses(emp_status_id),
 	foreign key (pay_grade_level) references pay_grades(pay_grade_level)
 );
 
@@ -72,7 +82,7 @@ create table users(
     username varchar(64) NOT NULL,
     user_level int(11),
     status TINYINT DEFAULT 1,
-    PASSWORD varchar(50),
+    password varchar(50),
     PRIMARY KEY (emp_id),
     FOREIGN key (emp_id) REFERENCES employees(emp_id),
     FOREIGN KEY (user_level) REFERENCES user_levels(user_level)
@@ -93,6 +103,7 @@ CREATE TABLE menu_permissions (
     menu_id int(11),
     permission int(1),
     PRIMARY KEY (user_level, menu_id),
+    UNIQUE(user_level, menu_id),
     FOREIGN KEY (user_level) REFERENCES user_levels(user_level),
     FOREIGN KEY (menu_id) REFERENCES menus(menu_id)
 );
@@ -139,8 +150,8 @@ CREATE TABLE emergency_contact_details (
 
 CREATE TABLE leave_types (
     leave_type_id int AUTO_INCREMENT,
-    title varchar(50),
-    PRIMARY KEY (leave_id)
+    leave_type varchar(50),
+    PRIMARY KEY (leave_type_id)
 );
 
 CREATE TABLE max_leave_days (
@@ -280,22 +291,28 @@ DELIMITER $$
 CREATE PROCEDURE menuPermission ()
 BEGIN
 	SET @sql = NULL;
-    SELECT
-      GROUP_CONCAT(DISTINCT
-        CONCAT(
-            'GROUP_CONCAT((CASE user_level when ',
-            user_level,
-            ' then permission else NULL END)) AS ',
-            'user_level_', user_level
-        )
-      ) INTO @sql
-    FROM menu_permissions natural join user_levels;
-
+    SET @rows = 0;
+    SELECT COUNT(1) INTO @rows FROM user_levels;
+    IF @rows <> 0 THEN
+        SELECT
+        GROUP_CONCAT(DISTINCT
+            CONCAT(
+                'GROUP_CONCAT((CASE user_level when ',
+                user_level,
+                ' then permission else NULL END)) AS ',
+                'user_level_', user_level
+            )
+        ) INTO @sql
+        FROM menu_permissions natural join user_levels;
+        SET @sql = concat(', ',@sql);
+    ELSE
+        SET @sql = '';
+    END IF;
 
     SET @sql = CONCAT('CREATE OR REPLACE VIEW pivoted_menu_permissions AS SELECT
                         *
                         FROM menus m NATURAL LEFT OUTER JOIN (
-                        SELECT menu_id, ', @sql, ' 
+                        SELECT menu_id', @sql, ' 
                         FROM menu_permissions
                         GROUP BY menu_id
                         ) menus
@@ -317,22 +334,28 @@ DELIMITER $$
 CREATE PROCEDURE maxLeaves ()
 BEGIN
 	SET @sql = NULL;
-    SELECT
-      GROUP_CONCAT(DISTINCT
-        CONCAT(
-            'GROUP_CONCAT((CASE pay_grade_level when ',
-            pay_grade_level,
-            ' then max_no_of_leaves else NULL END)) AS ',
-            'pay_grade_level_', pay_grade_level
-        )
-      ) INTO @sql
-    FROM max_leave_days;
-
+    SET @rows = 0;
+    SELECT COUNT(1) INTO @rows FROM max_leave_days;
+    IF @rows <> 0 THEN
+        SELECT
+        GROUP_CONCAT(DISTINCT
+            CONCAT(
+                'GROUP_CONCAT((CASE pay_grade_level when ',
+                pay_grade_level,
+                ' then max_no_of_leaves else NULL END)) AS ',
+                'pay_grade_level_', pay_grade_level
+            )
+        ) INTO @sql
+        FROM max_leave_days;
+        SET @sql = concat(', ',@sql);
+    ELSE
+        SET @sql = '';
+    END IF;
 
     SET @sql = CONCAT('CREATE OR REPLACE VIEW pivoted_max_leave_days AS SELECT
                         *
                         FROM leave_types NATURAL LEFT OUTER JOIN (
-                        SELECT leave_type_id, ', @sql, ' 
+                        SELECT leave_type_id', @sql, ' 
                         FROM max_leave_days
                         GROUP BY leave_type_id
                         ) leaves
@@ -345,3 +368,17 @@ BEGIN
 END$$
 DELIMITER ;
 call maxLeaves ();
+
+-- //////////////////////////////////////////
+-- Procedure for update menu permission
+
+DROP PROCEDURE IF EXISTS updateMenuPermission;
+DELIMITER $$
+CREATE PROCEDURE updateMenuPermission(
+    menu_id INT(11), user_level INT(11), permission INT(1)
+)
+BEGIN
+    INSERT INTO `menu_permissions` VALUES (user_level, menu_id, permission) ON DUPLICATE KEY UPDATE `permission`=permission;
+    call menuPermission ();
+END$$
+DELIMITER ;

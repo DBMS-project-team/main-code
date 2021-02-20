@@ -34,7 +34,7 @@
 
     <body>
         <div class="wrapper">
-            <%-include('common/sidebar') %>
+            <%-include('common/sidebar', {menus}) %>
             <div class="main">
                 <%-include('common/header'), {user} %>
 
@@ -77,6 +77,10 @@
 
         <!-- React bootstrap-->
         <script src="https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.min.js" crossorigin></script>
+
+        <!--Bootsrap switch-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap2/bootstrap-switch.min.css" />
 
         <script type='text/babel'>
             const Link = ReactRouterDOM.Link;
@@ -319,15 +323,18 @@
 
                         var table = $(this).parents('table').attr('db_table');
                         var title = $(this).parents('.card').find('.card-header h3').html();
-                            var column = $(this).parents('table').attr('db_primary_column');
+                        var column = $(this).parents('table').attr('db_primary_column');
 
-                        if($(this).attr('celledit')=='undefined'){
+                        if($(this).parents('table').attr('celledit')==undefined){
                             var dataid = $(this).parents('tr').attr('data-id');
                             var value = $(this).parents('tr').children('td').eq( $(this).parents('table').attr('popup-edit') ).html();
                             var field = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).html();
                             var db_column = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).attr('db_column');
                         }else{
-
+                            var dataid = $(this).parents('td').attr('data-id');
+                            var value = $(this).parents('td').text().trim();
+                            var field = $(this).parents('table').attr('field');
+                            var db_column = $(this).parents('table').attr('db_column');
                         }
                         
                         $('#modal-btn').attr({table, column, dataid, value, title, field, db_column});
@@ -344,6 +351,8 @@
                 //     $(this).toggleClass('active');
                 // })
             }
+
+            console.log('%c Developed By CSE grp 13!', 'color: pink; font-weight: bold;background-color: black;font-size:20px; font-family: "Segoe UI",Arial,sans-serif; padding: 20px;');
         </script>
 
     </body>

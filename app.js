@@ -6,6 +6,7 @@ const path = require('path');
 
 dotenv.config({path: './.env'})
 
+const db = require('./db_config');
 const app = express();
 
 app.use(bodyParser.json({limit: '50mb'}));
@@ -47,7 +48,23 @@ let auth = (req, res, next)=>{
 app.get('/', auth, (req, res)=>{
     var user = req.session;
     user.img="/img/avatars/avatar.jpg";
-    res.render('index', {user});
+    if(req.session.user_level===0)var query = "select * from menus where parent is null;select * from menus where parent is not null;";
+    else var query = `select menu_id, title, href, icon, parent from pivoted_menu_permissions where parent is null and user_level_${req.session.user_level}=1;select menu_id, title, href, icon, parent from pivoted_menu_permissions where parent is not null and user_level_${req.session.user_level}=1;`;
+    db.query(query, (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            if( result[0].length > 0 ){
+                result[0].forEach((menu)=>{
+                    var children = result[1].filter( m =>  m.parent === menu.menu_id);
+                    if(children.length > 0 ) menu.children = children;
+                    else menu.children = false;
+                })
+                res.render('index', {menus: result[0], user});
+            }else{
+                res.status(500).send();
+            }
+        }
+    });
 });
 app.use('/auth', require('./routes/auth'));
 app.use('/data', auth, require('./routes/data'));

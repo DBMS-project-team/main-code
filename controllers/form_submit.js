@@ -5,6 +5,7 @@ const db = require('../db_config');
 var fs = require("fs");
 
 router.use('/employees', require('./form_submit/employees'));
+router.use('/menus', require('./form_submit/menus'));
 
 router.post('/add_new_emp_status', (req, res) => {
     db.query('INSERT INTO `employment_statuses` SET ?', {emp_status: req.body.value}, (error, result) => {
@@ -180,7 +181,7 @@ router.post('/edit_menu', (req, res) => {
 });
 
 router.post('/add_new_leave_type', (req, res) => {
-    db.query('INSERT INTO `leave_types` SET ?', {name: req.body.value}, (error, result) => {
+    db.query('INSERT INTO `leave_types` SET ?', {leave_type: req.body.value}, (error, result) => {
         if(error) console.log('mysql error', error);
         else {
             res.json(result.insertId);

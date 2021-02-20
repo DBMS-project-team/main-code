@@ -30,9 +30,17 @@ router.post('/del_custom_attribute', (req, res) => {
     })
 });
 router.post('/edit', (req, res) => {
-    const {table, column, id,  value, changed_column} = req.body;
-    if( typeof column !== 'undefined' ) var argument = {[column]:id};
-    else {
+    var {table, column, id,  value, changed_column} = req.body;
+    if( typeof column !== 'undefined' ) {
+        //var argument = {[column]:id};
+        column = column.split(',');
+        id = id.split(',');
+        var string = '1';
+        column.forEach( (value, i) => {
+            string += ` and ${mysql.escapeId( value.trim() )} = ${mysql.escape( id[i].trim() )}`;
+        } );
+        var argument = { toSqlString: function() { return string; } };
+    } else {
         const column = req.body['column[]'];
         const id = req.body['id[]'];
         var string = '1';
@@ -41,7 +49,6 @@ router.post('/edit', (req, res) => {
         } );
         var argument = { toSqlString: function() { return string; } };
     }
-    console.log(typeof column);
     var query = db.query('UPDATE ?? SET ?? = ? WHERE ?', [table, changed_column, value, argument], (error, result) => {
         if(error) console.log('mysql error', error);
         else {

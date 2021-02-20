@@ -1,24 +1,28 @@
-<% var menus = [
+<%# var menus = [
     {
         title: "Dashboard",
         href: "#/",
         icon: "sliders",
-        child: false
+        children: false
     },
     {
         title: "Profile",
         href: "#/profile",
         icon: "user",
-        child: false
+        children: false
     },
     {
         title: "Employees",
         href: "employees",
         icon: "users",
-        child: [
+        children: [
             {
                 title: "Details",
                 href: "#/employees"
+            },
+            {
+                title: "New Employee",
+                href: "#/employees/newEmployee"
             },
             {
                 title: "Categories",
@@ -42,19 +46,13 @@
         title: "Settings",
         href: "#/settings",
         icon: "settings",
-        child: false
-    },
-    {
-        title: "Invoice",
-        href: "/",
-        icon: "credit-card",
-        child: false
+        children: false
     },
     {
         title: "Leaves",
         href: "leaves",
         icon: "calendar",
-        child: [
+        children: [
             {
                 title: "Details",
                 href: "#/leaves"
@@ -77,13 +75,13 @@
         title: "Departments",
         href: "#/departments",
         icon: "box",
-        child: false
+        children: false
     },
     {
         title: "Auth",
         href: "auth",
         icon: "users",
-        child: [
+        children: [
             {
                 title: "Sign In",
                 href: "signin"
@@ -98,7 +96,7 @@
         title: "Menus",
         href: "menus",
         icon: "menu",
-        child: [
+        children: [
         {
                 title: "Details",
                 href: "#/menus"
@@ -130,13 +128,13 @@
 
             <% menus.forEach(function(menu){ %>
                 <li class="sidebar-item">
-                    <a href="<%= menu.child ? "#"+menu.href : menu.href %>" data-toggle="<%= menu.child ? "collapse" : '' %>" class="sidebar-link <%= menu.child ? "collapsed" : "" %>">
+                    <a href="<%= menu.children ? "#"+menu.href : '#/'+menu.href %>" data-toggle="<%= menu.children ? "collapse" : '' %>" class="sidebar-link <%= menu.children ? "collapsed" : "" %>">
                         <i class="align-middle" data-feather="<%= menu.icon %>"></i> <span class="align-middle"><%= menu.title %></span>
                     </a>
-                    <% if ( menu.child ) { %>
+                    <% if ( menu.children ) { %>
                         <ul id="<%= menu.href %>" class="sidebar-dropdown list-unstyled collapse " data-parent="#sidebar">
-                            <% menu.child.forEach(function(item){ %>
-                                <li class="sidebar-item"><a class="sidebar-link" href="<%= item.href %>"><%= item.title %></a></li>
+                            <% menu.children.forEach(function(item){ %>
+                                <li class="sidebar-item"><a class="sidebar-link" href="#/<%= item.href %>"><%= item.title %></a></li>
                             <% }) %>
                         </ul>
                     <% } %>

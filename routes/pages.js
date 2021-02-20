@@ -4,13 +4,8 @@ var dateFormat = require('dateformat');
 const db = require('../db_config');
 const feather = require('feather-icons');
 
-var user = {
-    name: "Pranavan",
-    img:"/img/avatars/avatar.jpg"
-}
-
 router.get('/', (req, res)=>{
-    res.render('home', {user});
+    res.render('home');
 });
 
 router.use('/employees/', require('./pageRoutes/employees'));

@@ -1,18 +1,7 @@
 const mysql = require('mysql');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DATABASE
-});
-
-db.connect( error=> {
-    if(error)console.log(error);
-    else console.log("mysql connected");
-});
+const db = require('../db_config');
 
 exports.register = (req, res)=>{
     const {username, password} = req.body;
@@ -62,11 +51,12 @@ exports.login = async (req, res)=>{
                     req.session.admin = true;
                     req.session.emp_id = 0;
                     req.session.user_id = result[0].org_id;
+                    req.session.user_level = 0;
                     res.status(200).redirect('/'+url);
                 }
             })
         }else{
-            db.query('select * from users where username=?',[username], async (error, result)=>{
+            db.query('select * from users where username=?',[username.trim()], async (error, result)=>{
                 if(error) console.log('error', error);
                 else{
                     /*if( !result || !(await bcrypt.compare(password, results[0].password) ) ){
@@ -88,12 +78,20 @@ exports.login = async (req, res)=>{
                     res.cookie('jwt', token, cookieOptions);
                     res.status(200).redirect('/');*/
                     if(result.length > 0 ){
-                        req.session.username = username;
-                        req.session.admin = false;
-                        req.session.emp_id = result[0].emp_id;
-                        req.session.user_id = result[0].emp_id;
-                        res.status(200).redirect('/'+url);
-                    }   else {
+                        if(result[0].password===password){
+                            req.session.username = username;
+                            req.session.admin = false;
+                            req.session.emp_id = result[0].emp_id;
+                            req.session.user_id = result[0].emp_id;
+                            req.session.user_level = result[0].user_level;
+                            res.status(200).redirect('/'+url);
+                        }
+                        else {
+                            res.status(400).render('./logs/login', {
+                                error: `${username}, your password is incorrect `
+                            })
+                        }
+                    } else {
                         res.status(400).render('./logs/login', {
                             error: 'Cannot find the account'
                         })
