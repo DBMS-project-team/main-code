@@ -345,3 +345,113 @@ BEGIN
 END$$
 DELIMITER ;
 call maxLeaves ();
+
+
+-- ///////////////////////////////////////////////////
+-- custom attributes
+
+DROP PROCEDURE IF EXISTS `custom_attributes`;
+CREATE PROCEDURE `custom_attributes`() NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
+BEGIN 
+SELECT
+    JSON_OBJECT(
+        "field_id",
+        custom_fields.custom_field_id,
+        "field_name",
+        custom_fields.custom_field_name,
+        "field_value",
+        CONCAT(
+            "[",
+            GROUP_CONCAT(
+                JSON_OBJECT(
+                    "id",
+                    custom_field_values.custom_field_value_id,
+                    "value",
+                    custom_field_values.custom_field_value
+                )
+            ),
+            "]"
+        )
+    ) AS attributes
+FROM
+    custom_field_values
+INNER JOIN
+    custom_fields
+ON
+    custom_field_values.custom_field_id = custom_fields.custom_field_id
+GROUP BY
+    custom_field_values.custom_field_id;
+END
+
+-- ///////////////////////////////////////////////////
+-- employee custom attributes
+
+DROP PROCEDURE IF EXISTS `employee_custom_attributes`;
+CREATE PROCEDURE `employee_custom_attributes`(IN `empId` INT(10)) NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER BEGIN
+	SELECT 
+    JSON_OBJECT(
+        "field_id",custom_fields.custom_field_id,
+        "field_name",custom_fields.custom_field_name,
+        "old_value",MAX(employee_additional_details.custom_field_value_id),
+        "field_value",
+        CONCAT( "[",
+               GROUP_CONCAT(
+                   JSON_OBJECT(
+                       "id",custom_field_values.custom_field_value_id,
+                       "value",custom_field_values.custom_field_value,
+         "old_value",employee_additional_details.custom_field_value_id
+                       )
+                   ),
+               "]"
+          ) )as attributes
+     FROM custom_field_values INNER JOIN custom_fields
+     on custom_field_values.custom_field_id=custom_fields.custom_field_id
+     LEFT OUTER JOIN employee_additional_details on (employee_additional_details.custom_field_value_id=custom_field_values.custom_field_value_id AND
+     employee_additional_details.emp_id=empId)
+     GROUP BY custom_field_values.custom_field_id;
+     
+END
+
+-- ///////////////////////////////////////////////////
+-- emergency details
+
+DROP PROCEDURE IF EXISTS `emergency_details`;
+CREATE PROCEDURE `emergency_details`(IN `empId` INT(10)) NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
+BEGIN
+SELECT
+    CONCAT(
+        "[",
+        GROUP_CONCAT(
+            JSON_OBJECT(
+                "id",
+                i.eme_item_id,
+                "name",
+                i.eme_item_name,
+                "old_id",
+                d.eme_item_id,
+                "old_value",
+                d.eme_item_values
+            )
+        ),
+        "]"
+    ) AS details
+FROM
+    emergency_contact_items AS i
+LEFT JOIN
+    (
+    SELECT
+        eme_item_id,
+        GROUP_CONCAT(JSON_ARRAY(eme_item_value)) AS eme_item_values
+    FROM
+        emergency_contact_details
+    WHERE
+        emp_id = empId
+    GROUP BY
+        eme_item_id
+) AS d
+ON
+    d.eme_item_id = i.eme_item_id
+GROUP BY
+    i.is_required,
+    i.multivalued;
+END
