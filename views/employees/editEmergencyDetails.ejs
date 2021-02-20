@@ -1,0 +1,186 @@
+<% if(success) {%>
+<%  
+    var required=JSON.parse(required);
+    var required_multi=JSON.parse(required_multi);
+    var optional=JSON.parse(optional);
+    var optional_multi=JSON.parse(optional_multi);
+%>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Emergency contact details</h5>
+        <input type="hidden" name="emp_id" value="<%= emp_id %>" >
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="row">
+                <div class="card col-md-6">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Required Details</h5>
+                    </div>
+                    <div class="row">
+                        <% required.forEach(function(row){ %>
+                            <div class="mb-3">
+                                <label class="form-label" > <%= row.name.charAt(0).toUpperCase() + row.name.slice(1) %> <label style="color: red;">*</label></label>
+                                <input type="text" required class="form-control require" name="detail" data-id="<%= row.id%>" data-old="<%= row.old_value ? JSON.parse(row.old_value)[0]:'' %>" placeholder="<%= row.name%>" value="<%= row.old_value ? JSON.parse(row.old_value)[0]:'' %>">
+                            </div>
+                        <% }) %>
+
+                        <% required_multi.forEach(function(row){ %>
+                            <div class="mb-3 require_one">
+                                <label class="form-label" > <%= row.name.charAt(0).toUpperCase() + row.name.slice(1) %> <label style="color: red;">*</label></label>
+                                <% if(row.old_value){%>
+                                    <% var values=JSON.parse("["+row.old_value+"]") %>
+                                    <% values.forEach(function(val){%>
+                                        <div style="margin-bottom: 10px;" >
+                                            <input type="text" class="form-control" style="display: inline;width: 27rem;" name="detail" data-id="<%= row.id%>" data-old="<%= val %>"  placeholder="<%= row.name%>" value="<%= val %>" >
+                                            <button type="button" onclick="remove(this)" class="btn btn-primary"><i class="align-middle mr-2" data-feather="delete"></i> Remove</button>
+                                        </div>
+                                    <% }) %>
+                                <% } %>
+                                <div style="margin-bottom: 10px;" >
+                                    <input type="text" class="form-control" style="display: inline;width: 27rem;" name="detail" data-id="<%= row.id %>" data-old=""  placeholder="<%= row.name %>"  >
+                                    <button type="button" style="width: 6.4rem;" onclick="add(this)" class="btn btn-primary"><i class="align-middle mr-2" data-feather="plus-circle"></i> Add</button>                                   
+                                </div>
+                                <span style="color: red;visibility: hidden;">Please fill this</span>
+                            </div>
+                        <% }) %>
+
+                    </div>
+                </div>
+                
+                <div class="card col-md-6">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Optional Details</h5>
+                    </div>
+                    <div class="row">
+                        <% optional.forEach(function(row){ %>
+                            <div class="mb-3">
+                                <label class="form-label" > <%= row.name.charAt(0).toUpperCase() + row.name.slice(1) %></label>
+                                <input type="text" required class="form-control" name="detail" data-id="<%= row.id%>" data-old="<%= row.old_value ? JSON.parse(row.old_value)[0]:'' %>" placeholder="<%= row.name%>" value="<%= row.old_value ? JSON.parse(row.old_value)[0]:'' %>">
+                            </div>
+                        <% }) %>
+
+                        <% optional_multi.forEach(function(row){ %>
+                            <div class="mb-3">
+                                <label class="form-label" > <%= row.name.charAt(0).toUpperCase() + row.name.slice(1) %></label>
+                                <% if(row.old_value){%>
+                                    <% var values=JSON.parse("["+row.old_value+"]") %>
+                                    <% values.forEach(function(val){%>
+                                        <div style="margin-bottom: 10px;" >
+                                            <input type="text" class="form-control" style="display: inline;width: 27rem;" name="detail" data-id="<%= row.id%>" data-old="<%= val %>"  placeholder="<%= row.name%>" value="<%= val %>" >
+                                            <button type="button" onclick="remove(this)" class="btn btn-primary"><i class="align-middle mr-2" data-feather="delete"></i> Remove</button>
+                                        </div>
+                                    <% }) %>
+                                <% } %>
+                                <div style="margin-bottom: 10px;" >
+                                    <input type="text" class="form-control" style="display: inline;width: 27rem;" name="detail" data-id="<%= row.id %>" data-old=""  placeholder="<%= row.name %>"  >
+                                    <button type="button" style="width: 6.4rem;" onclick="add(this)" class="btn btn-primary"><i class="align-middle mr-2" data-feather="plus-circle"></i> Add</button>                                   
+                                </div>
+                                <span style="color: red;visibility: hidden;">Please fill this</span>
+                            </div>
+                        <% }) %>
+
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="saveChanges()" class="btn btn-primary">Save changes</button>
+            <br><span class="error_status" style="color: red;margin-top: 5px;"></span>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    var emp_id=$("input[name='emp_id']").val();
+    var deleted=[];
+    var del;
+    var prev;
+    var str="Please fill all required fields";
+    var sample= '<button type="button" onclick="remove(this)" class="btn btn-primary" style="margin-left:4px;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-delete align-middle mr-2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg> Remove</button>' ;
+    var item;
+    function saveChanges(){
+        var inputs=$("input[name='detail']");
+        var array=[];
+        var arr;
+        inputs.each(function( index ) {
+            arr=[];
+            arr.push($(this).data("id"))
+            arr.push($(this).data("old"))
+            arr.push($(this).val().trim())
+            array.push(arr);
+        });
+        if (validate()){
+            console.log(array);
+            $.post( "auth/form_submit/addEmergencyDetails", { array,deleted,emp_id })
+            .done(function( data ) {
+                location.hash = "/employees";
+            });
+        }else{
+            $(".error_status").html(str);
+            setTimeout(function(){
+                $(".error_status").html("");
+            },2000);
+        }
+    }
+
+    function validate(){
+        var valid=true;
+        var require=$(".require");
+        require.each(function( index ) {
+            if ($(this).val().trim() ==""){
+                valid=false;
+                return ;
+            }
+        });
+
+        if(valid){
+            var require_one=$(".require_one");
+            require_one.each(function( index ) {
+                valid=false;
+                $(this).children().each(function(inde,elem){
+                    if(this.tagName == 'DIV') {
+                        if($(elem).children().eq(0).val().trim() !==""){
+                            valid=true;
+                        }
+                    }
+                })
+                if (!valid){
+                    return;
+                }
+            });
+        }
+        return valid;
+    }
+    function remove(ele){
+        if ($(ele).prev().data("old") !==""){
+            del=[]
+            del.push($(ele).prev().data("id"));
+            del.push($(ele).prev().data("old"));
+            deleted.push(del);
+        }
+        $(ele).parent().remove()
+    }
+
+    function add(ele){
+        prev=$(ele).prev();
+        if ($(prev).val().trim() !==""){
+            var element = document.createElement("div");
+            $(element).css("margin-bottom","10px");
+            var inpElement=$(prev).clone();
+            $(inpElement).appendTo(element);
+            $(sample).appendTo(element);
+            $(prev).val("");      
+            $(element).insertBefore($(ele).parent());
+        }else{
+            $(ele).parent().next().css("visibility","visible");
+            setTimeout(function(){
+                $(ele).parent().next().css("visibility","hidden");
+            },2000);
+        }
+    }
+</script>
+
+<% }else {%>
+<h1>No Emergency details found</h1>
+<%}%>

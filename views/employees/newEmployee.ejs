@@ -5,17 +5,22 @@
             var employee={"emp_id":null,"firstname":"","lastname":"","bd":"","martial_status":"","dept_id":null,"job_id":null,"emp_status_id":null,"pay_grade_level":null,"supervisor":null,"username":null,"user_level":null,"userAcc":null}
             var action="auth/form_submit/addNewEmployee";
         }else{
-            var employee =result[7][0]
+            var employee =result[8][0]
             var action="auth/form_submit/editEmployee";
         } %>
     <div class="card">
 
         <div class="card-header">
             <h5 class="card-title mb-0">Employee Info</h5>
+            <%if(!newEmp){ %>
+                <a class="btn btn-primary mt-2" style="float: right;" href="#/employees/emergency_info/<%= newEmp? '':employee.emp_id %>" >
+                    <i class="align-middle" data-feather="plus-circle"></i><span class="align-middle">  Emergency Details</span>
+                </a>
+            <%} %>
         </div>
 
         <div class="card-body">
-            <form after_submit="change_page" action="<%= action %>">
+            <form class="form_tag" after_submit="change_page" action="<%= action %>">
                 <input type="hidden" name="empId" value="<%= employee.emp_id %>">
                 <input type="hidden" name="userAcc" value="<%= employee.userAcc %>">
                 <input type="hidden" name="profileImage" id="profileImage" value="<%= newEmp ? 'default' :'unchanged' %>">
@@ -87,11 +92,11 @@
                         </select>
                     </div>
                     <div class="mb-3 col-md-6">
-                        <label class="form-label" for="inputPglevel">Pay Grade Level</label>
-                        <select required name="payGlevel" id="inputPgl" class="form-control">
-                            <% result[3].forEach(function(pgl){ %>
-                                <option value="<%= pgl.pay_grade_level %>" <%= employee.pay_grade_level==pgl.pay_grade_level ? 'selected':'' %>><%= pgl.pay_grade_level_title %></option>
-                                <% }) %> 
+                        <label class="form-label" for="inputPglevel">Employment Status Type</label>
+                        <select required name="empStaType" id="inputPgl" class="form-control">
+                            <option value="1" <%= employee.emp_status_type=="not_applicable" ? 'selected':'' %> >Not Applicable</option>
+                            <option value="2" <%= employee.emp_status_type=="full_time" ? 'selected':'' %> >Full Time</option>
+                            <option value="3" <%= employee.emp_status_type=="part_time" ? 'selected':'' %> >Part time</option>
                         </select>
                     </div>
                 </div>
@@ -100,8 +105,27 @@
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputSupervisor">Supervisor</label>
                         <select required name="supervisor" id="inputSupervisor" class="form-control">
+                            <option value="0">Does not have a supervisor</option>
                             <% result[4].forEach(function(emp){ %>
                                 <option value="<%= emp.emp_id %>" <%= employee.supervisor==emp.emp_id ? 'selected':'' %>><%= emp.fullname %></option>
+                                <% }) %> 
+                        </select>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputMstatus">Gender</label>
+                        <select required name="gender" id="inputMstatus" class="form-control">
+                            <option value="male" <%= employee.gender=="male" ? 'selected':'' %> >Male</option>
+                            <option value="female" <%= employee.gender=="female" ? 'selected':'' %>>Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputPglevel">Pay Grade Level</label>
+                        <select required name="payGlevel" id="inputPgl" class="form-control">
+                            <% result[3].forEach(function(pgl){ %>
+                                <option value="<%= pgl.pay_grade_level %>" <%= employee.pay_grade_level==pgl.pay_grade_level ? 'selected':'' %>><%= pgl.pay_grade_level_title %></option>
                                 <% }) %> 
                         </select>
                     </div>
@@ -113,14 +137,20 @@
                             <h4 class="card-title">Custom Attributes</h4>
                         
                             <% result[6].forEach(function(cusAttr,val){ %>
-                            <% if ( val%2 == 0) { %>
-                                </div><div class='row'> 
-                            <% } %>
+                                <% var attribute=JSON.parse(cusAttr.attributes) %>
+                                <% var options=JSON.parse(attribute.field_value) %>
+                                <% if ( val%2 == 0) { %>
+                                    </div><div class='row'> 
+                                <% } %>
                                 <div class="mb-3 col-md-6">
-                                    <label class="form-label" for="input<%= cusAttr.custom_field_name %>"><%= cusAttr.custom_field_name.charAt(0).toUpperCase() + cusAttr.custom_field_name.slice(1) %></label>
-                                    <input type="hidden"  name=attr_id value="<%= cusAttr.custom_field_id %>" >
-                                    <input type="hidden"  name=exist_attr_id value="<%= cusAttr.old_custom_field_id %>" >
-                                    <input type="text" required name=attr_val class="form-control" id="input<%= cusAttr.custom_field_name %>" value="<%= cusAttr.custom_field_value? cusAttr.custom_field_value:"" %>" placeholder="<%= cusAttr.custom_field_name %>" >
+                                    <label class="form-label"><%= attribute.field_name.charAt(0).toUpperCase() + attribute.field_name.slice(1) %></label>
+                                    <input type="hidden"  name=attr_id value="<%= attribute.field_id %>" >
+                                    <input type="hidden"  name=exist_attr_id value="<%= attribute.old_value ? attribute.old_value:'0' %>" >
+                                    <select required name="attr_val"  class="form-control">
+                                        <% options.forEach(function(attr){ %>
+                                            <option value="<%= attr.id %>" <%= attribute.old_value ==attr.id ? "selected":'' %>><%= attr.value%></option>
+                                        <% }) %>
+                                    </select>
                                 </div>
                             <% }) %> 
                         </div>
@@ -155,7 +185,7 @@
                     </div>
                 </div>
                     
-                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button type="button" onclick="submit_form()" class="btn btn-primary">Save changes</button>
             </form>
 
         </div>
@@ -189,6 +219,25 @@
     </div>
 
 </div>
-<script src="/js/newEmployee.js"> </script>
+<script> 
+    var submit_form = () => {
+        var form = $(".form_tag");
+        $.post( form.attr('action'), form.serializeArray(), (data) =>{
+            change_page(data);
+        });
+    }
+    var change_page = (data) => {
+        if(data.new){
+            location.hash = "/employees/emergency_info/" +data.emp_id ;
+        }else{
+            location.hash = "/employees";
+        }
+        
+    }
+    var editUserToggle = () => {
+        document.querySelector("#editEmpUser").classList.toggle("d-none");
+        document.querySelector("#inputUsername").toggleAttribute("required");
+    }
+</script>
 <script src="/js/croppie.js"></script>
 
