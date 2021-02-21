@@ -23,7 +23,7 @@ router.get('/', (req, res)=>{
 
 router.get('/requests', (req, res)=>{
     const emp_id = req.session.emp_id;
-    db.query("SELECT l.emp_id,CONCAT(l.apply_date_time,'') datetime,l.period,CONCAT(e.firstname,' ',e.lastname) fullname,s.title status,lt.leave_type,d.name department,j.job_title_name jobtitle FROM leave_applications l INNER JOIN employees e ON l.emp_id=e.emp_id INNER JOIN leave_application_statuses s ON l.status_id=s.status_id INNER JOIN leave_types lt ON l.leave_type_id=lt.leave_type_id INNER JOIN departments d ON e.dept_id=d.dept_id INNER JOIN job_titles j ON e.job_id=j.job_id  WHERE e.status=1 and e.supervisor=? ORDER BY l.status_id,fullname;",
+    db.query("SELECT l.emp_id,CONCAT(l.apply_date_time,'') AS datetime,l.period,CONCAT(e.firstname,' ',e.lastname) fullname,s.title AS status,lt.leave_type,d.name department,j.job_title_name jobtitle FROM leave_applications l INNER JOIN employees e ON l.emp_id=e.emp_id INNER JOIN leave_application_statuses s ON l.status_id=s.status_id INNER JOIN leave_types lt ON l.leave_type_id=lt.leave_type_id INNER JOIN departments d ON e.dept_id=d.dept_id INNER JOIN job_titles j ON e.job_id=j.job_id INNER JOIN supervisors su ON su.emp_id=e.emp_id WHERE e.status=1 and su.supervisor=? ORDER BY l.status_id,fullname",
         emp_id,(err,result) =>{
             if(err) console.log('mysql error', err );
             else {
