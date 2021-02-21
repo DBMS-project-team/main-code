@@ -140,9 +140,13 @@
             }
             const Login = () => <h1>Login</h1>
             const Register = () => <h1>Register</h1>
+
             function MyVerticallyCenteredModal(props) {
                 const [show, setShow] = useState(false);
-                const [value, setValue] = useState(props.value);
+                const [value, setValue] = useState( [] );
+                useEffect( _ => {
+                    setValue( JSON.parse( props.value ) )
+                }, [props.value])
                 
                 const handleClose = () => setShow(false);
                 const handleShow = () => setShow(true);
@@ -155,13 +159,21 @@
                         var column = props.column;
                         var id = props.dataid;
                     }
-                    $.post( '/auth/alter/edit', {table: props.table, column, id,  value, changed_column: props.db_column}).always( _ => {
+                    console.log({value})
+                    $.post( '/auth/alter/edit', {table: props.table, column, id,  value, changed_column: JSON.parse( props.db_column )}).always( _ => {
                         $('#root_refresher').click();
                     });
                     props.onHide();
                 }
                 const handleChange = (event) => {
-                    setValue(event.target.value);
+                    console.log(event.target.value)
+                    setValue(value.map( (ele, id) => {
+                        if( (id+1)==event.target.id ){
+                            return event.target.value
+                        }else{
+                            return ele
+                        }
+                    }));
                 }
                 return (
                     <Modal
@@ -178,10 +190,12 @@
                         <h4>Enter detail</h4>
                         
                         <Form>
-                            <Form.Group controlId="formBasicEmail">
-                                <Form.Label>{props.field}</Form.Label>
-                                <Form.Control type="text" placeholder="Enter" defaultValue={props.value} onChange={handleChange} />
-                            </Form.Group>
+                            {JSON.parse( props.field ).map( (ele, id) => (
+                                <Form.Group key={id} controlId="formBasicEmail">
+                                    <Form.Label>{ele.trim()}</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter" defaultValue={JSON.parse( props.value )[id]} id={id+1} onChange={handleChange} />
+                                </Form.Group>
+                            ))}
                         </Form>
 
                     </Modal.Body>
@@ -193,9 +207,9 @@
                 );
                 }
 
-                function App2() {
+            function App2() {
                 const [modalShow, setModalShow] = React.useState(false);
-                const [datas, setDatas] = React.useState({table:'', column: '', dataid: '', value: '', title: '', field: '', db_column: ''});
+                const [datas, setDatas] = React.useState({table:'', column: '', dataid: '', value: '[]', title: '', field: '[]', db_column: '[]'});
 
                 const handleClick = (e) => {
                     var ele = e.target;
@@ -239,33 +253,33 @@
                     </React.Fragment>
                 );
             }
-            const SidebarItem = ({menu}) => {
-                return (
-                    <li className="sidebar-item">
-                    <a href={menu.child ? "#"+menu.href : menu.href} data-toggle={ menu.child ? "collapse" : '' } className={"sidebar-link" +  menu.child ? "collapsed" : "" }>
-                        <i className="align-middle" data-feather={ menu.icon }></i> <span className="align-middle">{ menu.title }</span>
-                    </a>
-                    {  menu.child &&
-                        <ul id={ menu.href } className="sidebar-dropdown list-unstyled collapse" data-parent="#sidebar">
-                            {
-                                menu.child.map((item, id)=> (
-                                    <li key={id} className="sidebar-item"><a className="sidebar-link" href={ item.href }>{ item.title }</a></li>
-                                ))
-                            }
-                        </ul>
-                    }
-                </li>
-                );
-            }
-            const SideBar = ({menus}) => {
-                return (
-                    <React.Fragment>
-                    {menus.map((menu, id)=>(
-                        <SidebarItem key={id} menu={menu} />
-                    ))}
-                    </React.Fragment>
-                )
-            }
+            // const SidebarItem = ({menu}) => {
+            //     return (
+            //         <li className="sidebar-item">
+            //         <a href={menu.child ? "#"+menu.href : menu.href} data-toggle={ menu.child ? "collapse" : '' } className={"sidebar-link" +  menu.child ? "collapsed" : "" }>
+            //             <i className="align-middle" data-feather={ menu.icon }></i> <span className="align-middle">{ menu.title }</span>
+            //         </a>
+            //         {  menu.child &&
+            //             <ul id={ menu.href } className="sidebar-dropdown list-unstyled collapse" data-parent="#sidebar">
+            //                 {
+            //                     menu.child.map((item, id)=> (
+            //                         <li key={id} className="sidebar-item"><a className="sidebar-link" href={ item.href }>{ item.title }</a></li>
+            //                     ))
+            //                 }
+            //             </ul>
+            //         }
+            //     </li>
+            //     );
+            // }
+            // const SideBar = ({menus}) => {
+            //     return (
+            //         <React.Fragment>
+            //         {menus.map((menu, id)=>(
+            //             <SidebarItem key={id} menu={menu} />
+            //         ))}
+            //         </React.Fragment>
+            //     )
+            // }
             ReactDOM.render(<App />, document.querySelector('#root'));
             ReactDOM.render(<App2 />, document.querySelector('#modal-cont'));
             //ReactDOM.render(<SideBar menus={menus} />, document.querySelector('.sidebar-nav'));
@@ -334,9 +348,11 @@
 
                         if($(this).parents('table').attr('celledit')==undefined){
                             var dataid = $(this).parents('tr').attr('data-id');
-                            var value = $(this).parents('tr').children('td').eq( $(this).parents('table').attr('popup-edit') ).html();
-                            var field = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).html();
-                            var db_column = $(this).parents('table').find('thead').find('th').eq( $(this).parents('table').attr('popup-edit') ).attr('db_column');
+                            
+                            var column_ids = $(this).parents('table').attr('popup-edit').split(',').map( ele => ele.trim());
+                            var db_column = JSON.stringify( column_ids.map( id => $(this).parents('table').find('thead').find('th').eq( id ).attr('db_column') ) );
+                            var value = JSON.stringify( column_ids.map( id => $(this).parents('tr').children('td').eq( id ).html() ) );
+                            var field = JSON.stringify( column_ids.map( id => $(this).parents('table').find('thead').find('th').eq( id ).html() ) );
                         }else{
                             var dataid = $(this).parents('td').attr('data-id');
                             var value = $(this).parents('td').text().trim();

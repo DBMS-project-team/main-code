@@ -49,7 +49,13 @@ router.post('/edit', (req, res) => {
         } );
         var argument = { toSqlString: function() { return string; } };
     }
-    var query = db.query('UPDATE ?? SET ?? = ? WHERE ?', [table, changed_column, value, argument], (error, result) => {
+    
+    var set = {};
+    changed_column.forEach( (val, id) => {
+        set = {...set, [val]:value[id]}
+    });
+
+    var query = db.query('UPDATE ?? SET ? WHERE ?', [table, set, argument], (error, result) => {
         if(error) console.log('mysql error', error);
         else {
             res.json(result);

@@ -1,26 +1,27 @@
 create table departments (
-dept_id int not null auto_increment,
-name varchar(50),
-constraint
-primary key (dept_id)
+    dept_id int not null auto_increment,
+    name varchar(50),
+    constraint
+    primary key (dept_id)
 );
 
 create table job_titles (
-job_id int not null auto_increment,
-job_title_name varchar(50),
-primary key (job_id)
+    job_id int not null auto_increment,
+    job_title_name varchar(50),
+    primary key (job_id)
 );
 
 create table pay_grades (
-pay_grade_level int not null auto_increment,
-pay_grade_level_title varchar(50),
-primary key (pay_grade_level)
+    pay_grade_level int not null auto_increment,
+    pay_grade_level_title varchar(50),
+    salary DECIMAL(13, 2) UNSIGNED NOT NULL,
+    primary key (pay_grade_level)
 );
 
 create table employment_statuses(
-emp_status_id int not null auto_increment,
-emp_status varchar(50),
-primary key (emp_status_id)
+    emp_status_id int not null auto_increment,
+    emp_status varchar(50),
+    primary key (emp_status_id)
 );
 
 CREATE TABLE branches (
