@@ -1,3 +1,5 @@
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
 create table departments (
     dept_id int not null auto_increment,
     name varchar(50),
@@ -491,3 +493,19 @@ GROUP BY
     i.is_required,
     i.multivalued;
 END
+
+
+-- ///////////////////////////////////////
+-- procedure for dashboard
+DROP PROCEDURE IF EXISTS `dashboard`;
+DELIMITER $$
+CREATE PROCEDURE `dashboard` ()
+BEGIN
+    SELECT departments.*, COUNT(emp_id) `count` FROM departments NATURAL LEFT JOIN employees GROUP BY dept_id;
+    SELECT job_titles.*, count(emp_id) count FROM job_titles NATURAL LEFT JOIN employees GROUP BY job_id;
+    SELECT pay_grades.*, count(emp_id) count FROM pay_grades NATURAL LEFT JOIN employees GROUP BY pay_grade_level;
+    SELECT user_levels.*, count(emp_id) count FROM user_levels NATURAL LEFT JOIN users GROUP BY user_level;
+END $$
+DELIMITER ;
+
+CALL dashboard();

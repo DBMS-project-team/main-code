@@ -5,7 +5,14 @@ const db = require('../db_config');
 const feather = require('feather-icons');
 
 router.get('/', (req, res)=>{
-    res.render('home');
+    db.query("CALL dashboard();", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            if( result.length > 0 ){
+                res.render('home', {departments: result[0], job_titles: result[1], pay_grades: result[2], user_levels: result[3]});
+            }
+        }
+    })
 });
 
 router.use('/employees/', require('./pageRoutes/employees'));

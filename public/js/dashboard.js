@@ -1,4 +1,109 @@
 //document.addEventListener("DOMContentLoaded", function() {
+    const allColors = Object.values(window.theme).reverse();
+
+    // Pie chart
+    const pie = document.getElementById("chartjs-dashboard-pie");
+    new Chart(pie, {
+        type: "pie",
+        data: {
+            labels: JSON.parse(pie.getAttribute('labels')),
+            datasets: [{
+                data: JSON.parse(pie.getAttribute('data')),
+                backgroundColor: allColors,
+                borderWidth: 5
+            }]
+        },
+        options: {
+            responsive: !window.MSInputMethodContext,
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            cutoutPercentage: 75
+        }
+    });
+
+    //
+
+    // Doughnut Chart
+    const chart = document.getElementById("chartjs-doughnut");
+    new Chart(chart, {
+        type: "doughnut",
+        data: {
+            labels: JSON.parse(chart.getAttribute('labels')),
+            datasets: [{
+                data: JSON.parse(chart.getAttribute('data')),
+                backgroundColor: [
+                    window.theme.primary,
+                    window.theme.success,
+                    window.theme.warning,
+                    "#dee2e6",
+                    ...allColors
+                ],
+                borderColor: "transparent"
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            cutoutPercentage: 65,
+            legend: {
+                display: false
+            }
+        }
+    });
+
+    //
+
+    // Pie chart-2
+    const pie2 = document.getElementById("chartjs-pie-2");
+    new Chart(pie2, {
+        type: "pie",
+        data: {
+            labels: JSON.parse(pie2.getAttribute('labels')),
+            datasets: [{
+                data: JSON.parse(pie2.getAttribute('data')),
+                backgroundColor: [
+                    window.theme.primary,
+                    window.theme.warning,
+                    window.theme.danger,
+                    "#dee2e6",
+                    ...allColors
+                ],
+                borderColor: "transparent"
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            }
+        }
+    });
+
+    // Polar Area chart
+    const polar = document.getElementById("chartjs-polar-area");
+    new Chart(polar, {
+        type: "polarArea",
+        data: {
+            labels: JSON.parse(polar.getAttribute('labels')),
+            datasets: [{
+                label: "Model S",
+                data: JSON.parse(polar.getAttribute('data')),
+                backgroundColor: [
+                    window.theme.primary,
+                    window.theme.success,
+                    window.theme.danger,
+                    window.theme.warning,
+                    window.theme.info,
+                    ...allColors
+                ]
+            }]
+        },
+        options: {
+            maintainAspectRatio: false
+        }
+    });
+
     var ctx = document.getElementById("chartjs-dashboard-line").getContext("2d");
     var gradient = ctx.createLinearGradient(0, 0, 0, 225);
     gradient.addColorStop(0, "rgba(215, 227, 244, 1)");
@@ -63,33 +168,6 @@
                     }
                 }]
             }
-        }
-    });
-
-    //
-
-    // Pie chart
-    new Chart(document.getElementById("chartjs-dashboard-pie"), {
-        type: "pie",
-        data: {
-            labels: ["Chrome", "Firefox", "IE"],
-            datasets: [{
-                data: [4306, 3801, 1689],
-                backgroundColor: [
-                    window.theme.primary,
-                    window.theme.warning,
-                    window.theme.danger
-                ],
-                borderWidth: 5
-            }]
-        },
-        options: {
-            responsive: !window.MSInputMethodContext,
-            maintainAspectRatio: false,
-            legend: {
-                display: false
-            },
-            cutoutPercentage: 75
         }
     });
 
