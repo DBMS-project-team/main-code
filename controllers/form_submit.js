@@ -26,7 +26,17 @@ router.post('/add_new_job_title', (req, res) => {
 });
 
 router.post('/add_new_pay_grade_level', (req, res) => {
-    db.query('INSERT INTO `pay_grades` SET ?', {pay_grade_level_title: req.body.value}, (error, result) => {
+    const { pay_grade_level, salary} = req.body; 
+    db.query('INSERT INTO `pay_grades` SET ? ;', { pay_grade_level_title: pay_grade_level, salary: salary}, (error, result) => {
+        if (error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
+
+router.post('/add_new_user_level_title', (req, res) => {
+    db.query('INSERT INTO `user_levels` SET ?', {user_level_title: req.body.value}, (error, result) => {
         if(error) console.log('mysql error', error);
         else {
             res.json(result.insertId);
