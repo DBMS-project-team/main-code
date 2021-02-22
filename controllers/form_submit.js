@@ -26,7 +26,17 @@ router.post('/add_new_job_title', (req, res) => {
 });
 
 router.post('/add_new_pay_grade_level', (req, res) => {
-    db.query('INSERT INTO `pay_grades` SET ?', {pay_grade_level_title: req.body.value}, (error, result) => {
+    const { pay_grade_level, salary} = req.body; 
+    db.query('INSERT INTO `pay_grades` SET ? ;', { pay_grade_level_title: pay_grade_level, salary: salary}, (error, result) => {
+        if (error) console.log('mysql error', error);
+        else {
+            res.json(result.insertId);
+        }
+    })
+});
+
+router.post('/add_new_user_level_title', (req, res) => {
+    db.query('INSERT INTO `user_levels` SET ?', {user_level_title: req.body.value}, (error, result) => {
         if(error) console.log('mysql error', error);
         else {
             res.json(result.insertId);
@@ -287,6 +297,68 @@ router.post('/addEmergencyDetails', (req,res)=>{
         })
     }
     res.end();
+});
+
+router.post('/changeOrgPassword', (req, res) => {
+    var org_id = req.body.org_id;
+    var new_pass = req.body.new_pass
+    db.query('UPDATE organization_details SET admin_password=? where org_id=?', [new_pass, org_id], (error, result) => {
+        if(error){
+            console.log('mysql error', error);
+            res.json({loc: '/organization/orgChangePassword/:org_id?'+org_id});
+        } 
+        else {
+            res.json({new:true});
+        }
+    })
+});
+
+router.post('/newOrg', (req, res) => {
+    var {org_name, reg_num, org_address,user_name,password} = req.body;
+    db.query("INSERT INTO `organization_details`(`org_name`, `registration_number`, `address`, `admin_username`, `admin_password`) VALUES (?,?,?,?,?)", [org_name, reg_num, org_address,user_name,password], (error, result) => {
+        if(error) {
+            console.log('mysql error', error);
+            res.json({loc: '/organization/newOrg'});
+        }else {
+            res.json({new:true});
+        }
+    })
+});
+
+router.post('/editOrg', (req, res) => {
+    var {org_id, org_name, reg_num, org_address} = req.body;
+    db.query('UPDATE organization_details SET org_name=?, registration_number=?, address=? where org_id=?', [org_name, reg_num, org_address, org_id], (error, result) => {
+        if(error) {
+            console.log('mysql error', error);
+            res.json({loc: '/organization/editOrg/:org_id?'+org_id});
+        }else {
+            res.json({new:true});
+        }
+    })
+});
+
+router.post('/newBranch', (req, res) => {
+    var {branch_name, status} = req.body;
+    db.query("INSERT INTO `branches`(`title`, `status`) VALUES (?,?)", [branch_name, status], (error, result) => {
+        if(error) {
+            console.log('mysql error', error);
+            res.json({loc: '/organization/newBranch'});
+        }else {
+            res.json({new:true});
+        }
+    })
+});
+
+router.post('/editBranch', (req, res) => {
+    var {branch_id, branch_name, status} = req.body;
+    db.query('UPDATE branches SET title=?, status=? where branch_id=?', [branch_name, status, branch_id], (error, result) => {
+        if(error) {
+            console.log('mysql error', error);
+            res.json({loc: 'organization/editBranch/:branch_id?'+branch_id});
+        }else {
+            res.json({new:true});
+        }
+    })
 });
 
 module.exports = router;
