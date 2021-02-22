@@ -1,0 +1,146 @@
+<style>
+    .card {
+    height: 510px;
+    width: 500px;
+    margin: auto;
+    box-shadow: 0 0 0.875rem 0 rgb(33 37 41 / 5%);
+    }
+</style>
+<div class="content container-fluid p-0">
+    <% if(org){
+        if(pass){ %>
+            <div class="card">
+                <div class="modal-header">
+                    <div class="modal-title h4" id="contained-modal-title-vcenter">
+                        Change <%= org_detail.org_name %> Password
+                    </div>
+                    <button type="button" class="close" onclick="close_card()"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                </div>
+                <div class="modal-body">
+                    <h4>Enter detail</h4>
+                    <form class="form_tag" after_submit="change_page" action="auth/form_submit/changeOrgPassword">
+                        <div class="form-group">
+                            <label class="form-label" for="old_pass">Old Password</label>
+                            <input placeholder="Enter" name="old_pass" type="text" id="formBasicEmail" class="form-control" value="<%= org_detail.admin_password %>" disabled>
+                            <label class="form-label" for="formBasicEmail">New Password</label>
+                            <input placeholder="Enter" name="new_pass" type="text" id="formBasicEmail" class="form-control" value="">
+                            <input type="hidden" id="org_id" name="org_id" value="<%= org_detail.org_id %>">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="close_card()"> Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submit_form()">Save Changes</button>
+                </div>
+            </div>
+        
+        <% }else{
+            if(data){
+                var org_detail = org_detail;
+                var action="auth/form_submit/editOrg";
+            }else{
+                var org_detail={"org_id":null,"org_name":"","address":"","registration_number":"","admin_username":"","admin_password":null};
+                var action="auth/form_submit/newOrg";
+            } %>
+            <div class="card">
+                <div class="modal-header">
+                    <div class="modal-title h4" id="contained-modal-title-vcenter">
+                        <% if (org_detail.org_id == null){ %>
+                            Create New Organization
+                        <% }else{ %>
+                            Edit <%= org_detail.org_name %> Details
+                        <% } %>
+                    </div>
+                    <button type="button" class="close" onclick="close_card()"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                </div>
+                <div class="modal-body">
+                    <h4>Enter detail</h4>
+                    <form class="form_tag" after_submit="change_page" action="<%= action %>">
+                        <div class="form-group">
+                            <% if (org_detail.org_id != null){ %>
+                                <input type="hidden" id="org_id" name="org_id" value="<%= org_detail.org_id %>">
+                            <% } %>
+                            <label class="form-label" for="formBasicEmail">Organization name</label>
+                            <input placeholder="Enter" type="text" name="org_name" id="formBasicEmail" class="form-control" value="<%= org_detail.org_name %>">
+                            <label class="form-label" for="formBasicEmail">Registration Number</label>
+                            <input placeholder="Enter" type="text" name="reg_num" id="formBasicEmail" class="form-control" value="<%= org_detail.registration_number %>">
+                            <label class="form-label" for="formBasicEmail">Address</label>
+                            <input placeholder="Enter" type="text" name="org_address" id="formBasicEmail" class="form-control" value="<%= org_detail.address %>">
+                            <% if (org_detail.org_id == null){ %>
+                                <label class="form-label" for="formBasicEmail">Admin User Name</label>
+                                <input placeholder="Enter" type="text" name="user_name" id="formBasicEmail" class="form-control" value="">
+                                <label class="form-label" for="formBasicEmail">Admin Password</label>
+                                <input placeholder="Enter" type="text" name="password" id="formBasicEmail" class="form-control" value="">    
+                            <% } %>
+                            
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="close_card()"> Close</button>
+                    <button type="submit" class="btn btn-primary" onclick="submit_form()">Save Changes</button>
+                </div>
+            </div>
+        <% }
+        }else{
+            if(data){
+                var branch_det = branch_det;
+                var action="auth/form_submit/editBranch";
+            }else{
+                var branch_det={"branch_id":null,"title":"","status":""};
+                var action="auth/form_submit/newBranch";
+            } %>
+            <div class="card">
+                <div class="modal-header">
+                    <div class="modal-title h4" id="contained-modal-title-vcenter">
+                        <% if (branch_det.branch_id == null){ %>
+                            Create New Branch
+                        <% }else{ %>
+                            Edit <%= branch_det.title %> Branch Details
+                        <% } %>
+                    </div>
+                    <button type="button" class="close" onclick="close_card()"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                </div>
+                <div class="modal-body">
+                    <h4>Enter detail</h4>
+                    <form class="form_tag" after_submit="change_page" action="<%= action %>">
+                        <div class="form-group">
+                            <% if (branch_det.branch_id != null){ %>
+                                <input type="hidden" id="org_id" name="branch_id" value="<%= branch_det.branch_id %>">
+                            <% } %>
+                            <label class="form-label" for="formBasicEmail">Branch name</label>
+                            <input placeholder="Enter" type="text" name="branch_name" id="formBasicEmail" class="form-control" value="<%= branch_det.title %>">
+                            <label class="form-label" for="formBasicEmail">Branch Status</label>
+                            <select required name="status" class="form-control">
+                                <option value="0" <%= branch_det.status=="0" ? 'selected':'' %> >Inactive</option>
+                                <option value="1" <%= branch_det.status=="1" ? 'selected':'' %>>Active</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="close_card()"> Close</button>
+                    <button type="submit" class="btn btn-primary" onclick="submit_form()">Save Changes</button>
+                </div>
+            </div>
+        <% } %>
+
+</div>
+<script> 
+    var submit_form = () => {
+        var form = $(".form_tag");
+        $.post( form.attr('action'), form.serializeArray(), (data) =>{
+            change_page(data);
+        });
+    }
+    var change_page = (data) => {
+        if(data.new){
+            location.hash = "/organization" ;
+        }else{
+            location.hash = data.loc;
+        }       
+    }
+    var close_card = () =>{
+        location.hash = '/organization' ;
+    }
+</script>
