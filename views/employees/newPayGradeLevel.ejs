@@ -1,0 +1,27 @@
+<div class="content container-fluid p-0">
+    <div class="card">
+
+        <div class="card-header">
+            <h5 class="card-title mb-0">Add Pay Grade Level</h5>
+        </div>
+        <div class="card-body">
+            <form page_after_submit="/employees/categories" action="/auth/form_submit/add_new_pay_grade_level">
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label" for="inputName">Pay Grade Level</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="pay_grade_level" class="form-control" id="inputName" placeholder="Enter New Pay Grade Level" required>
+                    </div>
+                </div>     
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label" for="inputName">Salary</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="salary" class="form-control" id="inputName" placeholder="Enter the Salary" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
+
+    </div>
+</div>
