@@ -30,9 +30,17 @@ exports.register = (req, res)=>{
 exports.login = async (req, res)=>{
     try {
         const {username, password, remember_me, url} = req.body;
-        if( !username || !password ){
+        if( !username ){
             return res.status(400).render('./logs/login', {
-                error: 'Please provie an username and password'
+                error: 'Please provie an username',
+                username_err: 'Please provide username',
+                password_err: false
+            })
+        }else if(!password){
+            return res.status(400).render('./logs/login', {
+                error: 'Please provie password',
+                username_err: false,
+                password_err: 'Please provie password'
             })
         }
         if(username === 'admin' ){
@@ -40,11 +48,15 @@ exports.login = async (req, res)=>{
                 if(error) console.log('error', error);
                 else if( !result || result.length < 1  ){
                     res.status(400).render('./logs/login', {
-                        error: 'Cannot find the account'
+                        error: 'Something went wrong!',
+                        username_err: false,
+                        password_err: false
                     })
                 } else if ( result[0].admin_password !== password ) {
                     res.status(400).render('./logs/login', {
-                        error: `${username}, your passowrd is incorrect `
+                        error: `${username}, your passowrd is incorrect`,
+                        username_err: false,
+                        password_err: 'Incorrect Password'
                     })
                 } else{
                     req.session.username = username;
@@ -88,12 +100,16 @@ exports.login = async (req, res)=>{
                         }
                         else {
                             res.status(400).render('./logs/login', {
-                                error: `${username}, your password is incorrect `
+                                error: `${username}, your password is incorrect `,
+                                username_err: false,
+                                password_err: 'Incorrect Password'
                             })
                         }
                     } else {
                         res.status(400).render('./logs/login', {
-                            error: 'Cannot find the account'
+                            error: 'Cannot find the account',
+                            username_err: 'Incorrect username',
+                            password_err: false
                         })
                     }
                 }

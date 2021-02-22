@@ -36,6 +36,7 @@ CREATE TABLE branches (
 
 create table employees (
     emp_id int not null auto_increment,
+    staff_id VARCHAR(10) NULL DEFAULT NULL
     firstname varchar(50) not null,
     lastname varchar (50) not null,
     status TINYINT DEFAULT 1,
@@ -53,7 +54,8 @@ create table employees (
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id),
 	foreign key (job_id) references job_titles(job_id),
     FOREIGN KEY (emp_status_id) REFERENCES employment_statuses(emp_status_id),
-	foreign key (pay_grade_level) references pay_grades(pay_grade_level)
+	foreign key (pay_grade_level) references pay_grades(pay_grade_level),
+    ADD UNIQUE `unique` (`staff_id`)
 );
 
 CREATE TABLE supervisors (

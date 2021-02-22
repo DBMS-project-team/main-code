@@ -38,7 +38,7 @@ let auth = (req, res, next)=>{
         if( req.originalUrl.startsWith('/pages') ){
             res.send('<meta http-equiv="refresh" content="0">');
         }else{
-            res.render('logs/login', {error: "login first"})
+            res.render('logs/login', {error: false, username_err: false, password_err: false})
         }
     }else{
         next();
