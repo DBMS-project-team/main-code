@@ -1,3 +1,25 @@
+<style>
+    .loader-cont{
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        display: none;
+        position: absolute;
+        z-index: 2;
+        background-color: #ffffff8f;
+    }
+    .loader-cont.show {
+        display: flex;
+    }
+    .spinner-border{
+        position: absolute;
+        top: 96px;
+    }
+    .card-title{
+        position: absolute;
+        top: 20px;
+    }
+</style>
 <% var cols = ['dept_id', 'pay_grade_level_id', 'job_id']; %>
 <div class="container-fluid p-0">
     <div class="row">
@@ -69,9 +91,9 @@
                                 <th></th>
                             </tr>
                         </tbody>
-                        <tbody>
+                        <tbody id="employee-content">
                             <% employees.forEach(function(emp){ %>
-                                <tr data-id="<%= emp.emp_id %>" show-name="<%= emp.firstname + " " + emp.lastname  %>">
+                                <tr data-id="<%= emp.emp_id %>" show-name="<%= emp.firstname + " " + emp.lastname  %>" style="cursor: pointer; user-select:none;">
                                     <td>
                                         <img src="img/avatars/avatar-5.jpg" width="48" height="48" class="rounded-circle mr-2" alt="Avatar"> <%= emp.firstname + " " + emp.lastname  %>
                                     </td>
@@ -98,7 +120,10 @@
         </div>
 
         <div class="col-xl-4">
-            <div class="card">
+            <div class="card" id="view_emp" style="height:100%">
+                <div class="loader-cont">
+                    <div class="spinner-border text-dark mr-2" role="status"><span class="sr-only">Loading...</span></div>
+                </div>
                 <div class="card-header">
                     <div class="card-actions float-right">
                         <div class="dropdown show">
@@ -113,9 +138,9 @@
                             </div>
                         </div>
                     </div>
-                    <h5 class="card-title mb-0">Angelica Ramos</h5>
                 </div>
                 <div class="card-body">
+                    <h5 class="card-title mb-0">Angelica Ramos</h5>
                     <div class="row g-0">
                         <div class="col-sm-3 col-xl-12 col-xxl-3 text-center">
                             <img src="img/avatars/avatar-3.jpg" width="64" height="64" class="rounded-circle mt-2" alt="Angelica Ramos">
@@ -194,5 +219,83 @@
         }else{
             location.hash = `/employees/${$(this).attr('filter_type')}/${$(this).attr('name')}/${$(this).find(':selected').text()}/${$(this).find(':selected').val()}${ $(this).attr('filter_type')==='custom' ? ('/'+$(this).attr('custom_field_id')) : '' }`;
         }
+    });
+
+    $('#employee-content tr').unbind('click').click( async e => {
+        $('#view_emp .loader-cont').addClass('show');
+        const ele = e.currentTarget
+        $('#employee-content tr.table-success').removeClass('table-success');
+        $(ele).addClass('table-success');
+        data = await fetch(`/pages/employees/ajax/${$(ele).attr('data-id')}`).then( data => data.json());
+        console.log(data);
+        $('#view_emp .card-body').html(
+            `<h3 class="card-title mb-0">${data.personal.firstname} ${data.personal.lastname}</h3>
+            <div class="row g-0 mb-3">
+                <div class="col-sm-3 col-xl-12 col-xxl-3 text-center">
+                    <img src="img/avatars/avatar-3.jpg" width="64" height="64" class="rounded-circle mt-2" alt="Angelica Ramos">
+                </div>
+                <!--div class="col-sm-9 col-xl-12 col-xxl-9">
+                    <strong>About me</strong>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua.</p>
+                </div-->
+            </div>
+            <h5>Personal Detail</h5>
+            <table class="table table-sm mt-2 mb-4">
+                <tbody>
+                    ${data.contactDetails.map(ele=>(
+                        `<tr>
+                            <th>${ele.eme_item_name}</th>
+                            <td>${ele.eme_item_value}</td>
+                        </tr>`
+                    )).join('')}
+                </tbody>
+            </table>
+
+            <h5>Emergency Detail</h5>
+            <table class="table table-sm mt-2 mb-4">
+                <tbody>
+                    ${data.emergencyDetails.map(ele=>(
+                        `<tr>
+                            <th>${ele.eme_item_name}</th>
+                            <td>${ele.eme_item_value}</td>
+                        </tr>`
+                    )).join('')}
+                </tbody>
+            </table>
+
+            <strong>Activity</strong>
+
+            <ul class="timeline mt-2 mb-0">
+                <li class="timeline-item">
+                    <strong>Signed out</strong>
+                    <span class="float-right text-muted text-sm">30m ago</span>
+                    <p>Nam pretium turpis et arcu. Duis arcu tortor, suscipit...</p>
+                </li>
+                <li class="timeline-item">
+                    <strong>Created invoice #1204</strong>
+                    <span class="float-right text-muted text-sm">2h ago</span>
+                    <p>Sed aliquam ultrices mauris. Integer ante arcu...</p>
+                </li>
+                <li class="timeline-item">
+                    <strong>Discarded invoice #1147</strong>
+                    <span class="float-right text-muted text-sm">3h ago</span>
+                    <p>Nam pretium turpis et arcu. Duis arcu tortor, suscipit...</p>
+                </li>
+                <li class="timeline-item">
+                    <strong>Signed in</strong>
+                    <span class="float-right text-muted text-sm">3h ago</span>
+                    <p>Curabitur ligula sapien, tincidunt non, euismod vitae...</p>
+                </li>
+                <li class="timeline-item">
+                    <strong>Signed up</strong>
+                    <span class="float-right text-muted text-sm">2d ago</span>
+                    <p>Sed aliquam ultrices mauris. Integer ante arcu...</p>
+                </li>
+            </ul>`
+        );
+        $('#view_emp .loader-cont').removeClass('show');
     })
+
+    $('#employee-content tr').first().click();
 </script>
