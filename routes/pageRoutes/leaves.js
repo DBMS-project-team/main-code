@@ -16,7 +16,7 @@ router.get('/', (req, res)=>{
                 ele.end = dateFormat( end, 'isoDateTime' );
                 ele.allDay = true;
             });
-            res.render('leaves/', {leaves: result});
+            res.render('leaves/', {leaves: result, now: dateFormat( Date(), 'isoDateTime' )});
         }
     })
 });

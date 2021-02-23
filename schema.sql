@@ -1,5 +1,3 @@
-SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
-
 create table departments (
     dept_id int not null auto_increment,
     name varchar(50),
@@ -29,6 +27,8 @@ create table employment_statuses(
 CREATE TABLE branches (
     branch_id int(11) NOT NULL AUTO_INCREMENT,
     title varchar(64) NOT NULL,
+    lat DECIMAL(11,8) DEFAULT 0,
+    lng DECIMAL(11,8) DEFAULT 0,
     status TINYINT DEFAULT 1,
     PRIMARY KEY (branch_id),
     CHECK (status=0 OR status=1)
@@ -511,3 +511,65 @@ END $$
 DELIMITER ;
 
 CALL dashboard();
+
+-- ///////////////////////////////////
+-- procedure for leave application
+
+DROP PROCEDURE IF EXISTS leaveApplication;
+DELIMITER $$
+CREATE PROCEDURE leaveApplication ()
+BEGIN
+    DECLARE finished INTEGER DEFAULT 0;
+    DECLARE c_emp_id int(11) DEFAULT 0;
+    DECLARE c_apply_date_time DATETIME;
+    DECLARE c_leave_type_id INT(11);
+    DECLARE c_period INT(3);
+    DECLARE c_status INT(1);
+    DEClARE x INT;
+    DEClARE temp_date DATE;
+    DECLARE custom_field_value_id int(11) DEFAULT 0;
+    
+    -- declare cursor for employee id
+	DEClARE curLeaves
+		CURSOR FOR 
+			SELECT * FROM leave_applications;
+
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;
+
+    CREATE TEMPORARY TABLE temp_leave_applications(
+        emp_id int(11),
+        leave_date int(11),
+        leave_type_id INT(11)
+    );
+
+	OPEN curLeaves;
+
+	getId: LOOP
+		FETCH curLeaves INTO c_emp_id, c_apply_date_time, c_leave_type_id, c_period, c_status;
+		IF finished = 1 THEN 
+			LEAVE getId;
+		END IF;
+		-- quesry
+        SET x=0;
+        SET temp_date = DATE(c_apply_date_time);
+        for_loop: LOOP
+            IF x>c_period THEN
+                LEAVE for_loop;
+            END IF;
+            
+            INSERT INTO temp_leave_applications VALUES (c_emp_id, YEAR(temp_date), c_leave_type_id);
+
+            SET x=x+1;
+            SET temp_date = DATE_ADD(temp_date, INTERVAL 1 DAY);
+
+        END LOOP for_loop;
+	END LOOP getId;
+	CLOSE curLeaves;
+
+    SELECT *, count(1) count FROM temp_leave_applications GROUP BY emp_id, leave_type_id, leave_date;
+END $$
+DELIMITER ;
+
+CALL leaveApplication ();

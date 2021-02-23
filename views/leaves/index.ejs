@@ -20,7 +20,7 @@
         var calendar = new FullCalendar.Calendar(calendarEl, {
             themeSystem: "bootstrap",
             initialView: "dayGridMonth",
-            initialDate: "2020-07-07",
+            initialDate: "<%= now %>",
             headerToolbar: {
                 left: "prev,next today",
                 center: "title",
@@ -80,22 +80,5 @@
         }, 250)
     //});
 //document.addEventListener("DOMContentLoaded", function(event) { 
-setTimeout(function(){
-  if(localStorage.getItem('popState') !== 'shown'){
-    window.notyf.open({
-      type: "success",
-      message: "Get access to all 500+ components and 45+ pages with AdminKit PRO. <u><a class=\"text-white\" href=\"https://adminkit.io/pricing\" target=\"_blank\">More info &#128640;",
-      duration: 10000,
-      ripple: true,
-      dismissible: false,
-      position: {
-        x: "left",
-        y: "bottom"
-      }
-    });
-
-    localStorage.setItem('popState','shown');
-  }
-}, 15000);
 //});
 </script>
