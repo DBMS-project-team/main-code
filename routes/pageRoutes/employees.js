@@ -148,4 +148,19 @@ router.get('/:filter_type?/:table?/:attr?/:id?/:custom_field_id?', (req, res)=>{
     })
 });
 
+router.get('/:emp_id/' ,(req,res) =>{
+    const emp_id = req.params.emp_id;
+    var query="SELECT eme_item_name, eme_item_value from emergency_contact_details left join emergency_contact_items using (eme_item_id) where emp_id=? and ";
+    db.query("SELECT concat(firstname,' ',lastname) as fullname from employees where emp_id in (SELECT supervisor from supervisors where emp_id=?);"+query+"personal=1;"+query+"personal=0;", [emp_id,emp_id,emp_id],(error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            var supervisor = result[0]
+            var contactDetails = result[1]
+            var emergencyDetails = result[2]
+            res.render('employees/',{supervisor, contactDetails, emergencyDetails});
+        }
+    })
+
+});
+
 module.exports = router;
