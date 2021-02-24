@@ -53,7 +53,6 @@ router.post('/add_new_department', (req, res) => {
     })
 });
 
-
 router.post('/addNewEmployee', ( req, res ) => {
     try {
         let {firstname, lastname, dob, martialStatus,gender, department,empStaType, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val,profileImage} = req.body;
@@ -229,9 +228,7 @@ router.post('/new_max_leave', (req, res) => {
         else {
             res.json(result.insertId);
         }
-    });
-        
-    
+    });   
 });
 
 router.post('/addNewLeaveApplication', (req, res) => {
@@ -244,7 +241,6 @@ router.post('/addNewLeaveApplication', (req, res) => {
         }
     })
 });
-
 
 router.post('/addEmergencyDetails', (req,res)=>{
     let { array,deleted,emp_id }=req.body;
@@ -305,21 +301,8 @@ router.post('/changeOrgPassword', (req, res) => {
     db.query('UPDATE organization_details SET admin_password=? where org_id=?', [new_pass, org_id], (error, result) => {
         if(error){
             console.log('mysql error', error);
-            res.json({loc: '/organization/orgChangePassword/:org_id?'+org_id});
         } 
         else {
-            res.json({new:true});
-        }
-    })
-});
-
-router.post('/newOrg', (req, res) => {
-    var {org_name, reg_num, org_address,user_name,password} = req.body;
-    db.query("INSERT INTO `organization_details`(`org_name`, `registration_number`, `address`, `admin_username`, `admin_password`) VALUES (?,?,?,?,?)", [org_name, reg_num, org_address,user_name,password], (error, result) => {
-        if(error) {
-            console.log('mysql error', error);
-            res.json({loc: '/organization/newOrg'});
-        }else {
             res.json({new:true});
         }
     })
@@ -330,7 +313,6 @@ router.post('/editOrg', (req, res) => {
     db.query('UPDATE organization_details SET org_name=?, registration_number=?, address=? where org_id=?', [org_name, reg_num, org_address, org_id], (error, result) => {
         if(error) {
             console.log('mysql error', error);
-            res.json({loc: '/organization/editOrg/:org_id?'+org_id});
         }else {
             res.json({new:true});
         }
@@ -338,11 +320,10 @@ router.post('/editOrg', (req, res) => {
 });
 
 router.post('/newBranch', (req, res) => {
-    var {branch_name, status} = req.body;
-    db.query("INSERT INTO `branches`(`title`, `status`) VALUES (?,?)", [branch_name, status], (error, result) => {
+    var {branch_name, branch_code, branch_lat, branch_lng, status} = req.body;
+    db.query("INSERT INTO `branches`(`title`, `code`, `lat`, `lng`, `status`) VALUES (?,?,?,?,?)", [branch_name, branch_code, branch_lat, branch_lng, status], (error, result) => {
         if(error) {
             console.log('mysql error', error);
-            res.json({loc: '/organization/newBranch'});
         }else {
             res.json({new:true});
         }
@@ -350,11 +331,10 @@ router.post('/newBranch', (req, res) => {
 });
 
 router.post('/editBranch', (req, res) => {
-    var {branch_id, branch_name, status} = req.body;
-    db.query('UPDATE branches SET title=?, status=? where branch_id=?', [branch_name, status, branch_id], (error, result) => {
+    var {branch_id, branch_name,branch_code, branch_lat, branch_lng, status} = req.body;
+    db.query('UPDATE branches SET title=?, code=?, lat=?, lng=?, status=? where branch_id=?', [branch_name,branch_code, branch_lat, branch_lng, status, branch_id], (error, result) => {
         if(error) {
             console.log('mysql error', error);
-            res.json({loc: 'organization/editBranch/:branch_id?'+branch_id});
         }else {
             res.json({new:true});
         }

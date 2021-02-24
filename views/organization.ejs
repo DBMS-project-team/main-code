@@ -5,16 +5,13 @@
     .btn-primary {margin-top: 1rem !important;}
 </style>
 <div class="container-fluid p-0">
-
-    <a href="#/organization/newOrg" class="btn btn-primary float-right mt-n1"><i class="fas fa-plus"></i> New Organization</a>
     <div class="mb-3">
-        <h1 class="h3 d-inline align-middle">Organizations</h1>
+        <h1 class="h3 d-inline align-middle">Organization</h1>
     </div>
 
     <div class="row">
         <% organization.forEach(function(org){ %>
             <div class="card">
-
                 <div class="card-header px-4 pt-4">
                     <div class="card-actions float-right">
                         <div class="dropdown show">
@@ -25,7 +22,6 @@
                             <div class="dropdown-menu dropdown-menu-right">
                                 <a class="dropdown-item" popup-edit="1" href="#/organization/editOrg/<%= org.org_id %>">Edit</a>
                                 <a class="dropdown-item" href="#/organization/orgChangePassword/<%= org.org_id %>">Change Password</a>
-                                <a class="dropdown-item" href="#/organization/delOrg/<%= org.org_id %>">Delete</a>
                             </div>
                         </div>
                     </div>
@@ -50,7 +46,6 @@
     <div class="row">
         <% branches.forEach(function(branch){ %>
             <div class="card">
-
                 <div class="card-header px-4 pt-4">
                     <div class="card-actions float-right">
                         <div class="dropdown show">
@@ -59,7 +54,7 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" popup-edit="1" href="#/organization/editBranch/<%= branch.branch_id %>">Edit</a>
+                                <a class="dropdown-item" href="#/organization/editBranch/<%= branch.branch_id %>">Edit</a>
                                 <a class="dropdown-item" href="#/organization/delBranch/<%= branch.branch_id %>">Delete</a>
                             </div>
                         </div>
@@ -71,6 +66,14 @@
                         <div class="badge bg-danger my-2">Inactive</div>
                     <% } %>
                 </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-4 pb-4">
+                        <% if(branch.code == null || branch.code == ""){ branch_code = "Not given";}else{ branch_code = branch.code;} %>
+                        <p class="mb-2 font-weight-bold">Code <span class="float-right"><%= branch_code %></span></p>
+                        <p class="mb-2 font-weight-bold">Latitude <span class="float-right address-detail"><%= branch.lat %></span></p>
+                        <p class="mb-2 font-weight-bold">Longitude <span class="float-right address-detail"><%= branch.lng %></span></p>
+                    </li>
+                </ul>
             </div>
         <% }) %> 
     </div>
