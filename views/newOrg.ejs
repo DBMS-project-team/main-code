@@ -1,9 +1,9 @@
 <style>
     .card {
-    height: 510px;
-    width: 500px;
-    margin: auto;
-    box-shadow: 0 0 0.875rem 0 rgb(33 37 41 / 5%);
+        height: 510px;
+        width: 500px;
+        margin: auto;
+        box-shadow: 0 0 0.875rem 0 rgb(33 37 41 / 5%);
     }
 </style>
 <div class="content container-fluid p-0">
@@ -35,21 +35,13 @@
             </div>
         
         <% }else{
-            if(data){
-                var org_detail = org_detail;
-                var action="auth/form_submit/editOrg";
-            }else{
-                var org_detail={"org_id":null,"org_name":"","address":"","registration_number":"","admin_username":"","admin_password":null};
-                var action="auth/form_submit/newOrg";
-            } %>
+            var org_detail = org_detail;
+            var action="auth/form_submit/editOrg"; %>
+            
             <div class="card">
                 <div class="modal-header">
                     <div class="modal-title h4" id="contained-modal-title-vcenter">
-                        <% if (org_detail.org_id == null){ %>
-                            Create New Organization
-                        <% }else{ %>
-                            Edit <%= org_detail.org_name %> Details
-                        <% } %>
+                        Edit <%= org_detail.org_name %> Details
                     </div>
                     <button type="button" class="close" onclick="close_card()"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
                 </div>
@@ -57,22 +49,13 @@
                     <h4>Enter detail</h4>
                     <form class="form_tag" after_submit="change_page" action="<%= action %>">
                         <div class="form-group">
-                            <% if (org_detail.org_id != null){ %>
-                                <input type="hidden" id="org_id" name="org_id" value="<%= org_detail.org_id %>">
-                            <% } %>
+                            <input type="hidden" id="org_id" name="org_id" value="<%= org_detail.org_id %>">
                             <label class="form-label" for="formBasicEmail">Organization name</label>
                             <input placeholder="Enter" type="text" name="org_name" id="formBasicEmail" class="form-control" value="<%= org_detail.org_name %>">
                             <label class="form-label" for="formBasicEmail">Registration Number</label>
                             <input placeholder="Enter" type="text" name="reg_num" id="formBasicEmail" class="form-control" value="<%= org_detail.registration_number %>">
                             <label class="form-label" for="formBasicEmail">Address</label>
                             <input placeholder="Enter" type="text" name="org_address" id="formBasicEmail" class="form-control" value="<%= org_detail.address %>">
-                            <% if (org_detail.org_id == null){ %>
-                                <label class="form-label" for="formBasicEmail">Admin User Name</label>
-                                <input placeholder="Enter" type="text" name="user_name" id="formBasicEmail" class="form-control" value="">
-                                <label class="form-label" for="formBasicEmail">Admin Password</label>
-                                <input placeholder="Enter" type="text" name="password" id="formBasicEmail" class="form-control" value="">    
-                            <% } %>
-                            
                         </div>
                     </form>
                 </div>
@@ -87,7 +70,7 @@
                 var branch_det = branch_det;
                 var action="auth/form_submit/editBranch";
             }else{
-                var branch_det={"branch_id":null,"title":"","status":""};
+                var branch_det={"branch_id":null, "title":"", "code":null, "lat":0.00000000, "lng":0.00000000, "status":"1"};
                 var action="auth/form_submit/newBranch";
             } %>
             <div class="card">
@@ -110,6 +93,12 @@
                             <% } %>
                             <label class="form-label" for="formBasicEmail">Branch name</label>
                             <input placeholder="Enter" type="text" name="branch_name" id="formBasicEmail" class="form-control" value="<%= branch_det.title %>">
+                            <label class="form-label" for="formBasicEmail">Code</label>
+                            <input placeholder="Enter" type="text" name="branch_code" id="formBasicEmail" class="form-control" value="<%= branch_det.code %>">
+                            <label class="form-label" for="formBasicEmail">Latitude</label>
+                            <input placeholder="Enter" type="text" name="branch_lat" id="formBasicEmail" class="form-control" value="<%= branch_det.lat %>">
+                            <label class="form-label" for="formBasicEmail">Longitude</label>
+                            <input placeholder="Enter" type="text" name="branch_lng" id="formBasicEmail" class="form-control" value="<%= branch_det.lng %>">
                             <label class="form-label" for="formBasicEmail">Branch Status</label>
                             <select required name="status" class="form-control">
                                 <option value="0" <%= branch_det.status=="0" ? 'selected':'' %> >Inactive</option>
@@ -136,9 +125,7 @@
     var change_page = (data) => {
         if(data.new){
             location.hash = "/organization" ;
-        }else{
-            location.hash = data.loc;
-        }       
+        }      
     }
     var close_card = () =>{
         location.hash = '/organization' ;
