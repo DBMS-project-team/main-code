@@ -32,8 +32,7 @@ router.get('/edit/:emp_id/*', (req, res)=>{
                         imageData="data:image/png;base64,"+image
                     }
                     res.render('employees/newEmployee',{result,newEmp:false,imageData}); 
-                  });
-                
+                  });               
             } 
         })
     } catch (error) {
@@ -96,6 +95,19 @@ router.get('/newEmergency/:isPersonal?', (req, res)=>{
  
 });
 
+router.get('/supervisor-details', (req, res)=>{
+    db.query("SELECT CONCAT(e1.firstname,' ',e1.lastname) sup_name, CONCAT(e2.firstname,' ',e2.lastname) sub_name FROM supervisors as s inner join employees as e1 ON s.supervisor=e1.emp_id inner join employees as e2 ON s.emp_id=e2.emp_id order by sup_name;", (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            var supvDetails = [];
+            result.forEach(ele =>{
+                supvDetails.push([ele.sup_name, ele.sub_name]);
+            });
+            console.log(supvDetails);
+            res.render('employees/supervisors',{supvDetails});
+        } 
+    });
+}); 
 
 router.get('/emergency_info/:emp_id/' ,(req,res) =>{
     const emp_id = req.params.emp_id;
