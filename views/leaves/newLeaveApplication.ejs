@@ -2,10 +2,13 @@
     <div class="card">
 
         <div class="card-header">
-            <h5 class="card-title mb-0">Leave Application</h5>
+            <h5 class="card-title mb-0">
+                <% if(emp_id == 0){ %> Sample Leave Application
+                <% }else{ %> Leave Application <% } %>
+            </h5>
         </div>
 
-        <div class="card-body">
+        <div class="card-body"> 
 
             <% if (newForm) { %>
                 <form page_after_submit="/leaves/my-applications" action="/auth/form_submit/addNewLeaveApplication">
@@ -37,14 +40,16 @@
                             <input type="int" name="period" class="form-control" id="inputPeriod" placeholder="# of days" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <% if (emp_id != 0) { %>
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                    <% } %>
                 </form>
 
             <% }else{ %>
 
                 <form page_after_submit="/leaves/my-applications" action="/auth/form_submit/editLeaveApplication">     
                     <div class="row mb-3">
-                        <input type="hidden" name="oldstartdate" value="<%= leave_from %>">
+                        <input type="hidden" name="leave_id" value="<%= leave_id %>">
                         <label class="col-sm-2 col-form-label" for="inputDT">Start Date</label>
                         <div class="col-sm-10">
                             <input type="date" name="startdate" class="form-control" id="inputSD" value="<%= leave_from %>" required>

@@ -245,15 +245,15 @@ router.post('/addNewLeaveApplication', (req, res) => {
 
 router.post('/editLeaveApplication', (req, res) => {
     const emp_id = req.session.emp_id;
-    var {oldstartdate,startdate,enddate,period} = req.body;
-    db.query('UPDATE leave_applications SET leave_from=?, leave_to=?, period=? where emp_id=? and leave_from=?', [startdate, enddate, period, emp_id, oldstartdate], (error, result) => {
+    var {leave_id,startdate,enddate,period} = req.body;
+    db.query('UPDATE leave_applications SET leave_from=?, leave_to=?, period=? where leave_id=?', [startdate, enddate, period, leave_id], (error, result) => {
         if(error) {
             console.log('mysql error', error);
         }else {
             res.json({status: 'ok'});
         }
     })
-});
+}); 
 
 router.post('/addEmergencyDetails', (req,res)=>{
     let { array,deleted,emp_id }=req.body;
