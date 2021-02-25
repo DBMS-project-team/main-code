@@ -56,17 +56,17 @@ router.get('/new_max_leave/:parent?/:parent_title?', (req, res)=>{
 
 router.get('/my-applications', (req, res)=>{
     const emp_id = req.session.emp_id;
-    db.query("select a.leave_id,t.leave_type,a.apply_date_time,a.leave_from,a.leave_to,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id=?",[emp_id], (error, result)=>{
+    db.query("CALL leaveApplication (?)",[emp_id], (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            if( result.length > 0 ){
-                result.forEach( row => {
+            if( result[0].length > 0 ){
+                result[0].forEach( row => {
                     row.formatted_date_time = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'dddd, mmmm dS, yyyy' ) : '';
                     row.formatted_leave_from = row.leave_from !== null ? dateFormat( row.leave_from, 'dddd, mmmm dS, yyyy' ) : '';
                     row.formatted_leave_to = row.leave_to !== null ? dateFormat( row.leave_to, 'dddd, mmmm dS, yyyy' ) : '';
                 })
             }
-            res.render('leaves/myLeaveApplications', {emp_id,applications: result});
+            res.render('leaves/myLeaveApplications', {emp_id,leaves: result[1], applications: result[0]});
         }
     })
 }); 

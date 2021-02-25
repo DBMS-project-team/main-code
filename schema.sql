@@ -27,6 +27,7 @@ create table employment_statuses(
 CREATE TABLE branches (
     branch_id int(11) NOT NULL AUTO_INCREMENT,
     title varchar(64) NOT NULL,
+    code varchar(3) DEFAULT NULL,
     lat DECIMAL(11,8) DEFAULT 0,
     lng DECIMAL(11,8) DEFAULT 0,
     status TINYINT DEFAULT 1,
@@ -167,22 +168,25 @@ CREATE TABLE max_leave_days (
     FOREIGN KEY (pay_grade_level) REFERENCES pay_grades(pay_grade_level)
 );
 
-CREATE TABLE leave_applications (
-    emp_id int(11) not null,
-    apply_date_time datetime not null,
-    leave_type_id int(11) not null,
-    period int(3),
-    status_id int(1),
-    PRIMARY KEY (emp_id, apply_date_time),
-    FOREIGN KEY (emp_id) REFERENCES employees(emp_id),
-    FOREIGN KEY (leave_type_id) REFERENCES leave_types(leave_type_id),
-    FOREIGN KEY (status_id) REFERENCES leave_application_statuses(status_id),
-);
-
 CREATE TABLE leave_application_statuses (
     status_id int AUTO_INCREMENT,
     title varchar(50),
     PRIMARY KEY (status_id)
+);
+
+CREATE TABLE leave_applications (
+    leave_id INT AUTO_INCREMENT,
+    emp_id int(11) not null,
+    apply_date_time datetime not null,
+    leave_type_id int(11) not null,
+    leave_from date,
+    leave_to date,
+    period int(3),
+    status_id int(11),
+    PRIMARY KEY (leave_id),
+    FOREIGN KEY (emp_id) REFERENCES employees(emp_id),
+    FOREIGN KEY (leave_type_id) REFERENCES leave_types(leave_type_id),
+    FOREIGN KEY (status_id) REFERENCES leave_application_statuses(status_id)
 );
 
 --/////////////////////////////////////////////////////////////////////////////////////
@@ -517,59 +521,19 @@ CALL dashboard();
 
 DROP PROCEDURE IF EXISTS leaveApplication;
 DELIMITER $$
-CREATE PROCEDURE leaveApplication ()
+CREATE PROCEDURE leaveApplication (IN empId INT(11))
 BEGIN
-    DECLARE finished INTEGER DEFAULT 0;
-    DECLARE c_emp_id int(11) DEFAULT 0;
-    DECLARE c_apply_date_time DATETIME;
-    DECLARE c_leave_type_id INT(11);
-    DECLARE c_period INT(3);
-    DECLARE c_status INT(1);
-    DEClARE x INT;
-    DEClARE temp_date DATE;
-    DECLARE custom_field_value_id int(11) DEFAULT 0;
-    
-    -- declare cursor for employee id
-	DEClARE curLeaves
-		CURSOR FOR 
-			SELECT * FROM leave_applications;
+    SET @pay_grade_level = NULL;
 
-	-- declare NOT FOUND handler
-	DECLARE CONTINUE HANDLER 
-        FOR NOT FOUND SET finished = 1;
-
-    CREATE TEMPORARY TABLE temp_leave_applications(
-        emp_id int(11),
-        leave_date int(11),
-        leave_type_id INT(11)
-    );
-
-	OPEN curLeaves;
-
-	getId: LOOP
-		FETCH curLeaves INTO c_emp_id, c_apply_date_time, c_leave_type_id, c_period, c_status;
-		IF finished = 1 THEN 
-			LEAVE getId;
-		END IF;
-		-- quesry
-        SET x=0;
-        SET temp_date = DATE(c_apply_date_time);
-        for_loop: LOOP
-            IF x>c_period THEN
-                LEAVE for_loop;
-            END IF;
-            
-            INSERT INTO temp_leave_applications VALUES (c_emp_id, YEAR(temp_date), c_leave_type_id);
-
-            SET x=x+1;
-            SET temp_date = DATE_ADD(temp_date, INTERVAL 1 DAY);
-
-        END LOOP for_loop;
-	END LOOP getId;
-	CLOSE curLeaves;
-
-    SELECT *, count(1) count FROM temp_leave_applications GROUP BY emp_id, leave_type_id, leave_date;
+    SELECT pay_grade_level INTO @pay_grade_level FROM employees WHERE emp_id=empId;
+    select a.leave_id,t.leave_type,a.apply_date_time,a.leave_from,a.leave_to,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id=empId;
+    SELECT outer_l.*, m.max_no_of_leaves maximum FROM 
+        (SELECT leave_types.*, COALESCE(SUM(l.period), 0) total FROM leave_types NATURAL LEFT JOIN 
+            (SELECT * FROM leave_applications WHERE emp_id=empId) l 
+            GROUP BY leave_type_id) outer_l
+        NATURAL JOIN
+        (SELECT * from max_leave_days where pay_grade_level=@pay_grade_level) m;
 END $$
 DELIMITER ;
 
-CALL leaveApplication ();
+CALL leaveApplication (17);
