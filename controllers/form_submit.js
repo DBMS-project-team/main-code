@@ -233,11 +233,24 @@ router.post('/new_max_leave', (req, res) => {
 
 router.post('/addNewLeaveApplication', (req, res) => {
     const emp_id = req.session.emp_id;
-    const applydatetime = dateFormat( req.body.applydatetime, 'yyyy-mm-dd HH:mm:ss' );
-    db.query("INSERT INTO `leave_applications`(`emp_id`, `apply_date_time`, `leave_type_id`, `period`, `status_id`) VALUES (?,?,?,?,?)", [emp_id, applydatetime,req.body.leavetype,req.body.period,1], (error, result) => {
+    var {leavetype,startdate,enddate,period} = req.body;
+    var applydatetime = new Date();
+    db.query("INSERT INTO `leave_applications`(`emp_id`, `apply_date_time`, `leave_type_id`,`leave_from`,`leave_to`, `period`, `status_id`) VALUES (?,?,?,?,?,?,?)", [emp_id, applydatetime,leavetype,startdate,enddate,period,1], (error, result) => {
         if(error) console.log('mysql error', error);
         else {
             res.json(result.insertId);
+        }
+    })
+});
+
+router.post('/editLeaveApplication', (req, res) => {
+    const emp_id = req.session.emp_id;
+    var {oldstartdate,startdate,enddate,period} = req.body;
+    db.query('UPDATE leave_applications SET leave_from=?, leave_to=?, period=? where emp_id=? and leave_from=?', [startdate, enddate, period, emp_id, oldstartdate], (error, result) => {
+        if(error) {
+            console.log('mysql error', error);
+        }else {
+            res.json({status: 'ok'});
         }
     })
 });

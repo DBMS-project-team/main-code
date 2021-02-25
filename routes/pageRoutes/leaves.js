@@ -56,13 +56,16 @@ router.get('/new_max_leave/:parent?/:parent_title?', (req, res)=>{
 
 router.get('/my-applications', (req, res)=>{
     const emp_id = req.session.emp_id;
-    db.query("select t.leave_type,a.apply_date_time,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id=?",[emp_id], (error, result)=>{
+    db.query("select t.leave_type,a.apply_date_time,a.leave_from,a.leave_to,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id=?",[emp_id], (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             if( result.length > 0 ){
                 result.forEach( row => {
                     row.formatted_date_time = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'dddd, mmmm dS, yyyy' ) : '';
                     row.apply_date_time     = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'yy-mm-dd HH:MM:ss' ) : '';
+                    row.formatted_leave_from = row.leave_from !== null ? dateFormat( row.leave_from, 'dddd, mmmm dS, yyyy' ) : '';
+                    row.leave_from = row.leave_from !== null ? dateFormat( row.leave_from, 'yyyy-mm-dd' ) : '';
+                    row.formatted_leave_to = row.leave_to !== null ? dateFormat( row.leave_to, 'dddd, mmmm dS, yyyy' ) : '';
                 })
             }
             res.render('leaves/myLeaveApplications', {emp_id,applications: result});
@@ -75,9 +78,23 @@ router.get('/newApplication', (req, res)=>{
     db.query("SELECT * FROM `leave_types`", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('leaves/newLeaveApplication',{emp_id,types: result});
+            res.render('leaves/newLeaveApplication',{emp_id,types: result,newForm:true});
         } 
     })
 });
+
+router.get('/editApplication/:leave_from/', (req, res)=>{
+    const emp_id = req.session.emp_id;
+    const startdate = req.params.leave_from;
+    db.query("select leave_from,leave_to,period from leave_applications where emp_id=? and leave_from=?",[emp_id, startdate], (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            var leave_from = result[0].leave_from !== null ? dateFormat( result[0].leave_from, 'yyyy-mm-dd' ) : '';
+            var leave_to = result[0].leave_to !== null ? dateFormat( result[0].leave_to, 'yyyy-mm-dd' ) : '';
+            var period = result[0].period;
+            res.render('leaves/newLeaveApplication',{emp_id,leave_from,leave_to,period,newForm:false});
+        } 
+    })
+}); 
 
 module.exports = router;

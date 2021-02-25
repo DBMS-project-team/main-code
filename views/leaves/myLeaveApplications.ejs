@@ -9,13 +9,15 @@
                 Default
             </div>
         </div>
-        <table class="table table-striped table-hover" datatable="true" db_table="leave_applications" db_primary_column='["emp_id", "apply_date_time"]' popup-edit="3">
+        <table class="table table-striped table-hover" datatable="false" db_table="leave_applications" db_primary_column='["emp_id", "apply_date_time"]'>
             <thead>
                 <tr>
                     <th style="width: 30px;"></th>
                     <th>Leave Type</th>
+                    <th>Applied Date</th>
                     <th>Start Date</th>
-                    <th db_column="period">Period (# of days)</th>
+                    <th>End Date</th>
+                    <th>Period (# of days)</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>  
@@ -23,15 +25,17 @@
             <tbody> 
                 <% var id=0 %>
                 <% applications.forEach(function(res){ %>
-                    <tr data-id='["<%= emp_id %>", "<%= res.apply_date_time %>"]'>
+                    <tr data-id='["<%= emp_id %>", "<%= res.leave_from %>"]'>
                         <td><%= ++id %></td>
                         <td><%= res.leave_type %></td>
                         <td><%= res.formatted_date_time %></td>
+                        <td><%= res.formatted_leave_from %></td>
+                        <td><%= res.formatted_leave_to %></td>
                         <td><%= res.period %></td> 
                         <td><%= res.title %></td>
                         <% if (res.title == "Sent") { %>
                             <td class="table-action">
-                                <a href="#"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
+                                <a href="#/leaves/editApplication/<%= res.leave_from %>"><i class="align-middle edit_ele" data-feather="edit-2"></i></a>
                             </td>
                         <% }else{ %>
                             <td></td>
