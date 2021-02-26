@@ -23,6 +23,14 @@
 	.my_prof{
 		margin-left: 4px;
 	}
+	.prof_btn{
+		position: absolute;
+		right: 10px;
+		bottom: 10px;
+	}
+	.prof_card{
+		position: relative;
+	}
 </style>
 <div class="container-fluid p-0">
 	<h1 class="h3 mb-3 my_prof">
@@ -53,12 +61,12 @@
 						my_pay_grade_level_title = Det.pay_grade_level_title;
 					})
 			}%>
-			<div class="card-body text-center">
+			<div class="card-body text-center prof_card">
 				<img src=<%= image_url %> alt="Christina Mason" id="profileImage" class="img-fluid rounded-circle mb-2" width="128" height="128" />
 				<br>
 
 				<!-- BEGIN primary modal -->
-				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#defaultModalPrimary">
+				<button type="button" class="btn btn-primary prof_btn" data-toggle="modal" data-target="#defaultModalPrimary">
 					Change Profile
 				</button>
 
