@@ -30,7 +30,29 @@ router.get('/', (req, res)=>{
                 var default_image=true;
             }
 
-            res.render('profile', {my_detail: res_1, cus_res: res_2, eme_res: res_3, sup_det: res_4, sub_det: res_5, emp_id: emp_id,image_url,default_image});
+            res.render('profile/profile', {my_detail: res_1, cus_res: res_2, eme_res: res_3, sup_det: res_4, sub_det: res_5, emp_id: emp_id,image_url,default_image});
+        }
+    })
+});
+
+router.get('/editDetails', (req, res)=>{
+    const emp_id = req.session.emp_id
+    db.query("select username, password, firstname, lastname from users NATURAL JOIN employees where emp_id=?;", [emp_id], (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            res.render('profile/editDetails', {users: result});
+            console.log(result)
+        }
+    })
+
+});
+
+router.get('/ChangePassword', (req, res)=>{
+    const emp_id = req.session.emp_id
+    db.query("select * from users where emp_id=?;",[emp_id], (error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            res.render('profile/changePassword', {users: result});
         }
     })
 });
