@@ -1,0 +1,275 @@
+<link rel="stylesheet" href="/css/croppie.css" />
+<style>
+	.main_cont{
+		display: flex;
+		flex-flow: row wrap;
+		width: 100%;
+		flex-grow: 1;
+	}
+	.card{
+		margin: auto;
+		min-width: 400px;
+		width: 49%;
+		height: 650px;
+		overflow: auto;
+	}
+	.timeline {
+    	padding-left: 25px;
+		margin: 3px;
+	}
+	.timeline-item{
+		margin: 4px;
+	}
+	.my_prof{
+		margin-left: 4px;
+	}
+	.prof_btn{
+		position: absolute;
+		right: 10px;
+		bottom: 10px;
+	}
+	.prof_card{
+		position: relative;
+	}
+</style>
+<div class="container-fluid p-0">
+	<h1 class="h3 mb-3 my_prof">
+		<% if(emp_id == 0){ %> Sample Profile
+		<% }else{ %> My Profile <% } %>
+	</h1>
+	<div class="main_cont">
+		<div class="card mb-3">
+			<div class="card-header">
+				<h4>Personal Deta</h4>
+			</div>
+			<div>
+				<form action="/auth/form_submit/edit_user_detail_password">
+					<div class="row p-2">
+						<div class="col-auto">
+							<a href="#/profile/editDetails" class="btn btn-primary gap-2 md">Edit Details</a>
+							<a href="#/profile/changePassword" class="btn btn-primary gap-2 md">Change Password</a>
+						</div>
+					</div>
+				</form>
+			</div>
+			<% if(emp_id == 0){
+				my_fullname = 'Full Name';
+				my_job_title_name = 'Job Title Name';
+				my_birthdate = 'Birth date';
+				my_martial_status = 'Martial status(Single/married)';
+				my_dept_name = 'Department name';
+				my_emp_status = 'Employee status - Employee status type';
+				my_pay_grade_level_title = 'Pay Grade Level Title';
+			}else{ 
+					my_detail.forEach(function(Det){ 
+						my_fullname = Det.fullname;
+						my_job_title_name = Det.job_title_name;
+						my_birthdate = Det.birthdate;
+						my_martial_status = Det.marital_status;
+						my_dept_name = Det.name;
+						my_emp_status = Det.emp_status + ' - ' + Det.emp_status_type;
+						my_pay_grade_level_title = Det.pay_grade_level_title;
+					})
+			}%>
+			<div class="card-body text-center prof_card">
+				<img src=<%= image_url %> alt="Christina Mason" id="profileImage" class="img-fluid rounded-circle mb-2" width="128" height="128" />
+				<br>
+
+				<!-- BEGIN primary modal -->
+				<button type="button" class="btn btn-primary prof_btn" data-toggle="modal" data-target="#defaultModalPrimary">
+					Change Profile
+				</button>
+
+				<div class="modal fade" id="defaultModalPrimary" tabindex="-1" role="dialog" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Change Profile Photo</h5>
+								<button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body m-3">
+								<label for="upload_image" style="margin-top: .5rem;width: 140px;" class="btn btn-primary" ><i class="fas fa-upload"></i>  Upload Image</label> 
+								<input type="file" style="display: none;" name="upload_image" id="upload_image" accept="image/*" />
+								<button type="Button" class="btn btn-primary <%= default_image ? 'disabled':'' %>" id="defaultImage">Set Default Image</button>
+								<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- END primary modal -->
+
+				<h5 class="card-title mb-0">
+					<%= my_fullname %>
+				</h5>
+				<div class="text-muted mb-2">
+					<%= my_job_title_name  %>
+				</div>
+			</div>
+			<hr class="my-0" />
+			<div class="card-body">
+				<strong>About</strong>
+				<div>
+					<ul class="list-unstyled mb-0 timeline">
+						<li class="mb-1 timeline-item"><span data-feather="calendar" class="feather-sm mr-1"></span> Born on <%= my_birthdate %></li><br>
+						<li class="mb-1 timeline-item"><span data-feather="map-pin" class="feather-sm mr-1"></span> Lives in </li><br>
+						<li class="mb-1 timeline-item"><span data-feather="briefcase" class="feather-sm mr-1"></span> <%= my_martial_status %></li>	<br>	
+					</ul>
+				</div>
+			</div>
+			<hr class="my-0" />
+			<div class="card-body">
+				<strong>Custom Fields</strong>
+				<div class="timeline">
+				<% if(emp_id == 0){ %>
+					<h4 class="card-title mb-0 timeline-item">Custom field name : Custom field value</h4><br>
+				<% }else{ 
+					if(eme_res.length > 0){
+						cus_res.forEach(function(Det){ %>
+							<h4 class="card-title mb-0 timeline-item"><%= Det.custom_field %></h4><br>
+						<% })
+					}else{ %>
+						<h4 class="card-title mb-0 timeline-item">Not Given</h4><br>
+					<% }
+				 } %>
+				</div>
+			</div>
+			<hr class="my-0" />
+			<div class="card-body">
+				<strong>Emergency Contact Details</strong>
+				<div class="timeline">
+				<% if(emp_id == 0){ %>
+					<h4 class="card-title mb-0 timeline-item">Field name : Field value</h4><br>
+				<% }else{ 
+						if(eme_res.length > 0){
+							eme_res.forEach(function(Det){ %>
+								<h4 class="card-title mb-0 timeline-item"><%= Det.con_detail %></h4><br>
+							<% })
+						}else{ %>
+							<h5 class="card-title mb-0 timeline-item">Not Given</h5><br>
+						<% }
+					} %>
+				</div>
+			</div>
+			<hr class="my-0" />
+		</div>
+		<div class="card mb-3">
+			<div class="card-header">
+				<h4>Employment Details</h4>
+			</div>
+			<hr class="my-0" />
+
+			<div class="card-body">
+				<strong>Department</strong>
+				<div class="timeline"><h4 class="card-title mb-0 timeline-item"><%= my_dept_name %></h4><br></div>
+			</div>
+			<hr class="my-0" />
+
+			<div class="card-body">
+				<strong>Employment Status</strong>
+				<div class="timeline"><h4 class="card-title mb-0 timeline-item"><%= my_emp_status %></h4><br></div>
+			</div>
+			<hr class="my-0" />
+
+			<div class="card-body">
+				<strong>Pay Grade Level</strong>
+				<div class="timeline"><h4 class="card-title mb-0 timeline-item"><%= my_pay_grade_level_title %></h4><br></div>
+			</div>
+			<hr class="my-0" />
+
+			<div class="card-body">
+				<strong>Supervisor and Subordinates</strong>
+				<% if(emp_id == 0){ %>
+					<div class="timeline">
+						<div class="card_body timeline-item">
+							<h2 class="card-title mb-0">My Supervisor </h2><br>
+							<div class="timeline"><h3 class="card-title mb-0 timeline-item">Supervisor Name </h3><br></div>
+						</div>
+						<div class="card_body timeline-item">
+							<h2 class="card-title mb-0">My Subordinates </h2><br>
+							<div class="timeline">
+								<h3 class="card-title mb-0 timeline-item">Subordinate name 1 </h3><br>
+								<h3 class="card-title mb-0 timeline-item">Subordinate name 2 </h3><br>
+								<h3 class="card-title mb-0 timeline-item">....... </h3><br>
+							</div>
+							
+						</div>
+					</div>
+					
+				<% }else{ %>
+					<div class="timeline">
+						<div class="card_body timeline-item">
+							<h2 class="card-title mb-0">My Supervisor </h2><br>
+							<div class="timeline">
+								<% if(sup_det.length > 0){
+									sup_det.forEach(function(Det){ %>
+										<h3 class="card-title mb-0 timeline-item"><%= Det.sup_name %> </h3><br>				
+									<% })
+								}else{ %>
+									<h3 class="card-title mb-0 timeline-item">No supervisor found</h3><br>
+								<% } %>
+							</div>
+						</div>
+						<div class="card_body timeline-item">
+							<h2 class="card-title mb-0">My Subordinates </h2><br>
+							<div class="timeline">
+								<% if(sub_det.length > 0){
+									sub_det.forEach(function(Det){ %>
+										<h3 class="card-title mb-0 timeline-item"><%= Det.sub_names %> </h3><br>					
+									<% })
+								}else{ %>
+									<h3 class="card-title mb-0 timeline-item">No Subordinates found</h3><br>
+								<% } %>
+							</div>
+						</div>
+					</div>
+				<% } %>
+			</div>				
+		</div>		 
+	</div>
+</div>
+
+<!-- Croppie modal -->
+<div id="uploadimageModal" class="modal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			  <div class="modal-header">
+				<h4 class="modal-title">Crop Image</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+			  </div>
+			  <div class="modal-body">
+				<div class="row">
+					  <div class="col-md-8 text-center">
+						  <div id="image_demo" style="width:350px; margin-top:30px"></div>
+					  </div>
+					  <div class="col-md-4" style="padding-top:30px;">
+						  <br />
+						  <br />
+						  <br/>
+						  <button class="btn btn-success crop_image">Crop and Save</button>
+					</div>
+				</div>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			  </div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+	$( document ).ready(function() {
+        setTimeout(include("/js/changeProfile.js"),300);
+    });
+
+	function include(file) { 
+		var script  = document.createElement('script'); 
+		script.src  = file; 
+		script.type = 'text/javascript'; 
+		script.defer = true; 
+		
+		document.getElementsByTagName('head').item(0).appendChild(script); 
+	} 
+
+</script>
+<script src="/js/croppie.js"></script>
