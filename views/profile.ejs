@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/css/croppie.css" />
 <style>
 	.main_cont{
 		display: flex;
@@ -53,7 +54,32 @@
 					})
 			}%>
 			<div class="card-body text-center">
-				<img src="img/avatars/avatar-4.jpg" alt="Christina Mason" class="img-fluid rounded-circle mb-2" width="128" height="128" />
+				<img src=<%= image_url %> alt="Christina Mason" id="profileImage" class="img-fluid rounded-circle mb-2" width="128" height="128" />
+				<br>
+
+				<!-- BEGIN primary modal -->
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#defaultModalPrimary">
+					Change Profile
+				</button>
+
+				<div class="modal fade" id="defaultModalPrimary" tabindex="-1" role="dialog" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Change Profile Photo</h5>
+								<button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body m-3">
+								<label for="upload_image" style="margin-top: .5rem;width: 140px;" class="btn btn-primary" ><i class="fas fa-upload"></i>  Upload Image</label> 
+								<input type="file" style="display: none;" name="upload_image" id="upload_image" accept="image/*" />
+								<button type="Button" class="btn btn-primary <%= default_image ? 'disabled':'' %>" id="defaultImage">Set Default Image</button>
+								<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- END primary modal -->
+
 				<h5 class="card-title mb-0">
 					<%= my_fullname %>
 				</h5>
@@ -183,3 +209,49 @@
 		</div>		 
 	</div>
 </div>
+
+<!-- Croppie modal -->
+<div id="uploadimageModal" class="modal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			  <div class="modal-header">
+				<h4 class="modal-title">Crop Image</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+			  </div>
+			  <div class="modal-body">
+				<div class="row">
+					  <div class="col-md-8 text-center">
+						  <div id="image_demo" style="width:350px; margin-top:30px"></div>
+					  </div>
+					  <div class="col-md-4" style="padding-top:30px;">
+						  <br />
+						  <br />
+						  <br/>
+						  <button class="btn btn-success crop_image">Crop and Save</button>
+					</div>
+				</div>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			  </div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+	$( document ).ready(function() {
+        setTimeout(include("/js/changeProfile.js"),3);
+    });
+
+	function include(file) { 
+		var script  = document.createElement('script'); 
+		script.src  = file; 
+		script.type = 'text/javascript'; 
+		script.defer = true; 
+		
+		document.getElementsByTagName('head').item(0).appendChild(script); 
+	} 
+
+</script>
+<script src="/js/croppie.js"></script>
