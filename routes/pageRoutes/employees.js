@@ -22,17 +22,19 @@ router.get('/actions', (req, res)=>{
 router.get('/edit/:emp_id/*', (req, res)=>{
     try{
         const emp_id = req.params.emp_id;
-        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where status=1 and emp_id != ? ;SELECT * FROM `user_levels`; CALL employee_custom_attributes(?) ; SELECT e.emp_id,e.firstname,e.lastname,concat(e.birthdate,'') as bd,e.gender,e.marital_status,e.dept_id,e.job_id,e.emp_status_id,e.emp_status_type,e.pay_grade_level,s.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) LEFT JOIN supervisors s on (s.emp_id=e.emp_id) WHERE e.emp_id=?", [emp_id,emp_id,emp_id],
+        db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where status=1 and emp_id != ? ;SELECT * FROM `user_levels`; CALL employee_custom_attributes(?) ;SELECT * FROM `branches` where status='1'; SELECT e.staff_id, e.emp_id,e.firstname,e.lastname,e.branch_id,concat(e.birthdate,'') as bd,e.gender,e.marital_status,e.dept_id,e.job_id,e.emp_status_id,e.emp_status_type,e.pay_grade_level,s.supervisor,u.username,u.user_level, u.emp_id AS userAcc FROM `employees` e LEFT JOIN `users` u on (e.emp_id=u.emp_id) LEFT JOIN supervisors s on (s.emp_id=e.emp_id) WHERE e.emp_id=?", [emp_id,emp_id,emp_id],
         (error, result)=>{
             if(error) console.log('mysql error', error);
             else {
-                fs.readFile("public\\img\\profile\\"+result[8][0].emp_id+".jpg",{encoding: 'base64'}, function(err, image) {
-                    if (err) imageData="default"; 
-                    else{
+                fs.readFile("public/img/profile/"+emp_id+".jpg",{encoding: 'base64'}, function(err, image) {
+                    if (err) {
+                        imageData="default"; 
+                    }else{
                         imageData="data:image/png;base64,"+image
                     }
                     res.render('employees/newEmployee',{result,newEmp:false,imageData}); 
-                  });               
+                  });
+                
             } 
         })
     } catch (error) {
@@ -59,7 +61,7 @@ router.get('/newPayGradeLevel', (req, res)=>{
 });
 
 router.get('/newEmployee', (req, res)=>{
-    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where  status=1;SELECT * FROM `user_levels`;CALL custom_attributes();", (error, result)=>{
+    db.query("SELECT * FROM `departments`;SELECT * FROM `job_titles`;SELECT * FROM `employment_statuses`;SELECT * FROM `pay_grades`;SELECT emp_id, concat(firstname,' ',lastname) as fullname FROM `employees` where  status=1;SELECT * FROM `user_levels`;CALL custom_attributes(); SELECT * FROM `branches` where status='1';", (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
             res.render('employees/newEmployee',{result, newEmp:true});
