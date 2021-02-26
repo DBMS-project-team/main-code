@@ -53,4 +53,37 @@ router.post('/change_profile',(req, res)=>{
     
 });
 
+router.post('/userEditDetails', (req, res) => {
+    var {emp_id, user_name, first_name, last_name, password} = req.body;
+    if(pass==password){
+        db.query('UPDATE users SET username=?; UPDATE employees SET firstname=?, lastname=?', [user_name, first_name, last_name], (error, result) => {
+            if(error) {
+                console.log('mysql error', error);
+            }else {
+                res.json({new:true});
+            }
+        })
+    }else{
+        res.send("Incorrect Password")
+    }
+    
+});
+
+router.post('/userChangePassword', (req, res) => {
+    var {emp_id, old_pass, curr_pass, new_pass, confirm_pass} = req.body;
+    if(old_pass == curr_pass){
+        if(new_pass == confirm_pass){
+            db.query('UPDATE users SET password=? where emp_id=?', [new_pass, emp_id], (error, result) => {
+                if(error){
+                    console.log('mysql error', error);
+                } 
+                else {
+                    res.json({new:true});
+                }
+            })
+        }else{res.send("Incorrect Password")}
+    }else{res.send("Incorrect Password")}
+    
+});
+
 module.exports = router;
