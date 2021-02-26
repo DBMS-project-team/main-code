@@ -3,6 +3,7 @@ const router = express.Router();
 var dateFormat = require('dateformat');
 const db = require('../../db_config');
 const feather = require('feather-icons');
+const fs = require('fs');
 
 router.get('/', (req, res)=>{
     const emp_id = req.session.emp_id;
@@ -20,7 +21,16 @@ router.get('/', (req, res)=>{
                 })
                 
             }
-            res.render('profile', {my_detail: res_1, cus_res: res_2, eme_res: res_3, sup_det: res_4, sub_det: res_5, emp_id: emp_id});
+            
+            if(fs.existsSync("public/img/profile/"+ emp_id +".jpg")){
+                var image_url="img/profile/"+ emp_id +".jpg";
+                var default_image=false;
+            }else{
+                var image_url="img/profile/default.jpg";
+                var default_image=true;
+            }
+
+            res.render('profile', {my_detail: res_1, cus_res: res_2, eme_res: res_3, sup_det: res_4, sub_det: res_5, emp_id: emp_id,image_url,default_image});
         }
     })
 });
