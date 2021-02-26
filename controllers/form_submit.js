@@ -55,10 +55,10 @@ router.post('/add_new_department', (req, res) => {
 
 router.post('/addNewEmployee', ( req, res ) => {
     try {
-        let {firstname, lastname, dob, martialStatus,gender, department,empStaType, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val,profileImage} = req.body;
+        let {firstname, lastname, dob, staffId,martialStatus,gender, department,branch,empStaType, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val,profileImage} = req.body;
         console.log(attr_id,attr_val);
-        db.query("INSERT INTO `employees`(`firstname`, `lastname`, `birthdate`,`gender`, `marital_status`, `dept_id`, `job_id`, `emp_status_id`,`emp_status_type`, `pay_grade_level`) VALUES (?,?,?,?,?,?,?,?,?,?)",
-            [firstname, lastname, dob,gender, martialStatus, department, jobTitle, empStatus,empStaType, payGlevel], 
+        db.query("INSERT INTO `employees`(`staff_id`, `firstname`, `lastname`, `birthdate`,`gender`, `marital_status`, `dept_id`,`branch_id`, `job_id`, `emp_status_id`,`emp_status_type`, `pay_grade_level`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            [staffId,firstname, lastname, dob,gender, martialStatus, department,branch, jobTitle, empStatus,empStaType, payGlevel], 
             async (err,result) =>{
                 if(err) console.log('error', err);
                 else {
@@ -106,7 +106,7 @@ router.post('/addNewEmployee', ( req, res ) => {
 
 router.post('/editEmployee', ( req, res ) => {
     try {
-        let {empId,userAcc,firstname, lastname, dob, martialStatus,gender, department, jobTitle, empStatus,empStaType, payGlevel,supervisor,attr_id,exist_attr_id,attr_val,profileImage} = req.body;
+        let {empId,userAcc,firstname,staffId, lastname, dob, martialStatus,gender, department,branch, jobTitle, empStatus,empStaType, payGlevel,supervisor,attr_id,exist_attr_id,attr_val,profileImage} = req.body;
         console.log(attr_id,exist_attr_id,attr_val);
         if(profileImage !== "unchanged"){
             if (profileImage=="default"){
@@ -118,8 +118,8 @@ router.post('/editEmployee', ( req, res ) => {
                 function(writeErr) {if(writeErr) console.log("write error",writeErr);});
             }
         }
-        db.query('UPDATE `employees` SET `firstname`=?,`lastname`=?,`birthdate`=?,`marital_status`=?,`gender`=?,`dept_id`=?,`job_id`=?,`emp_status_id`=?,`emp_status_type`=?,`pay_grade_level`=? WHERE emp_id=? ;', 
-        [firstname, lastname, dob, martialStatus,gender, department, jobTitle, empStatus,empStaType, payGlevel,empId], (error, result) => {
+        db.query('UPDATE `employees` SET `staff_id`=?, `firstname`=?,`lastname`=?,`birthdate`=?,`marital_status`=?,`gender`=?,`dept_id`=?,`branch_id`=?,`job_id`=?,`emp_status_id`=?,`emp_status_type`=?,`pay_grade_level`=? WHERE emp_id=? ;', 
+        [ staffId, firstname, lastname, dob, martialStatus,gender, department,branch, jobTitle, empStatus,empStaType, payGlevel,empId], (error, result) => {
             if(error) console.log('mysql error', error);
         })
 
