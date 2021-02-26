@@ -114,7 +114,7 @@
             console.log(array);
             $.post( "auth/form_submit/addEmergencyDetails", { array,deleted,emp_id })
             .done(function( data ) {
-                location.hash = "/employees";
+                location.hash = "/employees/actions";
             });
         }else{
             $(".error_status").html(str);
