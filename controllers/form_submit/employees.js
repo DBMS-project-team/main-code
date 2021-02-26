@@ -37,4 +37,20 @@ router.post('/add_new_emergency_attribute', (req, res) => {
     })
 });
 
+router.post('/change_profile',(req, res)=>{
+    const emp_id = req.session.emp_id;
+    const {response,removeImage} = req.body;
+    if(removeImage=="true"){
+        fs.unlink("public\\img\\profile\\"+emp_id+".jpg", (delErr) => {
+            if (delErr) console.log("image delete error",delErr);
+            res.send("Image removed successfully.");
+        });
+    }else{
+        fs.writeFile("public\\img\\profile\\"+emp_id+".jpg", new Buffer.from(response.split(",")[1], "base64"), 
+        function(writeErr) {if(writeErr) console.log("write error",writeErr);});
+        res.send("Image changed successfully.");
+    }
+    
+});
+
 module.exports = router;
