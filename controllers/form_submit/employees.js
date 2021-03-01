@@ -70,20 +70,20 @@ router.post('/userEditDetails', (req, res) => {
 });
 
 router.post('/userChangePassword', (req, res) => {
-    var {emp_id, old_pass, curr_pass, new_pass, confirm_pass} = req.body;
-    if(old_pass == curr_pass){
-        if(new_pass == confirm_pass){
-            db.query('UPDATE users SET password=? where emp_id=?', [new_pass, emp_id], (error, result) => {
-                if(error){
-                    console.log('mysql error', error);
-                } 
-                else {
-                    res.json({new:true});
-                }
-            })
-        }else{res.send("Incorrect Password")}
-    }else{res.send("Incorrect Password")}
-    
+    const emp_id = req.session.emp_id;
+    var {curr_pass, new_pass, confirm_pass} = req.body;
+    if(new_pass === confirm_pass){
+        db.query('CALL changePassword(?, ?, ?)', [emp_id, curr_pass, new_pass], (error, result) => {
+            if(error){
+                console.log('mysql error', error);
+            } 
+            else {
+                res.json({result});
+            }
+        })
+    }else{
+        res.json({status: 0, result: "Your new password and confirmation password do not match"})
+    }
 });
 
 module.exports = router;

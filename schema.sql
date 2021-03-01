@@ -519,21 +519,51 @@ CALL dashboard();
 -- ///////////////////////////////////
 -- procedure for leave application
 
-DROP PROCEDURE IF EXISTS leaveApplication;
-DELIMITER $$
-CREATE PROCEDURE leaveApplication (IN empId INT(11))
-BEGIN
-    SET @pay_grade_level = NULL;
+-- DROP PROCEDURE IF EXISTS leaveApplication;
+-- DELIMITER $$
+-- CREATE PROCEDURE leaveApplication (IN empId INT(11))
+-- BEGIN
+--     SET @pay_grade_level = NULL;
 
-    SELECT pay_grade_level INTO @pay_grade_level FROM employees WHERE emp_id=empId;
-    select a.leave_id,t.leave_type,a.apply_date_time,a.leave_from,a.leave_to,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id=empId;
-    SELECT outer_l.*, m.max_no_of_leaves maximum FROM 
-        (SELECT leave_types.*, COALESCE(SUM(l.period), 0) total FROM leave_types NATURAL LEFT JOIN 
-            (SELECT * FROM leave_applications WHERE emp_id=empId) l 
-            GROUP BY leave_type_id) outer_l
-        NATURAL JOIN
-        (SELECT * from max_leave_days where pay_grade_level=@pay_grade_level) m;
+--     SELECT pay_grade_level INTO @pay_grade_level FROM employees WHERE emp_id=empId;
+--     select a.leave_id,t.leave_type,a.apply_date_time,a.leave_from,a.leave_to,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id=empId;
+--     SELECT outer_l.*, m.max_no_of_leaves maximum FROM 
+--         (SELECT leave_types.*, COALESCE(SUM(l.period), 0) total FROM leave_types NATURAL LEFT JOIN 
+--             (SELECT * FROM leave_applications WHERE emp_id=empId) l 
+--             GROUP BY leave_type_id) outer_l
+--         NATURAL JOIN
+--         (SELECT * from max_leave_days where pay_grade_level=@pay_grade_level) m;
+-- END $$
+-- DELIMITER ;
+
+-- CALL leaveApplication (17);
+
+-- ////////////////////////////////////////
+-- Procedure for change password
+
+DROP PROCEDURE IF EXISTS changePassword;
+DELIMITER $$
+CREATE PROCEDURE changePassword ( IN empId INT(11), IN curr_pass VARCHAR(50), IN new_pass VARCHAR(50) )
+BEGIN
+    
+    DECLARE old_pass VARCHAR(50);
+    DECLARE _status INT(1);
+    DECLARE result VARCHAR(50);
+
+    SELECT password INTO old_pass FROM users WHERE emp_id=empId;
+
+    IF old_pass <> curr_pass THEN
+        SET _status = 0;
+        SET result = 'Provided previous password is incorrect';
+    ELSE
+        UPDATE users SET password=new_pass where emp_id=empId;
+        SET _status = 1;
+        SET result = '';
+    END IF;
+
+    SELECT _status `status`, result;
+
 END $$
 DELIMITER ;
 
-CALL leaveApplication (17);
+CALL changePassword (17, 123456, 123);

@@ -37,10 +37,11 @@ router.get('/', (req, res)=>{
 
 router.get('/editDetails', (req, res)=>{
     const emp_id = req.session.emp_id
-    db.query("select username, password, firstname, lastname from users NATURAL JOIN employees where emp_id=?;", [emp_id], (error, result)=>{
+    db.query("select username, firstname, lastname from employees_details WHERE emp_id=?;", [emp_id], (error, result)=>{
         if(error) console.log('mysql error', error);
         else {
-            res.render('profile/editDetails', {users: result});
+            console.table(result[0])
+            res.render('profile/editDetails', {user: result});
             console.log(result)
         }
     })
@@ -48,13 +49,7 @@ router.get('/editDetails', (req, res)=>{
 });
 
 router.get('/ChangePassword', (req, res)=>{
-    const emp_id = req.session.emp_id
-    db.query("select * from users where emp_id=?;",[emp_id], (error, result)=>{
-        if(error) console.log('mysql error', error);
-        else {
-            res.render('profile/changePassword', {users: result});
-        }
-    })
+    res.render('profile/changePassword');
 });
 
 module.exports = router;
