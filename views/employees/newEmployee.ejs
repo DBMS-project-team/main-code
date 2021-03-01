@@ -1,11 +1,11 @@
 <link rel="stylesheet" href="/css/croppie.css" />
 <div class="content container-fluid p-0">
-    <%#  JSON.stringify(result[6]) %>
+    <%#  JSON.stringify(result[8]) %>
     <% if(newEmp){
-            var employee={"emp_id":null,"firstname":"","lastname":"","bd":"","martial_status":"","dept_id":null,"job_id":null,"emp_status_id":null,"pay_grade_level":null,"supervisor":null,"username":null,"user_level":null,"userAcc":null}
+            var employee={"emp_id":null,"firstname":"","lastname":"","bd":"","martial_status":"","dept_id":null,"job_id":null,"emp_status_id":null,"pay_grade_level":null,"supervisor":null,"username":null,"user_level":null,"userAcc":null,"staff_id":""}
             var action="auth/form_submit/addNewEmployee";
         }else{
-            var employee =result[8][0]
+            var employee =result[9][0]
             var action="auth/form_submit/editEmployee";
         } %>
     <div class="card">
@@ -55,10 +55,24 @@
                         <input type="date" required  name="dob" class="form-control" id="inputDob" value="<%= employee.bd %>">
                     </div>
                     <div class="mb-3 col-md-6">
+                        <label class="form-label" for="staf_id">Staff Id</label>
+                        <input type="text" required  name="staffId" class="form-control" id="staf_id" value="<%= employee.staff_id %>" placeholder="staff id">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
                         <label class="form-label" for="inputMstatus">Martial Status</label>
                         <select required name="martialStatus" id="inputMstatus" class="form-control">
                             <option value="single" <%= employee.martial_status=="single" ? 'selected':'' %> >Single</option>
                             <option value="married" <%= employee.martial_status=="married" ? 'selected':'' %>>Married</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="inputMstatus">Gender</label>
+                        <select required name="gender" id="inputMstatus" class="form-control">
+                            <option value="male" <%= employee.gender=="male" ? 'selected':'' %> >Male</option>
+                            <option value="female" <%= employee.gender=="female" ? 'selected':'' %>>Female</option>
                         </select>
                     </div>
                 </div>
@@ -112,20 +126,21 @@
                         </select>
                     </div>
                     <div class="mb-3 col-md-6">
-                        <label class="form-label" for="inputMstatus">Gender</label>
-                        <select required name="gender" id="inputMstatus" class="form-control">
-                            <option value="male" <%= employee.gender=="male" ? 'selected':'' %> >Male</option>
-                            <option value="female" <%= employee.gender=="female" ? 'selected':'' %>>Female</option>
+                        <label class="form-label" for="inputPglevel">Pay Grade Level</label>
+                        <select required name="payGlevel" id="inputPgl" class="form-control">
+                            <% result[3].forEach(function(pgl){ %>
+                                <option value="<%= pgl.pay_grade_level %>" <%= employee.pay_grade_level==pgl.pay_grade_level ? 'selected':'' %>><%= pgl.pay_grade_level_title %></option>
+                                <% }) %> 
                         </select>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="mb-3 col-md-6">
-                        <label class="form-label" for="inputPglevel">Pay Grade Level</label>
-                        <select required name="payGlevel" id="inputPgl" class="form-control">
-                            <% result[3].forEach(function(pgl){ %>
-                                <option value="<%= pgl.pay_grade_level %>" <%= employee.pay_grade_level==pgl.pay_grade_level ? 'selected':'' %>><%= pgl.pay_grade_level_title %></option>
+                        <label class="form-label" for="inputBranch">Branch</label>
+                        <select required name="branch" id="inputBranch" class="form-control">
+                            <% result[8].forEach(function(bran){ %>
+                                <option value="<%= bran.branch_id %>" <%= employee.branch_id==bran.branch_id ? 'selected':'' %>><%= bran.title %></option>
                                 <% }) %> 
                         </select>
                     </div>
@@ -220,6 +235,10 @@
 
 </div>
 <script> 
+    $( document ).ready(function() {
+        setTimeout(include("/js/newEmployee.js"),3);
+    });
+
     var submit_form = () => {
         var form = $(".form_tag");
         $.post( form.attr('action'), form.serializeArray(), (data) =>{
@@ -230,7 +249,7 @@
         if(data.new){
             location.hash = "/employees/emergency_info/" +data.emp_id ;
         }else{
-            location.hash = "/employees";
+            location.hash = "/employees/actions";
         }
         
     }
@@ -238,6 +257,17 @@
         document.querySelector("#editEmpUser").classList.toggle("d-none");
         document.querySelector("#inputUsername").toggleAttribute("required");
     }
+
+    function include(file) { 
+  
+        var script  = document.createElement('script'); 
+        script.src  = file; 
+        script.type = 'text/javascript'; 
+        script.defer = true; 
+        
+        document.getElementsByTagName('head').item(0).appendChild(script); 
+        
+    } 
 </script>
 <script src="/js/croppie.js"></script>
 
