@@ -5,14 +5,22 @@
                 <% if(emp_id == 0){ %> Sample Applications
                 <% }else{ %> My Applications <% } %>
             </h3>
+            <% if(emp_id==0) { %>
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+                    <div class="alert-message">
+                        <strong>Warning!</strong> This is a sample page
+                    </div>
+                </div>
+            <% } %>
             <a href="#/leaves/newApplication" class="btn btn-primary float-right mt-n1"><i class="fas fa-plus"></i> New Application</a>
         </div>
-        <% colors=['primary', 'danger', 'waring', 'success', 'default'] %>
+        <% colors=['primary', 'danger', 'warning', 'success', 'default'] %>
         <% leaves.forEach( (leave, id) => { %>
             <h5><%= `${leave.leave_type} - ${leave.total} / ${leave.maximum}` %></h5>
             <div class="progress mb-3">
                 <div class="progress-bar bg-<%= colors[id] %>" role="progressbar" <%-`style="width: ${(leave.total/leave.maximum)*100}%"` %> aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                    <%= ( ( (leave.total/leave.maximum)*100 )<100? (leave.total/leave.maximum)*100 : 100)  +' %' %>
+                    <%= ( ( (leave.total/leave.maximum)*100 )<100? parseInt( (leave.total/leave.maximum)*100 ) : 100)  +' %' %>
                 </div>
             </div>
         <% }) %>

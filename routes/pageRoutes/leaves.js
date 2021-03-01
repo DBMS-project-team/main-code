@@ -23,7 +23,7 @@ router.get('/', (req, res)=>{
 
 router.get('/requests', (req, res)=>{
     const emp_id = req.session.emp_id;
-    db.query("SELECT l.emp_id,CONCAT(l.apply_date_time,'') AS datetime,l.period,CONCAT(e.firstname,' ',e.lastname) fullname,s.title AS status,lt.leave_type,d.name department,j.job_title_name jobtitle FROM leave_applications l INNER JOIN employees e ON l.emp_id=e.emp_id INNER JOIN leave_application_statuses s ON l.status_id=s.status_id INNER JOIN leave_types lt ON l.leave_type_id=lt.leave_type_id INNER JOIN departments d ON e.dept_id=d.dept_id INNER JOIN job_titles j ON e.job_id=j.job_id INNER JOIN supervisors su ON su.emp_id=e.emp_id WHERE e.status=1 and su.supervisor=? ORDER BY l.status_id,fullname",
+    db.query("SELECT l.leave_id, l.emp_id,CONCAT(l.apply_date_time,'') AS datetime,l.period,CONCAT(e.firstname,' ',e.lastname) fullname,s.title AS status,lt.leave_type,d.name department,j.job_title_name jobtitle FROM leave_applications l INNER JOIN employees e ON l.emp_id=e.emp_id INNER JOIN leave_application_statuses s ON l.status_id=s.status_id INNER JOIN leave_types lt ON l.leave_type_id=lt.leave_type_id INNER JOIN departments d ON e.dept_id=d.dept_id INNER JOIN job_titles j ON e.job_id=j.job_id INNER JOIN supervisors su ON su.emp_id=e.emp_id WHERE e.status=1 and su.supervisor=? ORDER BY l.status_id,fullname",
         emp_id,(err,result) =>{
             if(err) console.log('mysql error', err );
             else {
@@ -93,6 +93,22 @@ router.get('/editApplication/:leave_id/', (req, res)=>{
             res.render('leaves/newLeaveApplication',{emp_id,leave_id,leave_from,leave_to,period,newForm:false});
         } 
     })
-}); 
+});
+
+router.get('/ajax/:emp_id' ,(req,res) =>{
+    const emp_id = req.params.emp_id;
+    db.query("SELECT * FROM employees_details WHERE emp_id=?;CALL leaveApplication (?);",[emp_id, emp_id],(error, result)=>{
+        if(error) console.log('mysql error', error);
+        else {
+            result[1].forEach( row => {
+                row.formatted_date_time = row.apply_date_time !== null ? dateFormat( row.apply_date_time, 'dd-mm-yyyy' ) : '';
+                row.formatted_leave_from = row.leave_from !== null ? dateFormat( row.leave_from, 'dddd, mmmm dS, yyyy' ) : '';
+                row.formatted_leave_to = row.leave_to !== null ? dateFormat( row.leave_to, 'dddd, mmmm dS, yyyy' ) : '';
+            });
+            res.json({applications: result[1], leaves: result[2], personal: result[0][0]});
+        }
+    })
+
+});
 
 module.exports = router;
