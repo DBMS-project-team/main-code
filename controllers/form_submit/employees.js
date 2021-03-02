@@ -54,19 +54,24 @@ router.post('/change_profile',(req, res)=>{
 });
 
 router.post('/userEditDetails', (req, res) => {
-    var {emp_id, user_name, first_name, last_name, password} = req.body;
-    if(pass==password){
-        db.query('UPDATE users SET username=?; UPDATE employees SET firstname=?, lastname=?', [user_name, first_name, last_name], (error, result) => {
-            if(error) {
-                console.log('mysql error', error);
-            }else {
-                res.json({new:true});
-            }
-        })
-    }else{
-        res.send("Incorrect Password")
-    }
-    
+    var {user_name, first_name, last_name, password} = req.body;
+    var emp_id = req.session.emp_id;
+    db.query("select username from users where emp_id=? and password=?",[emp_id,password], (err,result)=>{
+        if(result.length >0){
+            db.query('UPDATE users SET username=? where emp_id=? ; UPDATE employees SET firstname=?, lastname=? where emp_id=?; ', [user_name,emp_id, first_name, last_name,emp_id], (error, result2) => {
+                if(error) {
+                    console.log('mysql error', error);
+                }else {
+                    res.json({success:true});
+                }
+            })
+        }else{
+            console.log(err)
+            res.json({success:false,error:"INCORRECT PASSWORD"});
+        }
+        
+    })
+
 });
 
 router.post('/userChangePassword', (req, res) => {
