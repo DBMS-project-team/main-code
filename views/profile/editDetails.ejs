@@ -5,7 +5,7 @@
             <h3 class="card-title mb-0">EDIT DETAILS</h3>
         </div>
         <div class="card-body">
-            <form page_after_submit="/profile/profile" action="/auth/form_submit/employees/userEditDetails">
+            <form after_submit= "after_submit" action="/auth/form_submit/employees/userEditDetails">
 
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label" for="inputUserName">User Name</label>
@@ -50,3 +50,14 @@
 
     </div>
 </div>
+
+<script>
+    function after_submit(res){
+        if(res.success){
+            location.hash="/profile"
+        }else{
+            alert(res.error);
+        }
+
+    }
+</script>
