@@ -355,7 +355,7 @@
                             var field = JSON.stringify( column_ids.map( id => $(this).parents('table').find('thead').find('th').eq( id ).html() ) );
                         }else{
                             var dataid = $(this).parents('td').attr('data-id');
-                            var value = $(this).parents('td').text().trim();
+                            var value = `["${$(this).parents('td').text().trim()}"]`;
                             var field = $(this).parents('table').attr('field');
                             var db_column = $(this).parents('table').attr('db_column');
                         }

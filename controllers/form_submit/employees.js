@@ -91,4 +91,16 @@ router.post('/userChangePassword', (req, res) => {
     }
 });
 
+router.post('/del_emp', (req, res) => {
+    const {emp_id} = req.body;
+    db.query('UPDATE employees SET status=0 WHERE emp_id=?', [emp_id], (error, result) => {
+        if(error){
+            console.log('mysql error', error);
+        } 
+        else {
+            res.json({result});
+        }
+    })
+});
+
 module.exports = router;
