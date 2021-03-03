@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const bcryptjs = require('bcryptjs');
+const bcrypt  = require('bcrypt');
 const db = require('../db_config');
 
 exports.register = (req, res)=>{
@@ -13,7 +14,7 @@ exports.register = (req, res)=>{
                     message: 'That username is already in use'
                 })
             }
-            let hashedPassword = await bcrypt.hash(password, 8);
+            let hashedPassword = await bcryptjs.hash(password, 8);
             console.log(hashedPassword);
             db.query('insert into users set ?',{username: username, password: hashedPassword}, (error, result)=>{
                 if(error) console.log(error);
@@ -71,7 +72,7 @@ exports.login = async (req, res)=>{
             db.query('select * from users where username=?',[username.trim()], async (error, result)=>{
                 if(error) console.log('error', error);
                 else{
-                    /*if( !result || !(await bcrypt.compare(password, results[0].password) ) ){
+                    /*if( !result || !(await bcryptjs.compare(password, results[0].password) ) ){
                     res.status(401).render('login', {
                         message: 'username or password incorrect!'
                     });*/
@@ -90,7 +91,8 @@ exports.login = async (req, res)=>{
                     res.cookie('jwt', token, cookieOptions);
                     res.status(200).redirect('/');*/
                     if(result.length > 0 ){
-                        if(result[0].password===password){
+                        const is_user = await bcrypt.compare(password, result[0].password);
+                        if(is_user){
                             req.session.username = username;
                             req.session.admin = false;
                             req.session.emp_id = result[0].emp_id;

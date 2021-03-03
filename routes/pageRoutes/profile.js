@@ -41,7 +41,7 @@ router.get('/editDetails', (req, res)=>{
         if(error) console.log('mysql error', error);
         else {
             console.table(result[0])
-            res.render('profile/editDetails', {user: result});
+            res.render('profile/editDetails', {user: result[0]});
             console.log(result)
         }
     })
