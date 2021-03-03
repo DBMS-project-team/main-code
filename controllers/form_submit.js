@@ -3,6 +3,7 @@ const router = express.Router();
 var dateFormat = require('dateformat');
 const db = require('../db_config');
 var fs = require("fs");
+const bcrypt = require('bcrypt');
 
 router.use('/employees', require('./form_submit/employees'));
 router.use('/menus', require('./form_submit/menus'));
@@ -53,60 +54,63 @@ router.post('/add_new_department', (req, res) => {
     })
 });
 
-router.post('/addNewEmployee', ( req, res ) => {
+router.post('/addNewEmployee', async ( req, res ) => {
     try {
-        let {firstname, lastname, dob, staffId,martialStatus,gender, department,branch,empStaType, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val,profileImage} = req.body;
+        let {firstname, lastname, dob, staffId,martialStatus,address,phone, gender, department,branch,empStaType, jobTitle, empStatus, payGlevel,supervisor,attr_id,attr_val,profileImage} = req.body;
         console.log(attr_id,attr_val);
-        db.query("INSERT INTO `employees`(`staff_id`, `firstname`, `lastname`, `birthdate`,`gender`, `marital_status`, `dept_id`,`branch_id`, `job_id`, `emp_status_id`,`emp_status_type`, `pay_grade_level`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
-            [staffId,firstname, lastname, dob,gender, martialStatus, department,branch, jobTitle, empStatus,empStaType, payGlevel], 
-            async (err,result) =>{
-                if(err) console.log('error', err);
-                else {
-                    const emp_id = result.insertId;
-                    if (supervisor !=="0"){
-                        db.query("INSERT INTO `supervisors`(`emp_id`, `supervisor`) VALUES (?,?);",[emp_id,supervisor],
-                        (err2) =>{
-                            if(err2) console.log('error', err2);
-                        });
+        var query="START TRANSACTION; SET @emp_id = NULL; INSERT INTO `employees`(`staff_id`, `firstname`, `lastname`, `birthdate`,`gender`, `marital_status`,`address`,`primary_phone_num`, `dept_id`,`branch_id`, `job_id`, `emp_status_id`,`emp_status_type`, `pay_grade_level`) VALUES (" + 
+                    db.escape(staffId) +","+ db.escape(firstname)+","+ db.escape(lastname)+","+ db.escape(dob)+","+ db.escape(gender)+","+ db.escape(martialStatus)+","+ db.escape(address)+","+ db.escape(phone)+","+ db.escape(department)+","+ db.escape(branch)+","+ db.escape(jobTitle)+","+ db.escape(empStatus)+","+ db.escape(empStaType)+","+ db.escape(payGlevel)+"); SELECT last_insert_id() INTO @emp_id;";
+        
+        if (supervisor !=="0"){
+            query +="INSERT INTO `supervisors`(`emp_id`, `supervisor`) VALUES ( @emp_id ,"+db.escape(supervisor)+ ");";
 
-                    }
-                    if (profileImage !=="default"){
-                        fs.writeFile("public\\img\\profile\\"+emp_id+".jpg", new Buffer.from(profileImage.split(",")[1], "base64"), 
-                        function(imageWriteErr) {if(imageWriteErr) console.log(imageWriteErr);});
-                    }
-                    if(attr_id){
-                        var valueArray=[];
-                        if (attr_id.length==1){
-                            attr_id=[attr_id];
-                            attr_val=[attr_val];
-                        }
-                        for (var i = 0; i < attr_id.length; i++) {
-                            valueArray.push([emp_id,attr_val[i]]);
-                          }
-                        db.query("INSERT INTO `employee_additional_details`(`emp_id`, `custom_field_value_id` ) VALUES ?",[valueArray], async (error,result2) =>{
-                            if(error) console.log('error', error);
-                        })
-                    }
-                    if (req.body.userAccount){
-                        const username = req.body.userName;
-                        const user_level = req.body.userLevel;
-                        const password = "password";
-
-                        db.query('INSERT INTO `users`(`emp_id`, `username`, `user_level`, `password`) VALUES (?,?,?,?);', [emp_id,username,user_level,password], (error, result) => {
-                            if(error) console.log('mysql error', error);
-                        });
-                    }
-                    res.json({new:true,emp_id});
+        }
+        
+        if(attr_id){
+            var sub_query= "INSERT INTO `employee_additional_details` (`emp_id`, `custom_field_value_id` ) VALUES  ";
+            if (attr_id.length==1){
+                attr_id=[attr_id];
+                attr_val=[attr_val];
+            }
+            for (var i = 0; i < attr_id.length; i++) {
+                sub_query += "( @emp_id ,"+db.escape(attr_val[i]) +"),"
+            }
+            sub_query = sub_query.substring(0,sub_query.length-1) +";";
+            query += sub_query;
+            
+        }
+        if (req.body.userAccount){
+            const username = req.body.userName;
+            const user_level = req.body.userLevel;
+            const password = "password";
+            const hash_password = await bcrypt.hash(password, 10);
+            query += "INSERT INTO `users`(`emp_id`, `username`, `user_level`, `password`) VALUES (@emp_id,"+ db.escape(username)+","+ db.escape(user_level)+","+ db.escape(hash_password)+");";
+            
+        }
+        query += "COMMIT;";
+        console.log(query);
+        db.query(query,(err,result)=>{
+            if (err) {
+                console.log({err});
+                res.json({error:true });
+            }else{
+                const emp_id=result[2].insertId
+                if (profileImage !=="default"){
+                    fs.writeFile("public\\img\\profile\\"+emp_id+".jpg", new Buffer.from(profileImage.split(",")[1], "base64"), 
+                    function(imageWriteErr) {if(imageWriteErr) console.log(imageWriteErr);});
                 }
-            });
+                res.json({error:false,new:true,emp_id});
+            }
+        })
+           
     } catch (error) {
         console.log(error);
     }
 });
 
-router.post('/editEmployee', ( req, res ) => {
+router.post('/editEmployee', async ( req, res ) => {
     try {
-        let {empId,userAcc,firstname,staffId, lastname, dob, martialStatus,gender, department,branch, jobTitle, empStatus,empStaType, payGlevel,supervisor,attr_id,exist_attr_id,attr_val,profileImage} = req.body;
+        let {empId,userAcc,firstname,staffId, lastname, dob, martialStatus,address,phone,gender, department,branch, jobTitle, empStatus,empStaType, payGlevel,supervisor,attr_id,exist_attr_id,attr_val,profileImage} = req.body;
         console.log(attr_id,exist_attr_id,attr_val);
         if(profileImage !== "unchanged"){
             if (profileImage=="default"){
@@ -118,43 +122,31 @@ router.post('/editEmployee', ( req, res ) => {
                 function(writeErr) {if(writeErr) console.log("write error",writeErr);});
             }
         }
-        db.query('UPDATE `employees` SET `staff_id`=?, `firstname`=?,`lastname`=?,`birthdate`=?,`marital_status`=?,`gender`=?,`dept_id`=?,`branch_id`=?,`job_id`=?,`emp_status_id`=?,`emp_status_type`=?,`pay_grade_level`=? WHERE emp_id=? ;', 
-        [ staffId, firstname, lastname, dob, martialStatus,gender, department,branch, jobTitle, empStatus,empStaType, payGlevel,empId], (error, result) => {
-            if(error) console.log('mysql error', error);
-        })
-
+        var query="START TRANSACTION; UPDATE `employees` SET `staff_id`="+db.escape(staffId)+", `firstname`="+db.escape(firstname)+",`lastname`="+db.escape(lastname)+",`birthdate`="+db.escape(dob)+",`marital_status`="+db.escape(martialStatus)+",`address`="+db.escape(address)+",`primary_phone_num`="+db.escape(phone)+
+                    ",`gender`="+db.escape(gender)+",`dept_id`="+db.escape(department)+",`branch_id`="+ db.escape(branch)+",`job_id`="+db.escape(jobTitle)+",`emp_status_id`="+db.escape(empStatus)+",`emp_status_type`="+db.escape(empStaType)+",`pay_grade_level`="+db.escape(payGlevel)+" WHERE emp_id="+db.escape(empId)+" ;";
+        
         if (supervisor !=="0"){
-            db.query("INSERT INTO supervisors (`emp_id`, `supervisor`) VALUES(?,?) ON DUPLICATE KEY UPDATE supervisor=?;",[empId,supervisor,supervisor],
-            (err2) =>{
-                if(err2) console.log('error', err2);
-            });
+            query += "INSERT INTO supervisors (`emp_id`, `supervisor`) VALUES("+db.escape(empId)+","+db.escape(supervisor)+") ON DUPLICATE KEY UPDATE supervisor="+db.escape(supervisor)+";";
+            
         }else{
-            db.query("DELETE FROM `supervisors` WHERE emp_id=?;",[empId],
-            (err3) =>{
-                if(err3) console.log('error', err3);
-            });
+            query += "DELETE FROM `supervisors` WHERE emp_id="+db.escape(empId)+";";
         }
 
         if(attr_id){
-            var valueArray=[];
-            var query='';
+            var sub_query='';
             if (attr_id.length==1){
                 attr_id=[attr_id];
                 attr_val=[attr_val];
             }
             for (var i = 0; i < attr_id.length; i++) {
                 if(exist_attr_id[i]=='0'){
-                    query += "INSERT INTO `employee_additional_details`(`emp_id`, `custom_field_value_id`) VALUES (?,?);";
-                    valueArray.push(empId,attr_val[i]);
+                    sub_query += "INSERT INTO `employee_additional_details`(`emp_id`, `custom_field_value_id`) VALUES ("+db.escape(empId)+","+db.escape(attr_val[i])+");";
                 }else{
-                    query +="UPDATE `employee_additional_details` SET `custom_field_value_id`=? WHERE `emp_id`=? AND`custom_field_value_id`=?;";
-                    valueArray.push(attr_val[i],empId,exist_attr_id[i]);
+                    sub_query +="UPDATE `employee_additional_details` SET `custom_field_value_id`="+db.escape(attr_val[i])+" WHERE `emp_id`="+db.escape(empId)+" AND`custom_field_value_id`="+db.escape(exist_attr_id[i])+";";
                 }
                 
-              }
-            db.query(query,valueArray, async (err,result2) =>{
-                if(err) console.log('error', err);
-            })
+            }
+            query += sub_query;
         }
         
         if(req.body.userAccount){
@@ -162,20 +154,26 @@ router.post('/editEmployee', ( req, res ) => {
             const user_level = req.body.userLevel;
             if(userAcc==""){
                 const password = "password";
-                db.query('INSERT INTO `users`(`emp_id`, `username`, `user_level`, `password`) VALUES (?,?,?,?);', [empId,username,user_level,password], (error, result) => {
-                    if(error) console.log('mysql error', error);
-                });
+                const hash_password = await bcrypt.hash(password, 10);
+                query += "INSERT INTO `users`(`emp_id`, `username`, `user_level`, `password`) VALUES ("+db.escape(empId)+","+db.escape(username)+","+db.escape(user_level)+","+db.escape(hash_password)+");";
             }else{
-                db.query('UPDATE `users` SET `username`=?,`user_level`=? WHERE `emp_id`=?', [username,user_level,empId], (error, result) => {
-                    if(error) console.log('mysql error', error);
-                });
+                query += "UPDATE `users` SET `username`="+db.escape(username)+",`user_level`="+db.escape(user_level)+" WHERE `emp_id`="+db.escape(empId)+";";
             }
         }else if(userAcc !=="") {
-            db.query('DELETE FROM `users` WHERE `emp_id`=?', [empId], (error, result) => {
-                if(error) console.log('mysql error', error);
-            });
+            query += "DELETE FROM `users` WHERE `emp_id`="+db.escape(empId)+";";
         }
-        res.json({new:false,emp_id:empId});
+
+        query += "COMMIT;";
+        console.log(query);
+        db.query(query,(err,result)=>{
+            if (err) {
+                console.log({err});
+                res.json({error:true });
+            }else{
+                res.json({error:false,new:false,emp_id:empId});
+            }
+        })
+
     } catch (error) {
         console.log(error);
     }
