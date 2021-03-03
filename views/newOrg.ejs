@@ -21,7 +21,7 @@
                     <form class="form_tag" after_submit="change_page" action="auth/form_submit/changeOrgPassword">
                         <div class="form-group">
                             <label class="form-label" for="old_pass">Old Password</label>
-                            <input placeholder="Enter" name="old_pass" type="text" id="formBasicEmail" class="form-control" value="<%= org_detail.admin_password %>" disabled>
+                            <input placeholder="Enter" name="old_pass" type="text" id="formBasicEmail" class="form-control" >
                             <label class="form-label" for="formBasicEmail">New Password</label>
                             <input placeholder="Enter" name="new_pass" type="text" id="formBasicEmail" class="form-control" value="">
                             <input type="hidden" id="org_id" name="org_id" value="<%= org_detail.org_id %>">

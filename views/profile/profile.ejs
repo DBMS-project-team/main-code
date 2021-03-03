@@ -62,6 +62,7 @@
 				my_fullname = 'Full Name';
 				my_job_title_name = 'Job Title Name';
 				my_birthdate = 'Birth date';
+				my_address = 'Address';
 				my_martial_status = 'Martial status(Single/married)';
 				my_dept_name = 'Department name';
 				my_emp_status = 'Employee status - Employee status type';
@@ -71,6 +72,7 @@
 						my_fullname = Det.fullname;
 						my_job_title_name = Det.job_title_name;
 						my_birthdate = Det.birthdate;
+						my_address = Det.address;
 						my_martial_status = Det.marital_status;
 						my_dept_name = Det.name;
 						my_emp_status = Det.emp_status + ' - ' + Det.emp_status_type;
@@ -117,7 +119,7 @@
 				<div class="card_body">
 					<ul class="list-unstyled mb-0 timeline timeline-blk">
 						<li class="mb-1 timeline-item timeline-item-blk"><span data-feather="calendar" class="feather-sm mr-1"></span> Born on <%= my_birthdate %></li><br>
-						<li class="mb-1 timeline-item timeline-item-blk"><span data-feather="map-pin" class="feather-sm mr-1"></span> Lives in </li><br>
+						<li class="mb-1 timeline-item timeline-item-blk"><span data-feather="map-pin" class="feather-sm mr-1"></span> Lives in <%= my_address %></li><br>
 						<li class="mb-1 timeline-item timeline-item-blk"><span data-feather="briefcase" class="feather-sm mr-1"></span> <%= my_martial_status %></li>	<br>	
 					</ul>
 				</div>
