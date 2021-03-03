@@ -1,23 +1,26 @@
 <link rel="stylesheet" href="/css/croppie.css" />
 <style>
-	.main_cont{
+	.main_contn{
 		display: flex;
 		flex-flow: row wrap;
 		width: 100%;
 		flex-grow: 1;
 	}
-	.card{
+	.card-itm{
 		margin: auto;
 		min-width: 400px;
 		width: 49%;
 		height: 650px;
 		overflow: auto;
 	}
-	.timeline {
+	.card-body-itm{
+		padding: 15px;
+	}
+	.timeline-blk {
     	padding-left: 25px;
 		margin: 3px;
 	}
-	.timeline-item{
+	.timeline-item-blk{
 		margin: 4px;
 	}
 	.my_prof{
@@ -31,18 +34,22 @@
 	.prof_card{
 		position: relative;
 	}
+	.hr-line{
+		display: list-item;
+	}
 </style>
 <div class="container-fluid p-0">
 	<h1 class="h3 mb-3 my_prof">
 		<% if(emp_id == 0){ %> Sample Profile
 		<% }else{ %> My Profile <% } %>
 	</h1>
-	<div class="main_cont">
-		<div class="card mb-3">
+	<div class="main_contn">
+		<div class="card card-itm mb-3">
 			<div class="card-header">
-				<h4>Personal Deta</h4>
+				<h4>Personal Data</h4>
 			</div>
-			<div>
+			<hr class="my-0 hr-line"/>
+			<div class="card-body-itm">
 				<form action="/auth/form_submit/edit_user_detail_password">
 					<div class="row p-2">
 						<div class="col-auto">
@@ -71,7 +78,7 @@
 						my_pay_grade_level_title = Det.pay_grade_level_title;
 					})
 			}%>
-			<div class="card-body text-center prof_card">
+			<div class="card-body-itm text-center prof_card">
 				<img src=<%= image_url %> alt="Christina Mason" id="profileImage" class="img-fluid rounded-circle mb-2" width="128" height="128" />
 				<br>
 
@@ -105,119 +112,119 @@
 					<%= my_job_title_name  %>
 				</div>
 			</div>
-			<hr class="my-0" />
-			<div class="card-body">
+			<hr class="my-0 hr-line" />
+			<div class="card-body-itm">
 				<strong>About</strong>
-				<div>
-					<ul class="list-unstyled mb-0 timeline">
-						<li class="mb-1 timeline-item"><span data-feather="calendar" class="feather-sm mr-1"></span> Born on <%= my_birthdate %></li><br>
-						<li class="mb-1 timeline-item"><span data-feather="map-pin" class="feather-sm mr-1"></span> Lives in </li><br>
-						<li class="mb-1 timeline-item"><span data-feather="briefcase" class="feather-sm mr-1"></span> <%= my_martial_status %></li>	<br>	
+				<div class="card_body">
+					<ul class="list-unstyled mb-0 timeline timeline-blk">
+						<li class="mb-1 timeline-item timeline-item-blk"><span data-feather="calendar" class="feather-sm mr-1"></span> Born on <%= my_birthdate %></li><br>
+						<li class="mb-1 timeline-item timeline-item-blk"><span data-feather="map-pin" class="feather-sm mr-1"></span> Lives in </li><br>
+						<li class="mb-1 timeline-item timeline-item-blk"><span data-feather="briefcase" class="feather-sm mr-1"></span> <%= my_martial_status %></li>	<br>	
 					</ul>
 				</div>
 			</div>
-			<hr class="my-0" />
-			<div class="card-body">
+			<hr class="my-0 hr-line" />
+			<div class="card-body-itm">
 				<strong>Custom Fields</strong>
-				<div class="timeline">
+				<div class="timeline timeline-blk">
 				<% if(emp_id == 0){ %>
-					<h4 class="card-title mb-0 timeline-item">Custom field name : Custom field value</h4><br>
+					<h4 class="card-title mb-0 timeline-item timeline-item-blk">Custom field name : Custom field value</h4><br>
 				<% }else{ 
 					if(eme_res.length > 0){
 						cus_res.forEach(function(Det){ %>
-							<h4 class="card-title mb-0 timeline-item"><%= Det.custom_field %></h4><br>
+							<h4 class="card-title mb-0 timeline-item timeline-item-blk"><%= Det.custom_field %></h4><br>
 						<% })
 					}else{ %>
-						<h4 class="card-title mb-0 timeline-item">Not Given</h4><br>
+						<h4 class="card-title mb-0 timeline-item timeline-item-blk">Not Given</h4><br>
 					<% }
 				 } %>
 				</div>
 			</div>
-			<hr class="my-0" />
-			<div class="card-body">
+			
+			<hr class="my-0 hr-line" />
+			<div class="card-body-itm">
 				<strong>Emergency Contact Details</strong>
-				<div class="timeline">
+				<div class="timeline timeline-blk">
 				<% if(emp_id == 0){ %>
-					<h4 class="card-title mb-0 timeline-item">Field name : Field value</h4><br>
+					<h4 class="card-title mb-0 timeline-item timeline-item-blk">Field name : Field value</h4><br>
 				<% }else{ 
 						if(eme_res.length > 0){
 							eme_res.forEach(function(Det){ %>
-								<h4 class="card-title mb-0 timeline-item"><%= Det.con_detail %></h4><br>
+								<h4 class="card-title mb-0 timeline-item timeline-item-blk"><%= Det.con_detail %></h4><br>
 							<% })
 						}else{ %>
-							<h5 class="card-title mb-0 timeline-item">Not Given</h5><br>
+							<h5 class="card-title mb-0 timeline-item timeline-item-blk">Not Given</h5><br>
 						<% }
 					} %>
 				</div>
 			</div>
-			<hr class="my-0" />
 		</div>
-		<div class="card mb-3">
+		<div class="card card-itm mb-3">
 			<div class="card-header">
 				<h4>Employment Details</h4>
 			</div>
-			<hr class="my-0" />
+			<hr class="my-0 hr-line" />
 
-			<div class="card-body">
+			<div class="card-body-itm">
 				<strong>Department</strong>
-				<div class="timeline"><h4 class="card-title mb-0 timeline-item"><%= my_dept_name %></h4><br></div>
+				<div class="timeline timeline-blk"><h4 class="card-title mb-0 timeline-item timeline-item-blk"><%= my_dept_name %></h4><br></div>
 			</div>
-			<hr class="my-0" />
+			<hr class="my-0 hr-line" />
 
-			<div class="card-body">
+			<div class="card-body-itm">
 				<strong>Employment Status</strong>
-				<div class="timeline"><h4 class="card-title mb-0 timeline-item"><%= my_emp_status %></h4><br></div>
+				<div class="timeline timeline-blk"><h4 class="card-title mb-0 timeline-item timeline-item-blk"><%= my_emp_status %></h4><br></div>
 			</div>
-			<hr class="my-0" />
+			<hr class="my-0 hr-line" />
 
-			<div class="card-body">
+			<div class="card-body-itm">
 				<strong>Pay Grade Level</strong>
-				<div class="timeline"><h4 class="card-title mb-0 timeline-item"><%= my_pay_grade_level_title %></h4><br></div>
+				<div class="timeline timeline-blk"><h4 class="card-title mb-0 timeline-item timeline-item-blk"><%= my_pay_grade_level_title %></h4><br></div>
 			</div>
-			<hr class="my-0" />
+			<hr class="my-0 hr-line" />
 
-			<div class="card-body">
+			<div class="card-body-itm">
 				<strong>Supervisor and Subordinates</strong>
 				<% if(emp_id == 0){ %>
-					<div class="timeline">
-						<div class="card_body timeline-item">
+					<div class="timeline timeline-blk">
+						<div class="card_body timeline-item timeline-item-blk">
 							<h2 class="card-title mb-0">My Supervisor </h2><br>
-							<div class="timeline"><h3 class="card-title mb-0 timeline-item">Supervisor Name </h3><br></div>
+							<div class="timeline timeline-blk"><h3 class="card-title mb-0 timeline-item timeline-item-blk">Supervisor Name </h3><br></div>
 						</div>
-						<div class="card_body timeline-item">
+						<div class="card_body timeline-item timeline-item-blk">
 							<h2 class="card-title mb-0">My Subordinates </h2><br>
-							<div class="timeline">
-								<h3 class="card-title mb-0 timeline-item">Subordinate name 1 </h3><br>
-								<h3 class="card-title mb-0 timeline-item">Subordinate name 2 </h3><br>
-								<h3 class="card-title mb-0 timeline-item">....... </h3><br>
+							<div class="timeline timeline-blk">
+								<h3 class="card-title mb-0 timeline-item timeline-item-blk">Subordinate name 1 </h3><br>
+								<h3 class="card-title mb-0 timeline-item timeline-item-blk">Subordinate name 2 </h3><br>
+								<h3 class="card-title mb-0 timeline-item timeline-item-blk">....... </h3><br>
 							</div>
 							
 						</div>
 					</div>
 					
 				<% }else{ %>
-					<div class="timeline">
-						<div class="card_body timeline-item">
+					<div class="timeline timeline-blk">
+						<div class="card_body timeline-item timeline-item-blk">
 							<h2 class="card-title mb-0">My Supervisor </h2><br>
-							<div class="timeline">
+							<div class="timeline timeline-blk">
 								<% if(sup_det.length > 0){
 									sup_det.forEach(function(Det){ %>
-										<h3 class="card-title mb-0 timeline-item"><%= Det.sup_name %> </h3><br>				
+										<h3 class="card-title mb-0 timeline-item timeline-item-blk"><%= Det.sup_name %> </h3><br>				
 									<% })
 								}else{ %>
-									<h3 class="card-title mb-0 timeline-item">No supervisor found</h3><br>
+									<h3 class="card-title mb-0 timeline-item timeline-item-blk">No supervisor found</h3><br>
 								<% } %>
 							</div>
 						</div>
-						<div class="card_body timeline-item">
+						<div class="card_body timeline-item timeline-item-blk">
 							<h2 class="card-title mb-0">My Subordinates </h2><br>
-							<div class="timeline">
+							<div class="timeline timeline-blk">
 								<% if(sub_det.length > 0){
 									sub_det.forEach(function(Det){ %>
-										<h3 class="card-title mb-0 timeline-item"><%= Det.sub_names %> </h3><br>					
+										<h3 class="card-title mb-0 timeline-item timeline-item-blk"><%= Det.sub_names %> </h3><br>					
 									<% })
 								}else{ %>
-									<h3 class="card-title mb-0 timeline-item">No Subordinates found</h3><br>
+									<h3 class="card-title mb-0 timeline-item timeline-item-blk">No Subordinates found</h3><br>
 								<% } %>
 							</div>
 						</div>
