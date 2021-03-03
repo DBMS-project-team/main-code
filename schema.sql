@@ -567,3 +567,16 @@ END $$
 DELIMITER ;
 
 CALL changePassword (17, 123456, 123);
+
+-- //////////////////////////////
+
+START TRANSACTION;
+	SET @emp_id = NULL;
+	INSERT INTO `employees`
+    (`staff_id`, `firstname`, `lastname`, `birthdate`,`gender`, `marital_status`,
+    `dept_id`,`branch_id`, `job_id`, `emp_status_id`,`emp_status_type`, `pay_grade_level`) VALUES 
+    ('000', 'abc', 'cms', '1998-10-07', 'male', 'single', 1, 1, 1, 1, 1, 1);
+    SELECT last_insert_id() INTO @emp_id;
+    INSERT INTO `employee_additional_details`(`emp_id`, `custom_field_value_id` ) VALUES (@emp_id, 2);
+    INSERT INTO `employee_additional_details`(`emp_id`, `custom_field_value_id` ) VALUES (@emp_id, 4);
+COMMIT;
