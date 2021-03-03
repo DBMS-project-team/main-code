@@ -53,19 +53,22 @@ exports.login = async (req, res)=>{
                         username_err: false,
                         password_err: false
                     })
-                } else if ( result[0].admin_password !== password ) {
-                    res.status(400).render('./logs/login', {
-                        error: `${username}, your passowrd is incorrect`,
-                        username_err: false,
-                        password_err: 'Incorrect Password'
-                    })
-                } else{
-                    req.session.username = username;
-                    req.session.admin = true;
-                    req.session.emp_id = 0;
-                    req.session.user_id = result[0].org_id;
-                    req.session.user_level = 0;
-                    res.status(200).redirect('/'+url);
+                } else {
+                    const is_user = await bcrypt.compare(password, result[0].admin_password);
+                    if ( !is_user ) {
+                        res.status(400).render('./logs/login', {
+                            error: `${username}, your passowrd is incorrect`,
+                            username_err: false,
+                            password_err: 'Incorrect Password'
+                        });
+                    } else{
+                        req.session.username = username;
+                        req.session.admin = true;
+                        req.session.emp_id = 0;
+                        req.session.user_id = result[0].org_id;
+                        req.session.user_level = 0;
+                        res.status(200).redirect('/'+url);
+                    }
                 }
             })
         }else{
