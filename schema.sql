@@ -500,32 +500,32 @@ CALL dashboard();
 -- ////////////////////////////////////////
 -- Procedure for change password
 
-DROP PROCEDURE IF EXISTS changePassword;
-DELIMITER $$
-CREATE PROCEDURE changePassword ( IN empId INT(11), IN curr_pass VARCHAR(50), IN new_pass VARCHAR(50) )
-BEGIN
+-- DROP PROCEDURE IF EXISTS changePassword;
+-- DELIMITER $$
+-- CREATE PROCEDURE changePassword ( IN empId INT(11), IN curr_pass VARCHAR(50), IN new_pass VARCHAR(50) )
+-- BEGIN
     
-    DECLARE old_pass VARCHAR(50);
-    DECLARE _status INT(1);
-    DECLARE result VARCHAR(50);
+--     DECLARE old_pass VARCHAR(50);
+--     DECLARE _status INT(1);
+--     DECLARE result VARCHAR(50);
 
-    SELECT password INTO old_pass FROM users WHERE emp_id=empId;
+--     SELECT password INTO old_pass FROM users WHERE emp_id=empId;
 
-    IF old_pass <> curr_pass THEN
-        SET _status = 0;
-        SET result = 'Provided previous password is incorrect';
-    ELSE
-        UPDATE users SET password=new_pass where emp_id=empId;
-        SET _status = 1;
-        SET result = '';
-    END IF;
+--     IF old_pass <> curr_pass THEN
+--         SET _status = 0;
+--         SET result = 'Provided previous password is incorrect';
+--     ELSE
+--         UPDATE users SET password=new_pass where emp_id=empId;
+--         SET _status = 1;
+--         SET result = '';
+--     END IF;
 
-    SELECT _status `status`, result;
+--     SELECT _status `status`, result;
 
-END $$
-DELIMITER ;
+-- END $$
+-- DELIMITER ;
 
-CALL changePassword (17, 123456, 123);
+-- CALL changePassword (17, 123456, 123);
 
 -- //////////////////////////////////////////////////////////////////////////////////////
 -- Triggers
@@ -575,4 +575,39 @@ END$$
 
 DELIMITER ;
 
--- 
+-- ///////////////////////////////////////////////////////////////////////////
+-- on insert in pay grade level
+
+DROP TRIGGER IF EXISTS after_pay_grade;
+
+DELIMITER $$
+CREATE TRIGGER after_pay_grade
+AFTER INSERT
+ON pay_grades FOR EACH ROW
+BEGIN
+	DECLARE finished INTEGER DEFAULT 0;
+    DECLARE leave_type int(11) DEFAULT 0;
+    
+    -- declare cursor for employee id
+	DEClARE curLeaveTypes
+		CURSOR FOR 
+			SELECT leave_type_id FROM leave_types;
+
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;
+
+	OPEN curLeaveTypes;
+
+	getLeaveLoop: LOOP
+		FETCH curLeaveTypes INTO leave_type;
+		IF finished = 1 THEN 
+			LEAVE getLeaveLoop;
+		END IF;
+		-- binsert quesry
+		INSERT INTO max_leave_days
+        VALUES (leave_type, NEW.pay_grade_level, 0);
+	END LOOP getLeaveLoop;
+	CLOSE curLeaveTypes;
+END$$
+DELIMITER ;
