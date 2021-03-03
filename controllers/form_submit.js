@@ -308,15 +308,34 @@ router.post('/addEmergencyDetails', (req,res)=>{
 
 router.post('/changeOrgPassword', (req, res) => {
     var org_id = req.body.org_id;
+    var old_pass = req.body.old_pass
     var new_pass = req.body.new_pass
-    db.query('UPDATE organization_details SET admin_password=? where org_id=?', [new_pass, org_id], (error, result) => {
-        if(error){
-            console.log('mysql error', error);
-        } 
-        else {
-            res.json({new:true});
+    db.query("select admin_password from organization_details where org_id=? ",[org_id], (err,result)=>{
+        if(err) console.log({err})
+        else{
+            bcrypt.compare(old_pass, result[0].admin_password,(err,is_correct) =>{
+                console.log(is_correct)
+                if (is_correct){
+                    bcrypt.hash(new_pass, 10, (err,hash_password) =>{
+                        if (err) console.log(err);
+                        else{
+                            db.query('UPDATE organization_details SET admin_password=? where org_id=?', [hash_password,org_id], (error, result2) => {
+                                if(error) {
+                                    console.log('mysql error', error);
+                                    res.json({new:false});
+                                }else {
+                                    res.json({new:true});
+                                }
+                            })
+                        }
+                    });
+                }else{
+                    res.json({new:false});
+                }
+            });
+            
         }
-    })
+    });
 });
 
 router.post('/editOrg', (req, res) => {
