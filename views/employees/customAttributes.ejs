@@ -67,18 +67,18 @@
             <div class="card-header">
                 <h3 style="font-family:verdana;"><%= attr.custom_field_name %></h3>
             </div>
-            <table class="table table-striped table-hover" del_fun="deleteCusAttrVal" datatable="true" db_table="custom_fields" db_primary_column="custom_field_id" popup-edit="1">
+            <table class="table table-striped table-hover" del_fun="deleteCusAttrVal" datatable="true" db_table="custom_field_values" db_primary_column="custom_field_value_id" popup-edit="1">
                 <thead>
                     <tr>
                         <th style="width: 30px;">#</th>
-                        <th db_column="custom_field_name"><%= attr.custom_field_name %> Type </th>
+                        <th db_column="custom_field_value"><%= attr.custom_field_name %> Type </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% var count = 1 %>
                     <% cusVal.filter(val => attr.custom_field_id == val.custom_field_id ).forEach(function(val){ %>
-                        <tr data-id="<%= attr.custom_field_id %>">
+                        <tr data-id="<%= val.custom_field_value_id %>">
                             <td><%= count++ %></td>
                             <td><%= val.custom_field_value%></td>
                             <td class="table-action">
