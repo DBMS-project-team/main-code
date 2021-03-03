@@ -478,24 +478,24 @@ CALL dashboard();
 -- ///////////////////////////////////
 -- procedure for leave application
 
--- DROP PROCEDURE IF EXISTS leaveApplication;
--- DELIMITER $$
--- CREATE PROCEDURE leaveApplication (IN empId INT(11))
--- BEGIN
---     SET @pay_grade_level = NULL;
+DROP PROCEDURE IF EXISTS leaveApplication;
+DELIMITER $$
+CREATE PROCEDURE leaveApplication (IN empId INT(11))
+BEGIN
+    SET @pay_grade_level = NULL;
 
---     SELECT pay_grade_level INTO @pay_grade_level FROM employees WHERE emp_id=empId;
---     select a.leave_id,t.leave_type,a.apply_date_time,a.leave_from,a.leave_to,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id=empId;
---     SELECT outer_l.*, m.max_no_of_leaves maximum FROM 
---         (SELECT leave_types.*, COALESCE(SUM(l.period), 0) total FROM leave_types NATURAL LEFT JOIN 
---             (SELECT * FROM leave_applications WHERE emp_id=empId) l 
---             GROUP BY leave_type_id) outer_l
---         NATURAL JOIN
---         (SELECT * from max_leave_days where pay_grade_level=@pay_grade_level) m;
--- END $$
--- DELIMITER ;
+    SELECT pay_grade_level INTO @pay_grade_level FROM employees WHERE emp_id=empId;
+    select a.leave_id,t.leave_type,a.apply_date_time,a.leave_from,a.leave_to,a.period,s.title from leave_applications as a inner join leave_application_statuses as s ON a.status_id=s.status_id inner join leave_types as t ON a.leave_type_id=t.leave_type_id where emp_id=empId;
+    SELECT outer_l.*, m.max_no_of_leaves maximum FROM 
+        (SELECT leave_types.*, COALESCE(SUM(l.period), 0) total FROM leave_types NATURAL LEFT JOIN 
+            (SELECT * FROM leave_applications WHERE emp_id=empId AND status_id=2) l
+            GROUP BY leave_type_id) outer_l
+        NATURAL JOIN
+        (SELECT * from max_leave_days where pay_grade_level=@pay_grade_level) m;
+END $$
+DELIMITER ;
 
--- CALL leaveApplication (17);
+CALL leaveApplication (5);
 
 -- ////////////////////////////////////////
 -- Procedure for change password
@@ -527,7 +527,7 @@ CALL dashboard();
 
 -- CALL changePassword (17, 123456, 123);
 
--- //////////////////////////////////////////////////////////////////////////////////////
+-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 -- Triggers
 
 --///////////////////////////////////////////////////////////////////////////////////////
@@ -611,3 +611,76 @@ BEGIN
 	CLOSE curLeaveTypes;
 END$$
 DELIMITER ;
+
+-- ///////////////////////////////////////////////////////////////////////////
+-- on insert in pay leave_type
+
+DROP TRIGGER IF EXISTS after_leave_type;
+
+DELIMITER $$
+CREATE TRIGGER after_leave_type
+AFTER INSERT
+ON leave_types FOR EACH ROW
+BEGIN
+	DECLARE finished INTEGER DEFAULT 0;
+    DECLARE pay_grade int(11) DEFAULT 0;
+    
+    -- declare cursor for employee id
+	DEClARE curPayGrade
+		CURSOR FOR 
+			SELECT pay_grade_level FROM pay_grades;
+
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;
+
+	OPEN curPayGrade;
+
+	getPayLoop: LOOP
+		FETCH curPayGrade INTO pay_grade;
+		IF finished = 1 THEN 
+			LEAVE getPayLoop;
+		END IF;
+		-- binsert quesry
+		INSERT INTO max_leave_days
+        VALUES (NEW.leave_type_id, pay_grade, 0);
+	END LOOP getPayLoop;
+	CLOSE curPayGrade;
+END$$
+DELIMITER ;
+
+-- ////////////////////////////////////////////////////////
+-- before del pay grade and leave type
+
+DROP TRIGGER IF EXISTS before_del_paygrade;
+
+CREATE TRIGGER before_del_paygrade
+BEFORE DELETE
+ON pay_grades FOR EACH ROW
+    DELETE FROM max_leave_days WHERE pay_grade_level=OLD.pay_grade_level;
+
+DROP TRIGGER IF EXISTS before_del_leave_Type;
+
+CREATE TRIGGER before_del_leave_Type
+BEFORE DELETE
+ON leave_types FOR EACH ROW
+    DELETE FROM max_leave_days WHERE leave_type_id=OLD.leave_type_id;
+
+
+-- ////////////////////////////////////////////////////////
+-- before del user_level and menus
+
+DROP TRIGGER IF EXISTS before_del_userlevel;
+
+CREATE TRIGGER before_del_userlevel
+BEFORE DELETE
+ON user_levels FOR EACH ROW
+    DELETE FROM menu_permissions WHERE user_level=OLD.user_level;
+
+DROP TRIGGER IF EXISTS before_del_menu;
+
+CREATE TRIGGER before_del_menu
+BEFORE DELETE
+ON menus FOR EACH ROW
+    DELETE FROM menu_permissions WHERE menu_id=OLD.menu_id;
+
