@@ -21,9 +21,9 @@
                     <form class="form_tag" after_submit="change_page" action="auth/form_submit/changeOrgPassword">
                         <div class="form-group">
                             <label class="form-label" for="old_pass">Old Password</label>
-                            <input placeholder="Enter" name="old_pass" type="text" id="formBasicEmail" class="form-control" >
+                            <input placeholder="Enter" name="old_pass" type="password" id="formBasicEmail" class="form-control" >
                             <label class="form-label" for="formBasicEmail">New Password</label>
-                            <input placeholder="Enter" name="new_pass" type="text" id="formBasicEmail" class="form-control" value="">
+                            <input placeholder="Enter" name="new_pass" type="password" id="formBasicEmail" class="form-control" value="">
                             <input type="hidden" id="org_id" name="org_id" value="<%= org_detail.org_id %>">
                         </div>
                     </form>
@@ -125,7 +125,9 @@
     var change_page = (data) => {
         if(data.new){
             location.hash = "/organization" ;
-        }      
+        }  else{
+            alert("Error...!");
+        }    
     }
     var close_card = () =>{
         location.hash = '/organization' ;
