@@ -4,7 +4,7 @@
             <h5>Employees Details</h5>
             <a href="#/employees/newEmployee" class="btn btn-primary gap-2 md">Add New Employee</a>
         </div>
-        <table class="table table-striped table-hover" datatable="true" db_table="employment_statuses" db_primary_column="emp_status_id" edit-page="/employees/edit"> <%# edit-page format will be /employees/edit/emp_id/emp_name  %>
+        <table class="table table-striped table-hover" datatable="true" db_table="employment_statuses" db_primary_column="emp_status_id" del_fun="del_emp" edit-page="/employees/edit"> <%# edit-page format will be /employees/edit/emp_id/emp_name  %>
             <thead>
                 <tr>
                     <th>Name</th>
@@ -48,3 +48,13 @@
         </table>
     </div>
 </div>
+<script>
+    function del_emp(ele){
+        var emp_id = $(ele).parents('tr').attr('data-id');
+        $.post( '/auth/form_submit/employees/del_emp', {emp_id}).done( _ => {
+            $('#root_refresher').click(); 
+        }).fail(_ => {
+            $('#root_refresher').click();
+        });
+    }
+</script>

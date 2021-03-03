@@ -3,6 +3,7 @@ const router = express.Router();
 var dateFormat = require('dateformat');
 const db = require('../../db_config');
 var fs = require("fs");
+const bcrypt =require('bcrypt');
 
 router.post('/add_new_cus_attribute', (req, res) => {
     const { attr_title } = req.body;
@@ -53,42 +54,78 @@ router.post('/change_profile',(req, res)=>{
     
 });
 
-router.post('/userEditDetails', (req, res) => {
+router.post('/userEditDetails', async (req, res) => {
     var {user_name, first_name, last_name, password} = req.body;
     var emp_id = req.session.emp_id;
-    db.query("select username from users where emp_id=? and password=?",[emp_id,password], (err,result)=>{
-        if(result.length >0){
-            db.query('UPDATE users SET username=? where emp_id=? ; UPDATE employees SET firstname=?, lastname=? where emp_id=?; ', [user_name,emp_id, first_name, last_name,emp_id], (error, result2) => {
-                if(error) {
-                    console.log('mysql error', error);
-                }else {
-                    res.json({success:true});
+    db.query("select password from users where emp_id=? ",[emp_id], (err,result)=>{
+        if(err) console.log({err})
+        else{
+            bcrypt.compare(password, result[0].password,(err,is_correct) =>{
+                if (is_correct){
+                    db.query('UPDATE users SET username=? where emp_id=? ; UPDATE employees SET firstname=?, lastname=? where emp_id=?; ', [user_name,emp_id, first_name, last_name,emp_id], (error, result2) => {
+                        if(error) {
+                            console.log('mysql error', error);
+                        }else {
+                            res.json({success:true});
+                        }
+                    })
+                }else{
+                    res.json({success:false,error:"INCORRECT PASSWORD"});
                 }
-            })
-        }else{
-            console.log(err)
-            res.json({success:false,error:"INCORRECT PASSWORD"});
+            });
+            
         }
-        
     })
 
 });
+
 
 router.post('/userChangePassword', (req, res) => {
     const emp_id = req.session.emp_id;
     var {curr_pass, new_pass, confirm_pass} = req.body;
     if(new_pass === confirm_pass){
-        db.query('CALL changePassword(?, ?, ?)', [emp_id, curr_pass, new_pass], (error, result) => {
-            if(error){
-                console.log('mysql error', error);
-            } 
-            else {
-                res.json({result});
+        db.query("select password from users where emp_id=? ",[emp_id], (err,result)=>{
+            if(err) console.log({err})
+            else{
+                bcrypt.compare(curr_pass, result[0].password,(err,is_correct) =>{
+                    console.log(is_correct)
+                    if (is_correct){
+                        bcrypt.hash(new_pass, 10, (err,hash_password) =>{
+                            if (err) console.log(err);
+                            else{
+                                db.query('UPDATE users SET password=? where emp_id=? ;', [hash_password,emp_id], (error, result2) => {
+                                    if(error) {
+                                        console.log('mysql error', error);
+                                        res.json({status: 0, result: "some error occured"})
+                                    }else {
+                                        res.json({status: 1, result: "Your password changed"})
+                                    }
+                                })
+                            }
+                        });
+                    }else{
+                        res.json({status: 0, result: "Your password do not match"})
+                    }
+                });
+                
             }
-        })
+        });
+
     }else{
         res.json({status: 0, result: "Your new password and confirmation password do not match"})
     }
+});
+
+router.post('/del_emp', (req, res) => {
+    const {emp_id} = req.body;
+    db.query('UPDATE employees SET status=0 WHERE emp_id=?', [emp_id], (error, result) => {
+        if(error){
+            console.log('mysql error', error);
+        } 
+        else {
+            res.json({result});
+        }
+    })
 });
 
 module.exports = router;

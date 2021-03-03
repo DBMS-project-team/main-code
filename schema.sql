@@ -44,6 +44,8 @@ create table employees (
     birthdate date,
     gender ENUM ( 'male', 'female', 'transgender', 'gender_neutral', 'non_binary', 'agender', 'pangender', 'genderqueer', 'two_spirit', 'third_gender', 'all') DEFAULT 'male',
     marital_status ENUM ('single', 'married', 'widowed', 'divorced', 'separated','registered_partnership') DEFAULT 'single',
+    address VARCHAR(100) NULL,
+    primary_phone_num INT(12) NULL,
     dept_id int(11),
     branch_id int(11),
     job_id int(11),
@@ -58,6 +60,8 @@ create table employees (
 	foreign key (pay_grade_level) references pay_grades(pay_grade_level),
     ADD UNIQUE `unique` (`staff_id`)
 );
+
+CREATE UNIQUE INDEX employee_index ON employees ( status, dept_id);
 
 CREATE TABLE supervisors (
     emp_id int(11) not null,
@@ -84,7 +88,7 @@ CREATE TABLE user_levels (
 
 create table users(
     emp_id int(11) NOT null,
-    username varchar(64) NOT NULL,
+    username varchar(64) NOT NULL UNIQUE,
     user_level int(11),
     status TINYINT DEFAULT 1,
     password varchar(50),
@@ -222,7 +226,7 @@ BEGIN
     
 
     SET @sql = CONCAT('CREATE OR REPLACE VIEW employees_details AS SELECT
-                        e.firstname, e.lastname, e.birthdate, e.marital_status, e.dept_id, e.job_id, e.emp_status_id, e.pay_grade_level pay_grade_level_id,
+                        e.firstname, e.lastname, e.birthdate, e.marital_status, e.address, e.primary_phone_num, e.dept_id, e.job_id, e.emp_status_id, e.pay_grade_level pay_grade_level_id,
                         additional.*,
                         d.name department, p.pay_grade_level_title pay_grade_level, j.job_title_name job_title,
                         u.username
@@ -245,51 +249,6 @@ BEGIN
 END$$
 DELIMITER ;
 call employeesProcedure ();
-
---///////////////////////////////////////////////////////////////////////////////////////
-
---Trigger for after insert in custom_fields table
-
-DROP TRIGGER IF EXISTS after_custom_field;
-
-DELIMITER $$
-
-CREATE TRIGGER after_custom_field
-AFTER INSERT
-ON custom_fields FOR EACH ROW
-BEGIN
-	DECLARE finished INTEGER DEFAULT 0;
-    DECLARE s_emp_id int(11) DEFAULT 0;
-    DECLARE custom_field_value_id int(11) DEFAULT 0;
-    
-    -- declare cursor for employee id
-	DEClARE curEmployee
-		CURSOR FOR 
-			SELECT emp_id FROM employees;
-
-	-- declare NOT FOUND handler
-	DECLARE CONTINUE HANDLER 
-        FOR NOT FOUND SET finished = 1;
-    
-	INSERT INTO custom_field_values (custom_field_id, custom_field_value)
-    VALUES (NEW.custom_field_id, 'Default');
-    SET custom_field_value_id = LAST_INSERT_ID();
-
-	OPEN curEmployee;
-
-	getId: LOOP
-		FETCH curEmployee INTO s_emp_id;
-		IF finished = 1 THEN 
-			LEAVE getId;
-		END IF;
-		-- binsert quesry
-		INSERT INTO employee_additional_details
-        VALUES (s_emp_id, custom_field_value_id);
-	END LOOP getId;
-	CLOSE curEmployee;
-END$$
-
-DELIMITER ;
 
 -- ///////////////////////////////////////////////////
 -- menupermission procedure
@@ -567,3 +526,53 @@ END $$
 DELIMITER ;
 
 CALL changePassword (17, 123456, 123);
+
+-- //////////////////////////////////////////////////////////////////////////////////////
+-- Triggers
+
+--///////////////////////////////////////////////////////////////////////////////////////
+
+--Trigger for after insert in custom_fields table
+
+DROP TRIGGER IF EXISTS after_custom_field;
+
+DELIMITER $$
+
+CREATE TRIGGER after_custom_field
+AFTER INSERT
+ON custom_fields FOR EACH ROW
+BEGIN
+	DECLARE finished INTEGER DEFAULT 0;
+    DECLARE s_emp_id int(11) DEFAULT 0;
+    DECLARE custom_field_value_id int(11) DEFAULT 0;
+    
+    -- declare cursor for employee id
+	DEClARE curEmployee
+		CURSOR FOR 
+			SELECT emp_id FROM employees;
+
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;
+    
+	INSERT INTO custom_field_values (custom_field_id, custom_field_value)
+    VALUES (NEW.custom_field_id, 'Default');
+    SET custom_field_value_id = LAST_INSERT_ID();
+
+	OPEN curEmployee;
+
+	getId: LOOP
+		FETCH curEmployee INTO s_emp_id;
+		IF finished = 1 THEN 
+			LEAVE getId;
+		END IF;
+		-- binsert quesry
+		INSERT INTO employee_additional_details
+        VALUES (s_emp_id, custom_field_value_id);
+	END LOOP getId;
+	CLOSE curEmployee;
+END$$
+
+DELIMITER ;
+
+-- 
