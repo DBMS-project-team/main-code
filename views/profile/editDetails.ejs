@@ -1,6 +1,16 @@
 <div class="content container-fluid p-0">
     <div class="card">
-
+        <% if(emp_id == 0){
+            my_username = 'Username';
+            my_first_name = 'Firstname';
+            my_last_name = 'Lastname';
+        }else{ 
+                my_detail.forEach(function(Det){ 
+                    my_username = user.username;
+                    my_first_name = user.firstname;
+                    my_last_name = user.lastname;
+                })
+        }%>
         <div class="card-header">
             <h3 class="card-title mb-0">EDIT DETAILS</h3>
         </div>
@@ -10,21 +20,21 @@
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label" for="inputUserName">User Name</label>
                     <div class="col-sm-10">
-                        <input type="text" name="user_name" class="form-control" id="inputUserName" value="<%= user.username %>" required>
+                        <input type="text" name="user_name" class="form-control" id="inputUserName" value="<%= my_username %>" required>
                     </div>
                 </div>  
 
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label" for="inputFirstName">First Name</label>
                     <div class="col-sm-10">
-                        <input type="text" name="first_name" class="form-control" id="inputFirstName" value="<%= user.firstname %>">
+                        <input type="text" name="first_name" class="form-control" id="inputFirstName" value="<%= my_first_name %>">
                     </div>
                 </div>  
 
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label" for="inputLastName">Last Name</label>
                     <div class="col-sm-10">
-                        <input type="text" name="last_name" class="form-control" id="inputLastName" value="<%= user.lastname %>" >
+                        <input type="text" name="last_name" class="form-control" id="inputLastName" value="<%= my_last_name %>" >
                     </div>
                 </div>  
                 
