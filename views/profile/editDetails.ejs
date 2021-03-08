@@ -5,9 +5,9 @@
             my_first_name = 'Firstname';
             my_last_name = 'Lastname';
         }else{ 
-                    my_username = user.username;
-                    my_first_name = user.firstname;
-                    my_last_name = user.lastname;
+                my_username = user.username;
+                my_first_name = user.firstname;
+                my_last_name = user.lastname;
         }%>
         <div class="card-header">
             <h3 class="card-title mb-0">EDIT DETAILS</h3>
@@ -51,7 +51,7 @@
                 </div>
                 <div>
                     <button type="submit" class="btn btn-primary" > Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="submit" class="btn btn-primary" <%= emp_id == 0?'disabled':'' %> >Save Changes</button>
                 </div>
             </form>
         </div>
